@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <CheckBox
+        android:id="@+id/btn_hours"
+        android:layout_width="120.0dip"
+        android:layout_height="40.0dip"
+        android:background="@drawable/hours_selector"
+        android:button="@null"
+        android:checked="false"
+        android:gravity="center"
+        android:textColor="@color/text_color" />
+</LinearLayout>

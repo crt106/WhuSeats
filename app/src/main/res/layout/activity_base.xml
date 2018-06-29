@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/all_bg">
+
+    <ImageView
+        android:id="@+id/line"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_line"
+        android:contentDescription="@string/app_name" />
+
+    <LinearLayout
+        android:id="@+id/body_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/rg_menu"
+        android:layout_below="@id/line"
+        android:orientation="vertical" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/rg_menu"
+        android:background="@drawable/top_line"
+        android:contentDescription="@string/app_name" />
+
+    <RadioGroup
+        android:id="@+id/rg_menu"
+        android:layout_width="fill_parent"
+        android:layout_height="50.0dip"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_bg"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="-10.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/radio_selector"
+            android:button="@color/transparent"
+            android:checked="false"
+            android:drawablePadding="-15.0dip"
+            android:drawableTop="@drawable/my_preordain_selector"
+            android:gravity="center"
+            android:text="@string/home"
+            android:textColor="@color/white"
+            android:textSize="12.0sp" />
+
+        <View
+            android:layout_width="1.0dip"
+            android:layout_height="fill_parent"
+            android:background="@color/dividing_line" />
+
+        <RadioButton
+            android:id="@+id/rb_2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="-10.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/radio_selector"
+            android:button="@color/transparent"
+            android:checked="false"
+            android:drawablePadding="-15.0dip"
+            android:drawableTop="@drawable/quick_preordain_selector"
+            android:gravity="center"
+            android:text="@string/预约座位"
+            android:textColor="@color/white"
+            android:textSize="12.0sp" />
+
+        <View
+            android:layout_width="1.0dip"
+            android:layout_height="fill_parent"
+            android:background="@color/dividing_line" />
+
+        <RadioButton
+            android:id="@+id/rb_3"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="-10.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/radio_selector"
+            android:button="@color/transparent"
+            android:checked="false"
+            android:drawablePadding="-15.0dip"
+            android:drawableTop="@drawable/other_preordain_selector"
+            android:gravity="center"
+            android:text="@string/监视座位"
+            android:textColor="@color/white"
+            android:textSize="12.0sp" />
+
+        <View
+            android:layout_width="1.0dip"
+            android:layout_height="fill_parent"
+            android:background="@color/dividing_line" />
+
+        <RadioButton
+            android:id="@+id/rb_4"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="-10.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/radio_selector"
+            android:button="@color/transparent"
+            android:checked="false"
+            android:drawablePadding="-15.0dip"
+            android:drawableTop="@drawable/more_selector"
+            android:gravity="center"
+            android:text="@string/more"
+            android:textColor="@color/white"
+            android:textSize="12.0sp" />
+    </RadioGroup>
+</RelativeLayout>

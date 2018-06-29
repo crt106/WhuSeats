@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00000000</color>
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="dividing_line">#66ffffff</color>
+    <color name="gray_font">#ff666666</color>
+    <color name="light_gray_font">#99666666</color>
+    <color name="green_font">#ff2e5713</color>
+    <color name="btn_text">#ff566a92</color>
+    <color name="light_btn_text">#66566a92</color>
+    <color name="text_color">#ff464646</color>
+    <color name="text_font">#ff2a2a2a</color>
+    <color name="red_font">#ffff0000</color>
+    <color name="light_red_font">#88ff0000</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+</resources>

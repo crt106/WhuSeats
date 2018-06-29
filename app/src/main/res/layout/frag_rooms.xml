@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="2dip">
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/sp_building"
+            android:layout_width="0.0px"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/spinner_bg"/>
+
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/sp_date"
+            android:layout_width="0.0px"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/spinner_bg"/>
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="3.5dip"
+            android:background="@drawable/search_btn_selector"
+            android:onClick="ButtonLogin_Click" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10.0dip"
+        android:background="@drawable/dashed" />
+
+    <GridView
+        android:id="@+id/gv_endtimes"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="15.0dip"
+        android:layout_marginTop="15.0dip"
+        android:gravity="center_vertical"
+        android:listSelector="@color/transparent"
+        android:numColumns="2"
+        android:scrollbars="none"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="20.0dip" />
+</LinearLayout>

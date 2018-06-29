@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@drawable/all_bg"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_checkin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/green_btn_selector"
+        android:enabled="false"
+        android:text="签到"
+        android:textColor="@color/white"
+        android:textSize="18.0sp" />
+
+    <Button
+        android:id="@+id/btn_leave_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10.0dip"
+        android:background="@drawable/green_btn_selector"
+        android:enabled="false"
+        android:text="暂离"
+        android:textColor="@color/white"
+        android:textSize="18.0sp" />
+
+    <Button
+        android:id="@+id/btn_extend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10.0dip"
+        android:background="@drawable/green_btn_selector"
+        android:clickable="false"
+        android:enabled="false"
+        android:text="续座?+1s不存在的"
+        android:textColor="@color/light_red_font"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10.0dip"
+        android:background="@drawable/green_btn_selector"
+        android:enabled="false"
+        android:text="结束使用"
+        android:textColor="@color/white"
+        android:textSize="18.0sp" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20.0dip"
+        android:layout_marginTop="20.0dip"
+         />
+
+    <Button
+        android:id="@+id/btn_Histroy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/green_btn_selector"
+        android:clickable="true"
+        android:text="我的预约"
+        android:textColor="@color/white"
+        android:textSize="18.0sp" />
+
+    <TextView
+        android:id="@+id/tv_Reshow"
+        android:layout_width="match_parent"
+        android:layout_height="69dp"
+        android:textAlignment="center" />
+</LinearLayout>

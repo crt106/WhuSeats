@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <style name="AppTheme" parent="@style/AppBaseTheme" />
+
+    <style name="CommonTitleBackground">
+        <item name="android:background">@color/transparent</item>
+    </style>
+
+    <style name="CommonWindowTitle">
+        <item name="android:shadowColor">#ff00ff00</item>
+        <item name="android:shadowRadius">0.0</item>
+    </style>
+
+    <style name="LoadingProgress">
+        <item name="android:maxWidth">32.0dip</item>
+        <item name="android:maxHeight">32.0dip</item>
+        <item name="android:indeterminateOnly">true</item>
+        <item name="android:indeterminateDrawable">@drawable/loading_rotate</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:minWidth">32.0dip</item>
+        <item name="android:minHeight">32.0dip</item>
+    </style>
+
+    <style name="AlertDialogProductMsg">
+        <item name="android:textSize">16.0sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="loading_progress">
+        <item name="android:maxWidth">23.0dip</item>
+        <item name="android:maxHeight">23.0dip</item>
+        <item name="android:indeterminateOnly">true</item>
+        <item name="android:indeterminateDrawable">@drawable/loading_rotate</item>
+        <item name="android:minWidth">23.0dip</item>
+        <item name="android:minHeight">23.0dip</item>
+    </style>
+
+    <style name="CommonActivityTheme" parent="@android:style/Theme">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleSize">48.0dip</item>
+        <item name="android:windowTitleStyle">@style/CommonWindowTitle</item>
+        <item name="android:windowTitleBackgroundStyle">@style/CommonTitleBackground</item>
+    </style>
+</resources>

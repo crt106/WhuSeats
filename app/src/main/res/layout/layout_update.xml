@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="365dp"
+    android:background="@drawable/dialog_bg"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:padding="15.0dip">
+
+    <TextView
+        android:id="@+id/tv_update_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/VersionUpdate"
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_nowVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="当前版本:"
+        android:textColor="@color/gray_font" />
+
+    <WebView
+        android:id="@+id/wb_update"
+        android:layout_width="match_parent"
+        android:layout_height="255dp"
+        android:layout_weight="1.0"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10.0dip"
+        android:layout_marginTop="20.0dip">
+
+        <Button
+            android:id="@+id/btn_update_ok"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10.0dip"
+            android:layout_weight="1.0"
+            android:background="@drawable/green_btn_selector"
+            android:text="@android:string/ok"
+            android:textColor="@color/white"
+            android:textSize="16.0sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_update_cancel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:background="@drawable/gray_btn"
+            android:text="@android:string/cancel"
+            android:textColor="@color/white"
+            android:textSize="16.0sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

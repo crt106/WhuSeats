@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -218,6 +219,8 @@ public class BookFragment extends Fragment
             tvClockinfo.setText("当前没有可用定时器");
             btnaddBook.setText("添加定时器");
             btnaddBook.setBackgroundResource(R.drawable.green_btn_selector);
+
+            if(istextrunning)
             EndClockTextrefresh();
 
             //设置添加预约按钮
@@ -249,10 +252,8 @@ public class BookFragment extends Fragment
 
             //设置取消预约按钮
             btnaddBook.setOnClickListener(v->{
-
                 mbinder.DeleteClock();
                 RefreshClockInfo();
-
             });
         }
     }
@@ -265,14 +266,14 @@ public class BookFragment extends Fragment
         @Override
         protected Void doInBackground(Void... voids)
         {
-            while (istextrunning)
+            while (istextrunning&!isCancelled())
             {
                 try
                 {
                     publishProgress(TimeHelp.GetBookLeftTime());
-                    Thread.sleep(1000);
+                    Thread.sleep(300);
                 }
-                catch (Exception e)
+                catch (InterruptedException e)
                 {
                     Log.e("BookFrag", e.toString());
                     return null;
@@ -290,8 +291,16 @@ public class BookFragment extends Fragment
             String hms = formatLongToTimeStr(values[0]);
             tvClockinfo.setText("当前已添加定时器\n"+ hms+"后执行");
         }
+
+        @Override
+        protected void onCancelled(Void aVoid)
+        {
+            super.onCancelled(aVoid);
+            return;
+        }
     }
 
+    //region 时间字符串获取
     /**
     *毫秒转换为时分秒
     */
@@ -320,6 +329,7 @@ public class BookFragment extends Fragment
             return "" + data;
         }
     }
+    //endregion
 
 
     //开启预约时间间隔文字刷新
@@ -337,6 +347,7 @@ public class BookFragment extends Fragment
         if(textrefreshTask!=null)
         {
            textrefreshTask.cancel(true);
+            Log.e("BookFragment", "成功暂停计时文字刷新");
            textrefreshTask=null;
         }
     }

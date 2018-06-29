@@ -59,23 +59,30 @@ public class JsonInfo_HistoryList extends JsonInfo_Base
             JSONArray reservationarray=((JSONObject)data).getJSONArray("reservations");
             for (int i=0;i<reservationarray.length();i++)
             {
-                JSONObject jobj=reservationarray.getJSONObject(i);
-                JsonInfo_Reservations temp=new JsonInfo_Reservations();
-                temp.id=jobj.getInt("id");
-                temp.onDate=jobj.getString("date");
-                temp.begin=jobj.getString("begin");
-                temp.end=jobj.getString("end");
-                temp.awayBegin=jobj.getString("awayBegin");
-                temp.awayEnd=jobj.getString("awayEnd");
-                temp.location=jobj.getString("loc");
-                temp.datastatus=jobj.getString("stat");
+                try
+                {
+                    JSONObject jobj=reservationarray.getJSONObject(i);
+                    JsonInfo_Reservations temp=new JsonInfo_Reservations();
+                    temp.id=jobj.getInt("id");
+                    temp.onDate=jobj.getString("date");
+                    temp.begin=jobj.getString("begin");
+                    temp.end=jobj.getString("end");
+                    temp.awayBegin=jobj.getString("awayBegin");
+                    temp.awayEnd=jobj.getString("awayEnd");
+                    temp.location=jobj.getString("loc");
+                    temp.datastatus=jobj.getString("stat");
 
-                reservationsList.add(temp);
+                    reservationsList.add(temp);
+                } catch (Exception e)
+                {
+                    continue;
+                }
             }
         }
         catch (Exception e)
         {
-            Log.e("JsonInfo_HistoryList",e.getMessage());
+            Log.e("JsonInfo_HistoryList",e.getMessage()+"nu");
+
         }
     }
 }

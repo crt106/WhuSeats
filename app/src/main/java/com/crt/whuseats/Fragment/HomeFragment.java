@@ -1,6 +1,7 @@
 package com.crt.whuseats.Fragment;
 
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.HistoryActivity;
 import com.crt.whuseats.Activity.MainActivity;
+import com.crt.whuseats.Activity.TimeChangeActivity;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
@@ -64,6 +66,7 @@ public class HomeFragment extends Fragment
         ButtonStop=(Button)getView().findViewById(R.id.btn_stop);
         ButtonHistroy=(Button)getView().findViewById(R.id.btn_Histroy);
         tv_Reshow=(TextView) getView().findViewById(R.id.tv_Reshow);
+
         //region 绑定有些东东的事件
         ButtonCheckIn.setOnClickListener((v)->{
 
@@ -73,11 +76,21 @@ public class HomeFragment extends Fragment
             ActivityConnect.mbinder.Leave(commonReturn);
         });
 
-        //TODO 实现切换座位时间功能...又是个坑
-        // ButtonExtend.setOnClickListener((v)->{});
+
+        ButtonExtend.setOnClickListener((v)->{
+            Intent timechange=new Intent(ActivityConnect, TimeChangeActivity.class);
+            startActivity(timechange);
+        });
 
         ButtonStop.setOnClickListener((v)->{
-            ActivityConnect.mbinder.Stop(commonReturn);
+            //弹出确认对话框
+            AlertDialog conformDialog=new AlertDialog.Builder(ActivityConnect)
+                    .setTitle("确认")
+                    .setMessage("是否结束使用")
+                    .setPositiveButton("是滴是滴", (dialog,i)->{ActivityConnect.mbinder.Stop(commonReturn);})
+                    .setNegativeButton("手滑了", null)
+                    .create();
+            conformDialog.show();
         });
 
         //跳转到新的Activity进行查询历史的操作咯~

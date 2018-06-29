@@ -44,6 +44,7 @@
         <!-- 日志发送策略 为SET_TIME_INTERVAL时，需设定时间间隔(取消下行注释)。取值为1-24的整数，默认为1 -->
         <!-- <meta-data android:name="BaiduMobAd_TIME_INTERVAL" android:value="2" /> -->
 
+
         <!-- 日志仅在wifi网络下发送，默认为false -->
         <meta-data
             android:name="BaiduMobAd_ONLY_WIFI"
@@ -60,7 +61,7 @@
         <meta-data
             android:name="BaiduMobAd_WIFI_LOCATION"
             android:value="false" />
-        <!-- Android N Provider-->
+        <!-- Android N Provider -->
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.crt.whuseats"
@@ -71,8 +72,9 @@
                 android:resource="@xml/file_path" />
         </provider>
 
-        <activity android:name=".Activity.MainActivity" />
-
+        <activity
+            android:name=".Activity.MainActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".Activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -112,7 +114,7 @@
             android:process=":remote">
             <intent-filter>
                 <action android:name="com.crt.whuseats.ReadytoBook" />
-                <!--提高Service的存活率的四个action-->
+                <!-- 提高Service的存活率的四个action -->
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
@@ -122,12 +124,15 @@
 
         <activity android:name=".Activity.AutoCreatSettingActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="crt"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="crt" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activity.TimeChangeActivity"></activity>
     </application>
 
 </manifest>

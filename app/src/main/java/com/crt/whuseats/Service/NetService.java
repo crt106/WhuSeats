@@ -1773,7 +1773,7 @@ public class NetService extends Service
     }
 
     /**
-     * 获取更新公告
+     * 获取图书馆公告
      */
     public void GetAnnounce(onTaskResultReturn r)
     {

@@ -98,6 +98,14 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
                 holder.ButtonCancel.setText("忘去了吧");
                 holder.ButtonCancel.setEnabled(false);
                 break;
+            case("INCOMPLETE"):
+                holder.ButtonCancel.setText("中断");
+                holder.ButtonCancel.setEnabled(false);
+                break;
+            default:
+                holder.ButtonCancel.setText("其他状况");
+                holder.ButtonCancel.setEnabled(false);
+                break;
 
         }
 

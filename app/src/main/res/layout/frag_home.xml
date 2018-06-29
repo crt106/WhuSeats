@@ -36,9 +36,9 @@
         android:background="@drawable/green_btn_selector"
         android:clickable="false"
         android:enabled="false"
-        android:text="续座?+1s不存在的"
-        android:textColor="@color/light_red_font"
-        android:textSize="15sp" />
+        android:text="时间管理"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/btn_stop"

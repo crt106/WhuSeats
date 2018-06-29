@@ -1,5 +1,7 @@
 package com.crt.whuseats.Activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -133,8 +135,13 @@ public class HistoryActivity extends BaseActivity {
 
     //取消预约按钮按下之后
     ReservationAdapter.onItemClick onCancelButtonClick=(Reid -> {
-
-        mbinder.Cancel(Integer.toString(Reid), CancelReturn);
+        AlertDialog conformDialog=new AlertDialog.Builder(HistoryActivity.this)
+                .setTitle("确认")
+                .setMessage("是否取消该预约?")
+                .setPositiveButton("是滴是滴",(DialogInterface dialog, int which)->{mbinder.Cancel(Integer.toString(Reid), CancelReturn);})
+                .setNegativeButton("手滑了",null )
+                .create();
+        conformDialog.show();
     });
     //查看详情按下之后
     ReservationAdapter.onItemClick onInfoViewButtonClick=(Reid ->{

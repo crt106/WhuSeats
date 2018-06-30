@@ -87,5 +87,8 @@
     <string name="BookChoosed">设置的座位:</string>
     <string name="EditBookInfo">修改绑定座位</string>
     <string name="clockintro"><![CDATA[使用说明>>]]></string>
+    <string name="StartTime">开始时间</string>
+    <string name="EndTime">结束时间</string>
+    <string name="SwitchTime">切换时间</string>
 
 </resources>

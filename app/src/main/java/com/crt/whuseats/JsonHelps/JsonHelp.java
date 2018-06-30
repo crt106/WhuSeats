@@ -7,8 +7,6 @@
    import org.json.JSONException;
    import org.json.JSONObject;
 
-   import java.util.Collection;
-   import java.util.Collections;
    import java.util.List;
 
    public class JsonHelp
@@ -136,9 +134,9 @@
        /**
         * 获取座位的开始时间
         */
-       public static JsonInfo_SeatTime_Strat GetSeatStartTime(String JsonStr)
+       public static JsonInfo_SeatTime_Start GetSeatStartTime(String JsonStr)
        {
-           return new JsonInfo_SeatTime_Strat(JsonStr);
+           return new JsonInfo_SeatTime_Start(JsonStr);
        }
 
        /**

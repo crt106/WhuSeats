@@ -17,6 +17,7 @@ public class ReservationChangeReciver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
         String intentinfo=intent.getStringExtra("Status");
+
         //如果当前没有预约
         if(intentinfo.equals("None"))
         {

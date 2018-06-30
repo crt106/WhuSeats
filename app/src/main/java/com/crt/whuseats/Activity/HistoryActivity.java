@@ -30,6 +30,7 @@ public class HistoryActivity extends BaseActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+
         historyView=(RecyclerView)findViewById(R.id.Rv_history);
     }
 
@@ -52,6 +53,7 @@ public class HistoryActivity extends BaseActivity {
                 JsonInfo_HistoryList his=JsonHelp.GetHistoryList(datastr);
                 //初始化Adapter
                 Re_adapter=new ReservationAdapter(his.reservationsList);
+                //设置两类按键事件
                 Re_adapter.setOnButtonAreaClick(onCancelButtonClick);
                 Re_adapter.setonInfoAreaClick(onInfoViewButtonClick);
                 //设置布局管理器 这好像是RecyclerView必须的

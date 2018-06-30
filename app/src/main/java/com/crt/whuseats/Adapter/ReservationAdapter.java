@@ -20,6 +20,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
 
     List<JsonInfo_Reservations> HistroyList;
 
+
     //构造函数
     public ReservationAdapter(List<JsonInfo_Reservations> list)
     {

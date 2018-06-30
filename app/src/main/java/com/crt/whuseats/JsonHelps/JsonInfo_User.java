@@ -31,7 +31,7 @@ public class JsonInfo_User extends JsonInfo_Base
             name=dataObj.getString("name");
             username=dataObj.getString("username");
             username2=dataObj.getString("username2");
-            userstatus=dataObj.getString("userstatus");
+            userstatus=dataObj.getString("status");
             lastLogin=dataObj.getString("lastLogin");
             checkedIn=dataObj.getBoolean("checkedIn");
             lastIn=dataObj.getString("lastIn");

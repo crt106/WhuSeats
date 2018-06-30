@@ -25,11 +25,11 @@ import java.util.List;
   "code": "0"
  }
  */
-public class JsonInfo_SeatTime_Strat extends JsonInfo_Base
+public class JsonInfo_SeatTime_Start extends JsonInfo_Base
 {
     //注意为什么这里的时间ID为String 因为这个ID有可能为:"now"
     public List<String> StartTimeList=new LinkedList<>();
-    public JsonInfo_SeatTime_Strat(String JsonStr)
+    public JsonInfo_SeatTime_Start(String JsonStr)
     {
         super(JsonStr);
         try
@@ -55,4 +55,5 @@ public class JsonInfo_SeatTime_Strat extends JsonInfo_Base
             return;
         }
     }
+
 }

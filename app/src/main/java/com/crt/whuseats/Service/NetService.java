@@ -6,33 +6,27 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.LoginActivity;
-import com.crt.whuseats.Broadcast.BookReceiver;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.JsonHelps.JsonInfo_BookReturn;
 import com.crt.whuseats.JsonHelps.JsonInfo_Login;
 import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
 import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
 import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_End;
-import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_Strat;
+import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_Start;
 import com.crt.whuseats.JsonHelps.JsonInfo_WebFiltrate;
 import com.crt.whuseats.JsonHelps.seat;
 import com.crt.whuseats.R;
@@ -41,7 +35,6 @@ import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.TimeHelp;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -50,12 +43,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,9 +57,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static com.crt.whuseats.Activity.BaseActivity.AppSetting;
-import static com.crt.whuseats.Activity.BaseActivity.timeHelp;
 
 //实现与图书馆服务器的交互
 public class NetService extends Service
@@ -303,10 +290,21 @@ public class NetService extends Service
             NetService.this.StartListenRoomOnce(roomInfo,startTime,endTime,Date,r,p);
         }
 
+        //获取座位开始时间
+        public void GetSeatStartTime(int SeatID,String Date,onTaskResultReturn r)
+        {
+            NetService.this.GetSeatStartTime(SeatID ,Date,r);
+        }
         //开始监听一次房间(移动端筛选)
         public void StartListenRoomOnce(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
         {
             NetService.this.StartListenRoomOnce(FiltrateInfo,startTime,endTime,Date,r,p);
+        }
+
+        //发起同步预约请求
+        public void FreeBookSync(int SeatID,String startTime,String endTime,String Date)
+        {
+            NetService.this.FreeBookSync(SeatID,startTime,endTime,Date);
         }
 
         //检查登陆权限
@@ -958,7 +956,7 @@ public class NetService extends Service
      * 检查某个座位的开始时间(异步)
      * http://seat.lib.whu.edu.cn/rest/v2/startTimesForSeat/9520/2018-05-15?token=ECKITYFWD405155501
      */
-    @Deprecated
+
     public void GetSeatStartTime(int SeatID,String Date,onTaskResultReturn r)
     {
         String requestUrl=LIB_URL+URL_GETSEATSTARTTIME+"/"+SeatID+"/"+Date+"?"+"token="+LIB_TOKEN;
@@ -970,14 +968,13 @@ public class NetService extends Service
                 .build();
         CommonTask startTimeTask=new CommonTask(r,"GetSeatStartTimeSyncTask",GetStartTimeRequest);
         startTimeTask.execute();
-
     }
 
     /**
      *检查某个座位的开始时间(同步 请在子线程执行)
      */
-    @Deprecated
-    public JsonInfo_SeatTime_Strat GetSeatStartTimeSync(int SeatID, String Date)
+
+    public JsonInfo_SeatTime_Start GetSeatStartTimeSync(int SeatID, String Date)
     {
         String requestUrl=LIB_URL+URL_GETSEATSTARTTIME+"/"+SeatID+"/"+Date+"?"+"token="+LIB_TOKEN;
         Request GetStartTimeRequest=new Request.Builder()
@@ -990,7 +987,7 @@ public class NetService extends Service
         {
             Response re=httpClient.newCall(GetStartTimeRequest).execute();
             String reStr=re.body().string();
-            return new JsonInfo_SeatTime_Strat(reStr);
+            return new JsonInfo_SeatTime_Start(reStr);
 
         }
         catch (Exception e)
@@ -1005,7 +1002,7 @@ public class NetService extends Service
      * 检查某个座位的结束时间(异步)
      * http://seat.lib.whu.edu.cn/rest/v2/endTimesForSeat/9185/2018-05-15/1320?token=ECKITYFWD405155501
      */
-    @Deprecated
+
     public void GetSeatEndTime(int SeatID,String startTime,String Date,onTaskResultReturn r)
     {
         String requestUrl=LIB_URL+URL_GETSEATENDTIME+"/"+SeatID+"/"+Date+"/"+startTime+"?"+"token="+LIB_TOKEN;
@@ -1022,7 +1019,6 @@ public class NetService extends Service
     /**
      * 检查某个座位结束时间(同步 请在子线程执行)
      */
-    @Deprecated
     public JsonInfo_SeatTime_End GetSeatEndTimeSync(int SeatID, String startTime, String Date)
     {
         String requestUrl=LIB_URL+URL_GETSEATENDTIME+"/"+SeatID+"/"+Date+"/"+startTime+"?"+"token="+LIB_TOKEN;
@@ -1091,7 +1087,7 @@ public class NetService extends Service
             public void OnTaskSucceed(Object... data)
             {
                 String jsonstr=(String)data[0];
-                JsonInfo_SeatTime_Strat temp=JsonHelp.GetSeatStartTime(jsonstr);
+                JsonInfo_SeatTime_Start temp=JsonHelp.GetSeatStartTime(jsonstr);
                 int min=Integer.parseInt(temp.minTimeID);
                 int max=Integer.parseInt(temp.maxTimeID);
                 //如果请求的开始时间合乎要求 则请求结束时间
@@ -1158,7 +1154,7 @@ public class NetService extends Service
                             Thread.sleep(DELAY_BEFORESTARTTIME);
                             Log.e("NetService——Listen", "结束等待");
                             //endregion
-                            JsonInfo_SeatTime_Strat startinfo=GetSeatStartTimeSync(nowseatID, Date);
+                            JsonInfo_SeatTime_Start startinfo=GetSeatStartTimeSync(nowseatID, Date);
 
                             //如果请求的开始时间合乎要求 则请求结束时间
                             if(JsonHelp.IsTimeAvaliable(startTime, startinfo.StartTimeList))

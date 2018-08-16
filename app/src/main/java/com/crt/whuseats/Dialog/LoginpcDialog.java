@@ -53,7 +53,7 @@ public class LoginpcDialog extends AlertDialog
 
         iv_captcha=(ImageView)findViewById(R.id.iv_captcha);
 //        iv_captcha.setOnClickListener((view)->{
-//            BindingActivity.mbinder.Getcaptcha(new onTaskResultReturn()
+//            BindingActivity.mbinder_b.Getcaptcha(new onTaskResultReturn()
 //        {
 //            @Override
 //            public void OnTaskSucceed(Object... data)

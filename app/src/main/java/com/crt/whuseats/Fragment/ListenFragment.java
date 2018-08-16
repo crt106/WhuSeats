@@ -439,7 +439,7 @@ public class ListenFragment extends Fragment
 //                progressDialog.setTitle("开始监听啦~(遍历模式)");
 //                progressDialog.setMessage("正在监听符合要求的座位(轮次"+LoopCount+")");
 //                //先检查房间布局 然后根据布局文件进行监听
-//                ActivityConnect.mbinder.CheckRoomStats(new onTaskResultReturn()
+//                ActivityConnect.mbinder_b.CheckRoomStats(new onTaskResultReturn()
 //                {
 //                    @Override
 //                    public void OnTaskSucceed(Object... data)
@@ -448,7 +448,7 @@ public class ListenFragment extends Fragment
 //                        {
 //                            JsonInfo_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
 //                            //注意这里又要嵌套一层回调 没有办法 谁叫这是异步操作呢 这里是使用mbinder的开始监听房间
-//                            ActivityConnect.mbinder.StartListenRoomOnce(roomLayout, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
+//                            ActivityConnect.mbinder_b.StartListenRoomOnce(roomLayout, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
 //                        } catch (Exception e)
 //                        {
 //                            Log.e("ListenFragment", "接收房间布局错误" + e.getMessage());

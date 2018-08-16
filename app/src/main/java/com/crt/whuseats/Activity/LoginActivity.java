@@ -224,13 +224,13 @@ public class LoginActivity extends BaseActivity
 //                    {
 //                        Toast.makeText(getApplicationContext(), "可能验证码输错了?", Toast.LENGTH_SHORT).show();
 //                        //**********注意！！！这里要清空Cookies以重新登录！！！******
-//                        mbinder.CleanCookies();
+//                        mbinder_b.CleanCookies();
 //                    }
 //                };
 //                //设置登录PC对话框的确定按钮点击事件
 //                loginpc.setButtonLoginPc_Click((View v1)->
 //                {
-//                    mbinder.LoginPc(USERNAME, PASSWORD, loginpc.getInputcaptcha(), LoginPCReturn);
+//                    mbinder_b.LoginPc(USERNAME, PASSWORD, loginpc.getInputcaptcha(), LoginPCReturn);
 //                    loginpc.dismiss();
 //                });
 //                //解决对话框无法弹出软键盘
@@ -291,7 +291,7 @@ public class LoginActivity extends BaseActivity
 
         try
         {
-            Thread t=new Thread(()->{IsneedUpdate=mbinder.CheckUpdate_IsShowDialog();});
+            Thread t=new Thread(()->{IsneedUpdate=mbinder.CheckUpdate_IsShowDialog(false);});
             t.start();
             t.join();
         }
@@ -360,7 +360,7 @@ public class LoginActivity extends BaseActivity
         downloadDialog.setMessage("不要催了不要催了..服务器小水管");
 
         //开始执行下载
-        mbinder.DownLoadUpdate(downloadTaskReturn,downloadProgress);
+        mbinder.DownLoadUpdateByHttp(downloadTaskReturn,downloadProgress);
     };
 
     //endregion

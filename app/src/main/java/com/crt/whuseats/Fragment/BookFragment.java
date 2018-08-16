@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,12 +25,14 @@ import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.SeatsActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
+import com.crt.whuseats.Interface.onTaskResultReturn;
+import com.crt.whuseats.JsonHelps.JsonHelp;
+import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.BookService;
-import com.crt.whuseats.Task.TaskManager;
 import com.crt.whuseats.TimeHelp;
 
-import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,6 +46,7 @@ public class BookFragment extends Fragment
     private TextView tvBookinfoHouse;
     private TextView tvBookinfoRoom;
     private TextView tvBookinfoTime;
+    private TextView tvIsseatcomp;
     private Button btnEditbook;
     private Button btnaddBook;
     private Button btnautostart;
@@ -62,24 +64,13 @@ public class BookFragment extends Fragment
     public boolean istextrunning;
     //region 与BookService的绑定
 
-    //endregion
-
-    public boolean IsClockon; //判断用户是不是已经提交过闹钟请求
-    Textrefresh textrefreshTask;
-
-
-    public BookService.BookBinder mbinder;
-    public BookFragment()
-    {
-        // Required empty public constructor
-    }
-
+    public BookService.BookBinder mbinder_b;
     public ServiceConnection serviceConnection=new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
         {
-            mbinder=(BookService.BookBinder)service;
+            mbinder_b =(BookService.BookBinder)service;
             //尝试刷新定时器信息
             try
             {
@@ -98,6 +89,20 @@ public class BookFragment extends Fragment
         }
     };
 
+    //endregion
+
+    public boolean IsClockon; //判断用户是不是已经提交过闹钟请求
+    Textrefresh textrefreshTask;
+
+
+
+    public BookFragment()
+    {
+        // Required empty public constructor
+    }
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -113,10 +118,12 @@ public class BookFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
         //绑定控件
         tvBookinfoHouse = (TextView) getView().findViewById(R.id.tv_bookinfo_house);
         tvBookinfoRoom = (TextView) getView().findViewById(R.id.tv_bookinfo_room);
         tvBookinfoTime = (TextView) getView().findViewById(R.id.tv_bookinfo_time);
+        tvIsseatcomp=(TextView)getView().findViewById(R.id.tv_isseatcomp);
         btnEditbook = (Button) getView().findViewById(R.id.btn_editbook);
         btnaddBook =(Button)getView().findViewById(R.id.btn_AddBook);
         btnautostart=(Button)getView().findViewById(R.id.btn_autostart);
@@ -124,6 +131,8 @@ public class BookFragment extends Fragment
         tvClockIntroduce = (TextView) getView().findViewById(R.id.tv_clock_introduce);
         swUsecloud = (Switch) getView().findViewById(R.id.sw_usecloud);
         //绑定事件们
+
+        tvIsseatcomp.setVisibility(View.INVISIBLE);
 
         //跳转说明书
         tvClockIntroduce.setOnClickListener(v->{
@@ -167,6 +176,7 @@ public class BookFragment extends Fragment
         super.onResume();
         InitBookInfo();
         RefreshClockInfo();
+        CheckIfCompetition();
     }
 
     @Override
@@ -190,9 +200,10 @@ public class BookFragment extends Fragment
         tvBookinfoHouse.setText(BaseActivity.AppSetting.BookSetting.getString("ChooseHouseName", ""));
         //拼接座位信息字符串
         StringBuilder sb1=new StringBuilder();
+        sb1.append("("+BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID", 0)+")");
         sb1.append(BaseActivity.AppSetting.BookSetting.getString("ChooseRoomName", ""));
         sb1.append(BaseActivity.AppSetting.BookSetting.getString("ChooseSeatName", ""));
-        sb1.append("("+BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID", 0)+")");
+
 
         tvBookinfoRoom.setText(sb1.toString());
 
@@ -242,8 +253,8 @@ public class BookFragment extends Fragment
         else
         {
             //重新刷新这个定时器
-            if(mbinder!=null)
-            mbinder.ReAddClock();
+            if(mbinder_b !=null)
+            mbinder_b.ReAddClock();
 
             btnaddBook.setText("取消定时器");
             btnaddBook.setBackgroundResource(R.drawable.red_btn_selector);
@@ -252,7 +263,7 @@ public class BookFragment extends Fragment
 
             //设置取消预约按钮
             btnaddBook.setOnClickListener(v->{
-                mbinder.DeleteClock();
+                mbinder_b.DeleteClock();
                 RefreshClockInfo();
             });
         }
@@ -261,7 +272,6 @@ public class BookFragment extends Fragment
     //预约倒计时文字刷新任务
     class Textrefresh extends AsyncTask<Void,Long,Void>
     {
-
 
         @Override
         protected Void doInBackground(Void... voids)
@@ -353,4 +363,57 @@ public class BookFragment extends Fragment
     }
 
 
+    /**
+     获取第二天座位预约信息并且判断当前座位是不是存在竞争
+     并且根据结果来判断是否显示提示文字
+     */
+    public void CheckIfCompetition()
+    {
+        int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID", 0);
+        if(seatID==0)
+        {
+            tvIsseatcomp.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        //否则 开始远端获取数据
+        ActivityConnect.mbinder.GetTomorrowInfo(new onTaskResultReturn()
+        {
+            @Override
+            public void OnTaskSucceed(Object... data)
+            {
+                try
+                {
+                    String str=(String)data[0];
+                    JsonInfo_Tomorrow JsonClass= JsonHelp.GetTomorrowInfo(str);
+                    //构建信息链表
+                    SeatsActivity.tomoinfolist.clear();
+                    for ( Map.Entry<Integer, Integer> ob : JsonClass.tomoInfo.entrySet() )
+                    {
+                        //如果大于等于2才出现竞争状况
+                        if(ob.getValue()>=2)
+                        SeatsActivity.tomoinfolist.add(ob.getKey());
+                    }
+                    //构建完成
+                    if(SeatsActivity.tomoinfolist.contains(seatID))
+                    {
+                        tvIsseatcomp.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        tvIsseatcomp.setVisibility(View.INVISIBLE);
+                    }
+                } catch (Exception e)
+                {
+                    Log.e("SeatsActivity","获取明日预约状况信息错误"+e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void OnTaskFailed(Object... data)
+            {
+
+            }
+        });
+    }
 }

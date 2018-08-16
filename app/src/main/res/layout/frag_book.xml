@@ -14,7 +14,6 @@
             android:layout_height="match_parent">
 
 
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -112,8 +111,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
                         android:layout_marginBottom="15dp"
+                        android:layout_marginTop="6dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -122,8 +121,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
-                            android:text="TextView"
                             android:maxLines="2"
+                            android:text="TextView"
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="18sp" />
@@ -147,8 +146,7 @@
                             android:layout_width="64dp"
                             android:layout_height="34dp"
                             android:text="设置自启动"
-                            android:textSize="8dp"
-                            />
+                            android:textSize="8dp" />
 
                         <TextView
                             android:id="@+id/tv_clock_introduce"
@@ -180,8 +178,19 @@
                     android:text="@string/预约座位"
                     android:textColor="@color/white"
                     android:textSize="18.0sp" />
+
             </LinearLayout>
 
+
+            <TextView
+                android:id="@+id/tv_isseatcomp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="200.0dip"
+                android:layout_marginTop="35.0dip"
+                android:text="当前座位可能存在竞争"
+                android:textColor="@android:color/holo_blue_dark"
+                android:textSize="14sp" />
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

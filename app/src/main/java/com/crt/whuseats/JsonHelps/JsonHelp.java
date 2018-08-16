@@ -201,6 +201,16 @@
            }
        }
 
+       /**
+        * 从自己的服务器 获取第二天信息
+        * @param Jsonstr
+        * @return
+        */
+       public static JsonInfo_Tomorrow GetTomorrowInfo(String Jsonstr)
+       {
+           return new JsonInfo_Tomorrow(Jsonstr);
+       }
+
 
 
    }

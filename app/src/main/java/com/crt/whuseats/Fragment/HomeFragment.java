@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment
     public TextView tv_Reshow;
     //与主活动的连接
     public MainActivity ActivityConnect;
+
     public HomeFragment()
     {
 
@@ -237,4 +238,6 @@ public class HomeFragment extends Fragment
             Log.e("HomeFragment",e.getMessage() );
         }
     }
+
+
 }

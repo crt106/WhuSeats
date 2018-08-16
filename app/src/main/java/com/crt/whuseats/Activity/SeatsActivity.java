@@ -21,6 +21,7 @@ import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
 import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
 import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
+import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
 import com.crt.whuseats.JsonHelps.seat;
 import com.crt.whuseats.R;
 import com.crt.whuseats.TimeHelp;
@@ -29,6 +30,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class SeatsActivity extends BaseActivity
 {
@@ -39,6 +42,7 @@ public class SeatsActivity extends BaseActivity
     private ListView rvRoom;
     private GridView gvSeatPage;
     //endregion
+
     BuildingAdapter buildingAdapter;
     RoomAdapter roomAdapter;
     SeatsAdapter seatsAdapter;
@@ -50,6 +54,7 @@ public class SeatsActivity extends BaseActivity
     public static int ChooseRoomID;
     public static String ChooseSeatName;
     public static int ChooseSeatID;
+    public static List<Integer> tomoinfolist=new LinkedList<>();               //第二天预约信息列表
 
 
     @Override
@@ -64,6 +69,7 @@ public class SeatsActivity extends BaseActivity
         gvSeatPage = (GridView) findViewById(R.id.gv_seat_page);
 
 
+        tomoinfolist=new LinkedList<>();
         //设置相应点击事件
         rvHouse.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->{
             //刷新当前选择
@@ -86,8 +92,17 @@ public class SeatsActivity extends BaseActivity
             ChooseSeatID=((seat)gvSeatPage.getAdapter().getItem(position)).seatid;
             ChooseSeatName=((seat)gvSeatPage.getAdapter().getItem(position)).name;
 
+            //构建指示文字
+            String infotext=ChooseRoomName+ChooseSeatName;
+
+            //如果被选择座位在明日信息列表中
+            if(tomoinfolist.contains(ChooseSeatID))
+            {
+                infotext+="\n(该座位有可能存在竞争情况)";
+            }
+
             //呼出选择时间对话框
-            ChooseTimeDialog tempDialog=new ChooseTimeDialog(SeatsActivity.this,ChooseRoomName+ChooseSeatName);
+            ChooseTimeDialog tempDialog=new ChooseTimeDialog(SeatsActivity.this,infotext);
             tempDialog.show();
             tempDialog.RunInBookMode(true);
             tempDialog.setButtonCancelOnClickListener(v -> {tempDialog.dismiss();});
@@ -113,6 +128,7 @@ public class SeatsActivity extends BaseActivity
         ReadSetting();
         GetFilters();
         GetRoomGrid();
+        GetTomorrowInfo();
     }
 
     //读取用户相关设置
@@ -125,6 +141,7 @@ public class SeatsActivity extends BaseActivity
         ChooseSeatName=BaseActivity.AppSetting.BookSetting.getString("ChooseSeatName", "");
         ChooseSeatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID", -1);
     }
+
     //通过活动发起请求总建筑布局请求
     public void GetFilters()
     {
@@ -194,6 +211,9 @@ public class SeatsActivity extends BaseActivity
 
     }
 
+    /**
+     * 获取座位布局
+     */
     public void GetSeatsLayout()
     {
         mbinder.CheckRoomStats(new onTaskResultReturn()
@@ -223,7 +243,46 @@ public class SeatsActivity extends BaseActivity
         }, ChooseRoomID, TimeHelp.GetTodayStr());
     }
 
+    /**
+      获取第二天座位预约信息，构建一个有预约座位的链表
+      如果在之前的BookFragment中没有获取到 则重新获取
+     */
+    public void GetTomorrowInfo()
+    {
+        //如果已经有信息了则跳过
+        if(tomoinfolist.size()!=0)
+            return;
 
+        mbinder.GetTomorrowInfo(new onTaskResultReturn()
+        {
+            @Override
+            public void OnTaskSucceed(Object... data)
+            {
+                try
+                {
+                    String str=(String)data[0];
+                    JsonInfo_Tomorrow JsonClass=JsonHelp.GetTomorrowInfo(str);
+                    //构建信息链表
+                    tomoinfolist.clear();
+                    for ( Map.Entry<Integer, Integer> ob : JsonClass.tomoInfo.entrySet() )
+                    {
+                        if(ob.getValue()>=2)
+                        tomoinfolist.add(ob.getKey());
+                    }
+                    //构建完成
+                } catch (Exception e)
+                {
+                    Log.e("SeatsActivity","获取明日预约状况信息错误"+e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            public void OnTaskFailed(Object... data)
+            {
+
+            }
+        });
+    }
 
 
 }

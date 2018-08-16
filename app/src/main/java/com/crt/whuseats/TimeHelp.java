@@ -117,7 +117,9 @@ public class TimeHelp
 
     }
 
-    //获取今天的日期字符串
+    /**
+     *获取今天的日期字符串 例如2018-08-25
+     */
     public static String GetTodayStr()
     {
         Calendar ca=Calendar.getInstance();
@@ -137,7 +139,10 @@ public class TimeHelp
         return Today;
     }
 
-    //获取明天的日期字符串
+    /**
+     * 获取明天的日期字符串 例如2018-08-25
+     * @return
+     */
     public static String GetTomorrowStr()
     {
         Calendar ca=Calendar.getInstance();

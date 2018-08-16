@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
@@ -71,6 +73,7 @@ public class NetService extends Service
 
     //OkHttp客户端
     OkHttpClient httpClient=new OkHttpClient.Builder()
+            .retryOnConnectionFailure(true)
             .cookieJar(new CookieJar()
             //设置cookieJar
             {
@@ -164,8 +167,12 @@ public class NetService extends Service
     static final String LIB_URLWITHPORT="https://seat.lib.whu.edu.cn:8443";
     static final String LIB_HOST="seat.lib.whu.edu.cn";
     static final String LIB_FREEBOOK="http://seat.lib.whu.edu.cn/rest/v2/freeBook";
+    static final String CRT_HOST="http://120.79.7.230";
+    static final String CRT_OSS="https://bucket-crt106.oss-cn-shenzhen.aliyuncs.com";
     static final String URL_LOGIN="/rest/auth";
+    @Deprecated
     static final String URL_LOGIN_PC="/login";
+
     static final String URL_CAPTCHA="/simpleCaptcha/captcha";
     static final String URL_USER="/rest/v2/user";
     static final String URL_CHECKNOWRE="/rest/v2/user/reservations";
@@ -184,6 +191,10 @@ public class NetService extends Service
     static final String URL_AJAXSEARCH="/freeBook/ajaxSearch";
     static final String URL_MOBILESEARCH="/rest/v2/searchSeats";
     static final String URL_ANNOUNCE="/rest/v2/announce";
+    static final String URL_UPDATE="/whuseatsapi/download.html";
+    static final String URL_TOMORROWINFO_GET="/whuseatsapi/api/getinfo";
+    static final String URL_TOMORROWINFO_ADD="/whuseatsapi/api/add";
+    static final String URL_TOMORROWINF_DELETE="/whuseatsapi/api/delete";
 
     //endregion
 
@@ -314,16 +325,29 @@ public class NetService extends Service
         }
 
         //检查更新1 是否弹出对话框
-        public boolean CheckUpdate_IsShowDialog()
+        public boolean CheckUpdate_IsShowDialog(boolean isneedwinform)
         {
-           return NetService.this.CheckUpdate_IsShowDialog();
+           return NetService.this.CheckUpdate_IsShowDialog(isneedwinform);
         }
 
+        //下载更新
         public void DownLoadUpdate(onTaskResultReturn r,onProgressReturn p)
         {
             NetService.this.DownLoadUpdate(r,p);
         }
 
+        //利用okhttp3下载更新
+        public void DownLoadUpdateByHttp(onTaskResultReturn r,onProgressReturn p)
+        {
+            NetService.this.DownLoadUpdateByHttp(r,p );
+        }
+
+
+        //获取第二天座位信息
+        public void GetTomorrowInfo(onTaskResultReturn r)
+        {
+            NetService.this.GetTomorrowInfo(r);
+        }
 
         //清除NetService中存在的Cookies
         public void CleanCookies()
@@ -1539,6 +1563,20 @@ public class NetService extends Service
     }
 
     /**
+     * 获取明天的预约情况(全部座位)
+     */
+    public void GetTomorrowInfo(onTaskResultReturn r)
+    {
+        String requestUrl=CRT_HOST+URL_TOMORROWINFO_GET+"?date="+TimeHelp.GetTomorrowStr();
+        Request request=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        CommonTask tmpTask=new CommonTask(r,"GetTomorrowInfoTask",request);
+        tmpTask.execute();
+    }
+
+    /**
      * 检查登陆权限(同步,请在子线程中处理)
      */
     public boolean CheckPermissionTxT(String Username)
@@ -1575,9 +1613,10 @@ public class NetService extends Service
 
     /**
      * 检查更新,用于弹出对话框(同步)
+     * @param IsneedWinform 这个参数用于干预本次判断要不要检测服务器上的服务端winform程序的存活情况
      * @return
      */
-    public boolean CheckUpdate_IsShowDialog()
+    public boolean CheckUpdate_IsShowDialog(boolean IsneedWinform)
     {
         //先检查当前版本 这一步用HTTP检查 如果不需要更新 则可以加快速度
         String requestUrl="http://120.79.7.230/appVersion.txt";
@@ -1605,20 +1644,24 @@ public class NetService extends Service
             return false;
         }
 
-        //再检查与服务器的连接
-        try
+        if(IsneedWinform)
         {
-            //绑定本地套接字并且连接
-            ClientSocket=new Socket(ServerIP1,7777);
-            Clientop=ClientSocket.getOutputStream();
-            Clientin=ClientSocket.getInputStream();
+            //再检查与服务器winform的连接
+            try
+            {
+                //绑定本地套接字并且连接
+                ClientSocket=new Socket(ServerIP1,7777);
+                Clientop=ClientSocket.getOutputStream();
+                Clientin=ClientSocket.getInputStream();
+            }
+            catch (Exception e)
+            {
+                Log.e("CheckUpdate","连接到服务器失败\n"+e.getMessage());
+                return false;
+            }
+            return true;
         }
-        catch (Exception e)
-        {
-            Log.e("CheckUpdate","连接到服务器失败\n"+e.getMessage());
-            return false;
-        }
-        return true;
+       return true;
     }
 
     /**
@@ -1672,10 +1715,11 @@ public class NetService extends Service
                     {
                         Log.e("DownLoadApk", e.toString() );
                     }
-                    return null;
+
                 }
 
 
+                //正式开始下载
                 try
                 {
                     Clientop.flush();
@@ -1769,6 +1813,143 @@ public class NetService extends Service
     }
 
     /**
+     * 利用OKHttp3 异步下载更新
+     */
+    public void DownLoadUpdateByHttp(onTaskResultReturn r,onProgressReturn p)
+    {
+        class DownloadTask extends ResultsTask<Void,Double,File>
+        {
+            public DownloadTask(onTaskResultReturn i, String name)
+            {
+                super(i, name);
+            }
+
+            @Override
+            protected File doInBackground(Void... voids)
+            {
+                String filename = BaseActivity.PACKAGENAME + "_" + REMOTEVERSION+".apk";//拼接文件名
+                File ImageFile = new File(getExternalCacheDir(), filename);
+
+                //如果已经有了这个的完整安装包 则直接跳过下载
+                if(ImageFile.exists())
+                {
+                    //读取保存好的文件正确的大小
+                    SharedPreferences apksp = getSharedPreferences("apkdata", MODE_PRIVATE);
+                    long RightapkLength = apksp.getLong(filename, 0);
+                    //如果文件大小正确
+                    if (ImageFile.length() == RightapkLength)
+                    {
+                        try
+                        {
+                            ClientSocket.close();
+                        } catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        return ImageFile;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            ImageFile.delete();
+                            ImageFile=new File(getExternalCacheDir(), filename);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.e("DownLoadApk", e.toString() );
+                        }
+                    }
+                }
+
+                File ImageFile_Final=ImageFile; //构建的final中转量供内部类使用
+                //正式开始下载请求
+                String requesturl=CRT_OSS+"/apks/"+filename;
+                Request downloadRequest=new Request.Builder()
+                        .get()
+                        .url(requesturl)
+                        .build();
+                try
+                {
+                    Response response=httpClient.newCall(downloadRequest).execute();
+
+                    //从head里面获取文件总长度
+                    long totalFileLength=Integer.parseInt(response.header("Content-Length"));
+
+                    if(totalFileLength==0)
+                    {
+                        throw new IOException("获取到的远端文件长度出错");
+                    }
+
+                    //这里把该文件的大小保存到SharedPreferences中 便于之后判断文件是否存在
+                    SharedPreferences.Editor apkSPeditor=getSharedPreferences("apkdata", MODE_PRIVATE).edit();
+                    apkSPeditor.putLong(filename, totalFileLength).apply();
+
+
+                    byte[] buff = new byte[2048 * 60];            //缓冲池子
+                    Clientin=response.body().byteStream();        //构建输入流
+                    long recvlen = 0;                             //已接收的文件长度
+                    int len = 0;                                  //本次缓冲接收的文件长度
+                    //创建输出文件流
+                    FileOutputStream fos = new FileOutputStream(ImageFile_Final);
+                    while ((len = Clientin.read(buff)) != -1)
+                    {
+                        fos.write(buff, 0, len);
+                        recvlen += len;
+
+                        //刷新进度
+                        publishProgress(recvlen * 100.0 / totalFileLength);
+
+                        // Log.e("Net", String.format("正在写入文件%f%%",recvlen*100.0/totalLength));
+
+                        if (recvlen >= totalFileLength)
+                            break;
+                    }
+                    //文件读取完毕
+                    fos.close();
+                    Clientin.close();
+                    Log.e("Net", String.format("文件写入完毕", recvlen * 100.0 / totalFileLength));
+
+                    //region 利用Linux命令改变文件的权限 使其能够正常安装
+                    String[] command = {"chmod", "777", ImageFile_Final.getPath() };
+                    ProcessBuilder builder = new ProcessBuilder(command);
+                    builder.start();
+                    //endregion
+
+                }
+                catch (IOException e)
+                {
+                    Log.e("Downloadhttp",e.getLocalizedMessage());
+                    return null;
+                }
+                return ImageFile_Final;
+            }
+
+            @Override
+            protected void onProgressUpdate(Double... values)
+            {
+                super.onProgressUpdate(values);
+                double progress = values[0];
+                p.OnSendProgress(progress);
+                Log.e("Net", String.format("正在写入文件%f%%", progress));
+            }
+
+            @Override
+            protected void onPostExecute(File file)
+            {
+                if (file == null)
+                {
+                    ResultReturn.OnTaskFailed();
+                } else
+                    ResultReturn.OnTaskSucceed(file);
+            }
+        }
+
+        DownloadTask downloadTask=new DownloadTask(r,"DownLoadUpdateTask");
+        downloadTask.execute();
+    }
+
+    /**
      * 获取图书馆公告
      */
     public void GetAnnounce(onTaskResultReturn r)
@@ -1782,7 +1963,9 @@ public class NetService extends Service
         CommonTask tempTask=new CommonTask(r,"GetAnnounceTask",Leaverequest);
         tempTask.execute();
     }
+
     //endregion
+
 
 
 

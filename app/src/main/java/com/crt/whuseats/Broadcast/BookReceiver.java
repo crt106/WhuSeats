@@ -5,13 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.TimeHelp;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.crt.whuseats.Utils.TimeHelp;
 
 public class BookReceiver extends BroadcastReceiver
 {

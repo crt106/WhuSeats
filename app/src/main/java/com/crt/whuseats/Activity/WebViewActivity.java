@@ -104,6 +104,7 @@ public class WebViewActivity extends BaseActivity
             Intent i=new Intent(WebViewActivity.this,AutoCreatSettingActivity.class);
             startActivity(i);
         }
+
         @JavascriptInterface
         public void JoinQQGroup()
         {

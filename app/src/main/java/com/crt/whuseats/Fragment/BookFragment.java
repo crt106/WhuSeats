@@ -27,10 +27,11 @@ import com.crt.whuseats.Activity.SeatsActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
+import com.crt.whuseats.JsonHelps.JsonInfo_Base;
 import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.BookService;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Utils.TimeHelp;
 
 import java.util.Map;
 
@@ -157,7 +158,6 @@ public class BookFragment extends Fragment
         });
 
 
-
         //创建的时候尝试刷新预约
         try
         {
@@ -242,6 +242,28 @@ public class BookFragment extends Fragment
                     Intent bookService=new Intent(ActivityConnect, BookService.class);
                     ActivityConnect.startService(bookService);
                     BaseActivity.AppSetting.BookSettingEditor.putBoolean("IsClockon", true).apply();
+
+                    //region 向服务器添加预约信息
+                    int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",0 );
+                    String usernumber= BaseActivity.AppSetting.UserAndPwd.getString("Username", "");
+                    if(seatID!=0&&!usernumber.isEmpty())
+                    ActivityConnect.mbinder.AddTomorrowInfo(seatID, usernumber, new onTaskResultReturn()
+                    {
+                        @Override
+                        public void OnTaskSucceed(Object... data)
+                        {
+                            JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
+                            String message= info.message;
+                            Log.e("book_addtomoinfo", message);
+                        }
+
+                        @Override
+                        public void OnTaskFailed(Object... data)
+                        {
+
+                        }
+                    });
+                    //endregion
                     RefreshClockInfo();
                 }
                 else
@@ -264,6 +286,27 @@ public class BookFragment extends Fragment
             //设置取消预约按钮
             btnaddBook.setOnClickListener(v->{
                 mbinder_b.DeleteClock();
+                //region 向服务器删除预约信息
+                int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",0 );
+                String usernumber= BaseActivity.AppSetting.UserAndPwd.getString("Username", "");
+                if(seatID!=0&&!usernumber.isEmpty())
+                    ActivityConnect.mbinder.DeleteTomorrowInfo(seatID, usernumber, new onTaskResultReturn()
+                    {
+                        @Override
+                        public void OnTaskSucceed(Object... data)
+                        {
+                            JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
+                            String message= info.message;
+                            Log.e("book_addtomoinfo", message);
+                        }
+
+                        @Override
+                        public void OnTaskFailed(Object... data)
+                        {
+
+                        }
+                    });
+                //endregion
                 RefreshClockInfo();
             });
         }

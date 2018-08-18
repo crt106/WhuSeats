@@ -1,12 +1,10 @@
 package com.crt.whuseats.Activity;
 
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,10 +22,8 @@ import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
 import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
 import com.crt.whuseats.JsonHelps.seat;
 import com.crt.whuseats.R;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Utils.TimeHelp;
 
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;

@@ -17,9 +17,12 @@ import java.util.List;
 public class RoomAdapter extends ArrayAdapter<JsonInfo_HouseStats.room>
 {
 
+    List<JsonInfo_HouseStats.room> roomList;
+
     public RoomAdapter(@NonNull Context context, @NonNull List<JsonInfo_HouseStats.room> objects)
     {
         super(context, R.layout.layout_rooms, objects);
+        roomList=objects;
     }
 
     @NonNull
@@ -41,5 +44,20 @@ public class RoomAdapter extends ArrayAdapter<JsonInfo_HouseStats.room>
         roomFree.setText(String.format("可能空闲的座位:%d",thisroom.free));
 
         return view;
+    }
+
+    /**
+     * 获取房间名称
+     * @param roomID 房间的ID
+     * @return
+     */
+    public String GetRoomname(int roomID)
+    {
+        for(JsonInfo_HouseStats.room ro:roomList)
+        {
+            if(ro.roomId==roomID)
+                return ro.roomname;
+        }
+        return "";
     }
 }

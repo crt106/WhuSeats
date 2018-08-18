@@ -1,4 +1,4 @@
-package com.crt.whuseats;
+package com.crt.whuseats.Utils;
 
 import android.util.Log;
 
@@ -53,6 +53,9 @@ public class TimeHelp
 
     public TimeHelp()
     {
+        ID2Value.clear();
+        Value2ID.clear();
+
         ID2Value.put(480, "8:00");
         ID2Value.put(510, "8:30");
         ID2Value.put(540, "9:00");
@@ -114,7 +117,6 @@ public class TimeHelp
         Value2ID.put("21:30", 1290);
         Value2ID.put("22:00", 1320);
         Value2ID.put("22:30", 1350);
-
     }
 
     /**

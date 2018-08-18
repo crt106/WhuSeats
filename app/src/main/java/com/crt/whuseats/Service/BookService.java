@@ -3,8 +3,6 @@ package com.crt.whuseats.Service;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.TimeHelp;
-
-import java.util.Calendar;
-import java.util.List;
+import com.crt.whuseats.Utils.TimeHelp;
 
 //添加定时预约座位的服务
 public class BookService extends Service

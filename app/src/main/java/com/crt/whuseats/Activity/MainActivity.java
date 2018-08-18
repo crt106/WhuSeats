@@ -5,11 +5,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.crt.whuseats.Fragment.BookFragment;
 import com.crt.whuseats.Fragment.HomeFragment;
 import com.crt.whuseats.Fragment.ListenFragment;
+import com.crt.whuseats.Fragment.ListenFragment_old;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Fragment.SettingFragment;
 
@@ -28,6 +28,7 @@ public class MainActivity extends BaseActivity
     //这些个东西应该是起到碎片管理的作用来着？
     private FragmentTransaction transaction;
     public HomeFragment homeFragment;
+    public ListenFragment_old listenFragment_old;
     public ListenFragment listenFragment;
     public SettingFragment settingFragment;
     public BookFragment bookFragment;

@@ -17,9 +17,9 @@ import android.util.Log;
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
 import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.Settings;
+import com.crt.whuseats.Utils.Settings;
 import com.crt.whuseats.Task.TaskManager;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Utils.TimeHelp;
 
 public class BaseActivity extends AppCompatActivity
 {

@@ -1,4 +1,4 @@
-package com.crt.whuseats;
+package com.crt.whuseats.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -33,7 +33,7 @@ import com.crt.whuseats.R;
 import com.crt.whuseats.Task.ResultsTask;
 import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Utils.TimeHelp;
 
 import org.json.JSONObject;
 
@@ -49,8 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
@@ -194,7 +192,7 @@ public class NetService extends Service
     static final String URL_UPDATE="/whuseatsapi/download.html";
     static final String URL_TOMORROWINFO_GET="/whuseatsapi/api/getinfo";
     static final String URL_TOMORROWINFO_ADD="/whuseatsapi/api/add";
-    static final String URL_TOMORROWINF_DELETE="/whuseatsapi/api/delete";
+    static final String URL_TOMORROWINFO_DELETE="/whuseatsapi/api/delete";
 
     //endregion
 
@@ -236,6 +234,11 @@ public class NetService extends Service
         public void SeatsFiltrate_Mobile(String onDate,int buildingID,int roomID,String ST,String ET,onTaskResultReturn r)
         {
             NetService.this.SeatsFiltrate_Mobile(onDate,buildingID,roomID,ST,ET,r);
+        }
+        //移动端筛选座位-同步
+        public String SeatsFiltrate_Mobile_Sync(String onDate,int buildingID,int roomID,String ST,String ET)
+        {
+            return NetService.this.SeatsFiltrate_Mobile_Sync(onDate,buildingID,roomID,ST,ET);
         }
         //检查当前预约情况
         public void CheckReservations(onTaskResultReturn r)
@@ -311,6 +314,11 @@ public class NetService extends Service
         {
             NetService.this.StartListenRoomOnce(FiltrateInfo,startTime,endTime,Date,r,p);
         }
+        //同步监听一次房间(移动端筛选)
+        public boolean StartListenRoomOnce_Sync(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
+        {
+            return NetService.this.StartListenRoomOnce_Sync(FiltrateInfo,startTime,endTime,Date);
+        }
 
         //发起同步预约请求
         public void FreeBookSync(int SeatID,String startTime,String endTime,String Date)
@@ -347,6 +355,18 @@ public class NetService extends Service
         public void GetTomorrowInfo(onTaskResultReturn r)
         {
             NetService.this.GetTomorrowInfo(r);
+        }
+
+        //添加第二天预约信息
+        public void AddTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+        {
+            NetService.this.AddTomorrowInfo(seatID,usernumber,r);
+        }
+
+        //删除第二天预约信息
+        public void DeleteTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+        {
+            NetService.this.DeleteTomorrowInfo(seatID,usernumber,r);
         }
 
         //清除NetService中存在的Cookies
@@ -392,7 +412,7 @@ public class NetService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.e("NetService","服务启动");
+        Log.e("NetService","服务由OnstartCommand启动");
         //如果这次接受到的Intent里面要求启动定时预约
         try
         {
@@ -402,7 +422,7 @@ public class NetService extends Service
                 //这里服务启动的时候可能是没有activity的 所以修改文件内容的时候要绕一圈
                 this.getSharedPreferences("bookdata", Context.MODE_PRIVATE).edit().putBoolean("IsClockon", false).apply();
                 Log.e("NetService","接收到Dobook要求");
-                //创建一个准备抢座位的通知
+                //region 创建一个准备抢座位的通知
                 NotificationManager manager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
                 NotificationCompat.Builder builder=new NotificationCompat.Builder(NetService.this);
                 builder.setContentTitle("当当当当~");
@@ -413,6 +433,7 @@ public class NetService extends Service
                 builder.setWhen(System.currentTimeMillis());
                 Notification n=builder.build();
                 manager.notify(1, n);
+                //endregion
                 DoBook();
             }
             return super.onStartCommand(intent, flags, startId);
@@ -421,7 +442,6 @@ public class NetService extends Service
         {
             Log.e("NetonStart",e.toString() );
             return super.onStartCommand(intent, flags, startId);
-
         }
     }
 
@@ -706,6 +726,40 @@ public class NetService extends Service
         CommonTask SeatsFiltrateTask=new CommonTask(r,"SeatsFiltrateTask",FiltrateRequest);
         SeatsFiltrateTask.execute();
     }
+
+    /**
+     * 通过移动端向服务器请求过滤之后的座位信息--------同步
+     * https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/2018-06-08/1200/1320 HTTP/1.1
+     */
+    public String SeatsFiltrate_Mobile_Sync(String onDate,int buildingID,int roomID,String ST,String ET)
+    {
+        //组成一个Post请求
+        String requestUrl=LIB_URL+URL_MOBILESEARCH+"/"+onDate+"/"+ST+"/"+ET;
+        RequestBody FiltrateRequestBody=new FormBody.Builder()
+
+                .add("t", "1")
+                .add("roomId", Integer.toString(roomID))
+                .add("buildingId", Integer.toString(buildingID))
+                .add("batch","9999")
+                .add("page", "1")
+                .add("t2","2")
+                .build();
+        Request FiltrateRequest=new Request.Builder()
+                .url(requestUrl)
+                .addHeader("token", LIB_TOKEN)
+                .post(FiltrateRequestBody)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(FiltrateRequest).execute();
+            return response.body().string();
+
+        } catch (IOException e)
+        {
+            Log.e("SeatsFiltrate_Mobile",e.getMessage());
+            return "";
+        }
+    }
     /**
      * 在token有效的情况下检查当前预约情况 比如
      * http://seat.lib.whu.edu.cn/rest/v2/user/reservations?token=8ZXSSXN3CC05154011
@@ -946,6 +1000,7 @@ public class NetService extends Service
                     LIB_SEATSSTATUS = "success";
                     LIB_BOOKRETURNINFO = bookReturn;
                     LIB_MESSAGE=bookReturn.message;
+
                     //region 向百度统计发送成功数据
                     try
                     {
@@ -1365,6 +1420,7 @@ public class NetService extends Service
             @Override
             protected Void doInBackground(Void... voids)
             {
+
                 //region 头等待1
                 try
                 {
@@ -1378,6 +1434,7 @@ public class NetService extends Service
                     return null;
                 }
                 //endregion
+
                 TotalSeatsNumber=FiltrateInfo.seatList.size();
                 //如果筛选结果为空直接返回
                 if(TotalSeatsNumber<=0)
@@ -1438,7 +1495,71 @@ public class NetService extends Service
                     ResultReturn.OnTaskFailed();
             }
         }
+
         new ListenRoomTask(r).execute();
+    }
+
+    /**************************************************
+     *  移动端监听 (同步操作)
+     *  ************************************************
+     *  @return 返回本次监听是否成功
+     */
+    public boolean StartListenRoomOnce_Sync(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
+    {
+
+        //region 头等待1
+        try
+        {
+            Log.e("NetService——Listen", "开启新筛选的等待");
+            Thread.sleep(DELAY_BEFOREFILTRATE);
+            Log.e("NetService——Listen", "结束新筛选的等待");
+        }
+        catch (InterruptedException e)
+        {
+            Log.e("ListenRoomOnce_PC", "任务中断" );
+            return false;
+        }
+        //endregion
+
+        int TotalSeatsNumber=FiltrateInfo.seatList.size();
+        //如果筛选结果为空直接返回
+        if(TotalSeatsNumber<=0)
+            return false;
+
+        for (seat thisseat:FiltrateInfo.seatList)
+        {
+            //把字符串形式转换为整数
+            int thisseatId=thisseat.seatid;
+
+
+            //如果已经预定成功了直接跳出
+            if (LIB_SEATSSTATUS.equals("success"))
+                return true;
+
+            try
+            {
+                FreeBookSync(thisseatId, startTime, endTime, Date);
+
+                if (LIB_SEATSSTATUS.equals("success"))
+                    return true;
+
+                //region 预约等待
+                Thread.sleep(DELAY_SENDBOOK*3);
+                //endregion
+            }
+            catch (InterruptedException e)
+            {
+                Log.e("ListenRoomOnce_MFSync", "任务中断" );
+                return false;
+            }
+            catch (Exception e)
+            {
+                Log.e("ListenRoomOnce_MFSync", e.getMessage());
+                continue;
+            }
+        }
+
+        return false;
     }
 
     /*******************************************************************核心方法
@@ -1486,6 +1607,7 @@ public class NetService extends Service
                         et = tempListenSetting.getString("endTimeValue", "");
                         Log.e("DoBook_back", "et="+et );
                     }
+
                     //构建Final中转变量*************** 注意！！！这里的字典可能没有实例化！******************
                     TimeHelp tempTimeHelp=new TimeHelp();
                     String st_final=(tempTimeHelp.Value2ID.get(st)).toString();
@@ -1510,6 +1632,7 @@ public class NetService extends Service
                     builder.setDefaults(NotificationCompat.DEFAULT_ALL);
                     builder.setPriority(NotificationCompat.PRIORITY_MAX);
                     //endregion
+
                     //一次预约执行完毕 判断结果
                     if(LIB_SEATSSTATUS.equals("success")) //执行成功
                     {
@@ -1574,6 +1697,50 @@ public class NetService extends Service
                 .build();
         CommonTask tmpTask=new CommonTask(r,"GetTomorrowInfoTask",request);
         tmpTask.execute();
+    }
+
+    /**
+     * 添加第二日预约信息
+     */
+    public void AddTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+    {
+        String requestURl=CRT_HOST+URL_TOMORROWINFO_ADD;
+        FormBody requestbody=new FormBody.Builder()
+                .add("seatID", Integer.toString(seatID))
+                .add("usernumber", usernumber)
+                .add("date",TimeHelp.GetTomorrowStr() )
+                .build();
+
+        Request addrequest=new Request.Builder()
+                .url(requestURl)
+                .post(requestbody)
+                .addHeader("Content-Type","application/x-www-form-urlencoded")
+                .build();
+
+        CommonTask commonTask=new CommonTask(r,"Addtomorowinfotask",addrequest);
+        commonTask.execute();
+    }
+
+    /**
+     * 删除第二日预约信息
+     */
+    public void DeleteTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+    {
+        String requestURl=CRT_HOST+URL_TOMORROWINFO_DELETE;
+        FormBody requestbody=new FormBody.Builder()
+                .add("seatID", Integer.toString(seatID))
+                .add("usernumber", usernumber)
+                .add("date",TimeHelp.GetTomorrowStr())
+                .build();
+
+        Request addrequest=new Request.Builder()
+                .url(requestURl)
+                .post(requestbody)
+                .addHeader("Content-Type","application/x-www-form-urlencoded")
+                .build();
+
+        CommonTask commonTask=new CommonTask(r,"Addtomorowinfotask",addrequest);
+        commonTask.execute();
     }
 
     /**

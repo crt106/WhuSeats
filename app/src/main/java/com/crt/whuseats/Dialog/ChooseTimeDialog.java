@@ -10,7 +10,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -18,8 +17,7 @@ import android.widget.TextView;
 
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Utils.TimeHelp;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +46,7 @@ public class ChooseTimeDialog extends AlertDialog
     //region 相关静态字段 供ListenFragment访问 不过貌似这不是一个长久之计
     public static String CHOOSESTARTTIME="480";
     public static String CHOOSEENDTIME="1350";
-    public static boolean ISLOOP;      //是否循环
+    public static boolean ISLOOP=true;      //是否循环
     @Deprecated
     public static boolean ISFTYPE;     //是否启用Web端的过滤模式 Ftype="过滤模式"
     //endregion

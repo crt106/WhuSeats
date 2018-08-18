@@ -231,6 +231,7 @@ public class TimeChangeActivity extends BaseActivity
                 {
                     JsonInfo_SeatTime_Start seatTime_start=JsonHelp.GetSeatStartTime((String)data[0]);
                     List<String> timelist=new LinkedList<>();
+
                     /**建立合乎要求的时间链表
                      8:00_false
                      9:00_free

@@ -66,7 +66,7 @@ public class JsonInfo_HouseStats extends JsonInfo_Base
 
     }
 
-    public List<room> roomList=new LinkedList<>();
+    public List<room> roomList=new LinkedList<>();   //房间列表
     public JsonInfo_HouseStats(String JsonStr)
     {
         super(JsonStr);

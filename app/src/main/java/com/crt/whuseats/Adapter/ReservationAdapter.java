@@ -34,6 +34,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
         //这个position用于向外界传出点击的是第几个子项
         void onclick(int Reid);
     }
+
     private onItemClick onInfoAreaClick;    //信息面板点击
     private onItemClick onButtonAreaClick;  //按钮点击
 

@@ -25,6 +25,7 @@ public class TimeManageAdapter extends RecyclerView.Adapter<TimeManageAdapter.Vi
      三种类型
      */
     List<String> TimeList=new LinkedList<>();//时间链表
+
     //本Adapter对外的事件处理接口
     public interface OnItemClick
     {

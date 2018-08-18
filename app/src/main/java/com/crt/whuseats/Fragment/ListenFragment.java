@@ -1,190 +1,95 @@
 package com.crt.whuseats.Fragment;
 
-
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.GridView;
-import android.widget.Spinner;
+import android.widget.Filter;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.Activity.ListenActivity;
 import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Adapter.BuildingAdapter;
-import com.crt.whuseats.Adapter.RoomAdapter;
+import com.crt.whuseats.Adapter.ListenItemAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
 import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
+import com.crt.whuseats.Interface.ListenSwitchChangeListener;
 import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
 import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
-import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
-import com.crt.whuseats.JsonHelps.JsonInfo_WebFiltrate;
+import com.crt.whuseats.Model.ListenDateType;
+import com.crt.whuseats.Model.ListenItem;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.TimeHelp;
+import com.crt.whuseats.Task.ResultsTask;
+import com.crt.whuseats.Utils.TimeHelp;
 
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * 监听界面碎片
- */
 public class ListenFragment extends Fragment
 {
+    //控件们
+    private RecyclerView rcvListenrooms;
+    private Button btnAddroom;
+    private Button btnStartlistenlist;
+    private Switch swIsloopListen;
 
-
-    //与Activity的连接
-
-    public MainActivity ActivityConnect;
-    //region 控件
-    Spinner buildingSpinner;
-    Spinner DateSpinner;
-    GridView RoomGrid;
-
-    CustomProgressDialog progressDialog;
-
-    public BuildingAdapter bdSpinnerAdapter;
-    public ArrayAdapter DateSpinnerAdapter;
-    public RoomAdapter roomAdapter;
-
-    public Button buttonSubmit;
-    //endregion
-
-    //region 相应字段
-
-    public List<JsonInfo_Fliters.buildings> buildingsList=new LinkedList<>();//当前建筑列表
-    public List<JsonInfo_HouseStats.room> roomList=new LinkedList<>();       //当前房间情况列表
-    public List<String> DateList=new LinkedList<>();                         //当前日期列表
-
+    //字段们
     public static int MAXLOOPCOUNT=100;   //筛选模式下最大的筛选轮次
     public static int MAXLOOPCOUT_DEFAULT=100;
 
-    public static int ChooseHouseID=1;   //选择的建筑ID
-    public static int ChooseRoomID;    //选择的房间ID
-    public static String ChooseDate;   //选择的日期
+    /**
+     * 监听界面进度对话框
+     */
+    CustomProgressDialog progressDialog;
 
-    //endregion
+    //与主活动的连接
+    public MainActivity ActivityConnect;
+
+    //适配器
+    public ListenItemAdapter listenItemAdapter;
+
+
+
+
     public ListenFragment()
     {
-        // Required empty public constructor
+        super();
     }
 
-
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         ActivityConnect=(MainActivity)getActivity();
-        return inflater.inflate(R.layout.frag_rooms, container,false);
+        ListenItem.ReadFromFile(ActivityConnect);
+        return inflater.inflate(R.layout.frag_listen, container, false);
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    //onActivityCreated里面执行相应的界面初始化以及发送查询建筑列表请求
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        super.onStart();
-        //region 控件初始化
-        RoomGrid=(GridView)getView().findViewById(R.id.gv_endtimes);
-        buildingSpinner=(Spinner)getView().findViewById(R.id.sp_building);
-        DateSpinner=(Spinner)getView().findViewById(R.id.sp_date);
-        buttonSubmit=(Button)getView().findViewById(R.id.btn_submit);
 
-        progressDialog=new CustomProgressDialog(ActivityConnect);
-        //endregion
-        //region相应点击事件的注册
-
-        //"搜索按钮点下"
-        buttonSubmit.setOnClickListener((View v)->
-        {
-            if(buildingSpinner.getAdapter()==null||buildingSpinner.getAdapter().getCount()==0)
-                GetFilters();
-            if(DateSpinner.getAdapter()==null||DateSpinner.getAdapter().getCount()==0)
-                GetDateString();
-            GetRoomGrid();
-        });
-
-        //建筑Spinner选择
-        buildingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-                JsonInfo_Fliters.buildings choosebuilding=buildingsList.get(position);
-                ChooseHouseID=choosebuilding.id;
-                //记录用户习惯
-                ActivityConnect.AppSetting.ListenSettingEditor.putInt("DefaultBuilding", ChooseHouseID);
-                ActivityConnect.AppSetting.ListenSettingEditor.apply();
-                //Toast.makeText(ActivityConnect, "切换建筑选择到"+ChooseHouseID, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-
-            }
-        });
-
-        //日期Sppinner选择
-        DateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
-            {
-
-                ChooseDate=DateList.get(position);
-                //Toast.makeText(ActivityConnect, "切换日期选择到"+ChooseDate, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-
-            }
-        });
-
-        //在RoomGrid上面点击房间按钮的响应
-        RoomGrid.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->
-        {
-            //刷新选择房间的ID
-            JsonInfo_HouseStats.room chooseroom=roomList.get(position);
-            ChooseRoomID=chooseroom.roomId;
-
-            //展开设置对话框
-            ChooseTimeDialog timeDialog=new ChooseTimeDialog(ActivityConnect,chooseroom.roomname);
-            timeDialog.show();
-
-            //给ChooseTime对话框上的两个按钮添加监听事件
-            //这里由于设计失误 要先show再添加监听事件
-            timeDialog.setButtonOKOnClickListener((View v)->
-            {
-                StartListen(ChooseTimeDialog.CHOOSESTARTTIME,ChooseTimeDialog.CHOOSEENDTIME);
-                timeDialog.dismiss();
-            });
-            timeDialog.setButtonCancelOnClickListener((View v)->
-            {
-                timeDialog.dismiss();
-            });
-
-        });
+        //获取控件以及绑定他们的事件们
+        rcvListenrooms = (RecyclerView) getView().findViewById(R.id.rcv_listenrooms);
+        btnAddroom = (Button) getView().findViewById(R.id.btn_addroom);
+        btnStartlistenlist = (Button) getView().findViewById(R.id.btn_startlistenlist);
+        swIsloopListen=(Switch)getView().findViewById(R.id.sw_isloopListen);
+        //初始化对话框
+        progressDialog =new CustomProgressDialog(ActivityConnect);
 
         //为这个等待对话框添加取消响应 即取消掉监听任务
         progressDialog.setOnCancelListener((dialog) ->
@@ -200,301 +105,298 @@ public class ListenFragment extends Fragment
                 Log.e("PDialog_cancelTask", e.getMessage());
             }
         });
-        //endregion
+
+        //添加房间按钮响应事件
+        btnAddroom.setOnClickListener(v->{
+            Intent start=new Intent(ActivityConnect, ListenActivity.class);
+            ActivityConnect.startActivity(start);
+        });
+
+        //开始监听按钮响应事件
+        btnStartlistenlist.setOnClickListener(v->{
+            StartListen();
+        });
+
+        swIsloopListen.setChecked(ChooseTimeDialog.ISLOOP);
+        swIsloopListen.setOnCheckedChangeListener((compbutton,ischecked)->{ChooseTimeDialog.ISLOOP=ischecked;});
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
-        //界面初始化 自动执行一次查询
-        if(buildingSpinner.getAdapter()==null||buildingSpinner.getAdapter().getCount()==0)
-            GetFilters();
-        if(DateSpinner.getAdapter()==null||DateSpinner.getAdapter().getCount()==0)
-            GetDateString();
-        GetRoomGrid();
+        RefreshListenList();
     }
 
-    //获取合乎格式的今天日期字符串 并且赋值给相应的adapter
-    public void GetDateString()
+    @Override
+    public void onDestroy()
     {
-        //用于返回的链表
-        DateList= TimeHelp.GetLegalTimeList();
-        DateSpinnerAdapter=new ArrayAdapter(ActivityConnect,android.R.layout.simple_list_item_1,DateList);
-        DateSpinner.setAdapter(DateSpinnerAdapter);
+        super.onDestroy();
+        ListenItem.Save2File(ActivityConnect);
     }
 
-    //通过活动发起请求总建筑布局请求
-    public void GetFilters()
-    {
-        //真实返回
-        ActivityConnect.mbinder.GetFilters(new onTaskResultReturn()
+    //删除按钮按下操作
+    ListenItemAdapter.OnDeleteButtonClick deleteButtonClick=(id->{
+        ListenItem.ItemList.remove(id);
+        RefreshListenList();
+    });
+
+    //开关切换响应事件接口
+    ListenSwitchChangeListener switchClck=(buttonView,isChecked,item)->{
+
+        //首先无条件改变状态
+        buttonView.setChecked(isChecked);
+
+        switch (item.dateType)
         {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                try
+            case Today:
+                //如果超过了今天的时间
+                if(TimeHelp.IsOverTime("22:45"))
                 {
-                    String datastr=(String)data[0];
-                    if(datastr==null||datastr.equals(""))
-                        throw new Exception("返回Json为空");
-                    JsonInfo_Fliters info= JsonHelp.GetFliters(datastr);
-                    //把接收到的数据复制给本类变量
-                    buildingsList=info.buildingsList;
-                    bdSpinnerAdapter=new BuildingAdapter(info.buildingsList);
-                    buildingSpinner.setAdapter(bdSpinnerAdapter);
-
-                    //读取用户习惯
-                    int defaultbuilding=ActivityConnect.AppSetting.ListenSetting.getInt("DefaultBuilding", 1)-1;
-                    buildingSpinner.setSelection(defaultbuilding, true);
+                    Toast.makeText(ActivityConnect,"该项日期为今日,当前不可用" ,Toast.LENGTH_SHORT).show();
+                    buttonView.setChecked(false);
                 }
-                catch (Exception e)
+                //否则如果合法 则改变列表项的启用状态
+                else {
+                    item.SetEnable(isChecked);
+                }
+                break;
+
+            case Tomorrow:
+                //如果没有超过今天的时间
+                if(!TimeHelp.IsOverTime("22:43"))
                 {
-                    Log.e("ListenFragment", "建筑布局获取错误"+e.getMessage());
-                    Toast.makeText(ActivityConnect.getApplicationContext(),"建筑布局获取错误",Toast.LENGTH_SHORT).show();
-                    Toast.makeText(ActivityConnect.getApplicationContext(),"可能性：图书馆服务器维护、账号短时间冻结",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityConnect,"该项日期为明日,当前不可用" ,Toast.LENGTH_SHORT).show();
+                    buttonView.setChecked(false);
                 }
-            }
-
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
-                //Toast.makeText(ActivityConnect.getApplicationContext(),"建筑布局获取错误",Toast.LENGTH_SHORT).show();
-            }
-        });
-        //region 模拟返回
-
-
-//        JsonInfo_Fliters jf=new JsonInfo_Fliters();
-//        JsonInfo_Fliters.buildings t1= jf.new buildings(1,"信息科学分馆");
-//        JsonInfo_Fliters.buildings t2= jf.new buildings(2,"总馆");
-//        JsonInfo_Fliters.buildings t3= jf.new buildings(3,"医学分馆");
-//        JsonInfo_Fliters.buildings t4= jf.new buildings(4,"工学分馆");
-//        testlist.add(t1);
-//        testlist.add(t2);
-//        testlist.add(t3);
-//        testlist.add(t4);
-//        bdSpinnerAdapter=new BuildingAdapter(testlist);
-//        buildingSpinner.setAdapter(bdSpinnerAdapter);
-        //endregion
-    }
-
-    //通过活动发起建筑内房间布局
-    public void GetRoomGrid()
-    {
-        ActivityConnect.mbinder.CheckHouseStats(new onTaskResultReturn()
-        {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                try
-                {
-                    String datastr=(String)data[0];
-                    if(datastr==null||datastr.equals(""))
-                        throw new Exception("返回Json为空");
-                    JsonInfo_HouseStats info= JsonHelp.GetHouseStats(datastr);
-                    //把接收到的数据复制给本类变量
-                    roomList=info.roomList;
-                    roomAdapter=new RoomAdapter(ActivityConnect,roomList);
-                    RoomGrid.setAdapter(roomAdapter);
+                //否则如果合法 则改变列表项的启用状态
+                else {
+                    item.SetEnable(isChecked);
                 }
-                catch (Exception e)
-                {
-                    Log.e("ListenFragment", "房间布局获取错误"+e.getMessage());
-                    Toast.makeText(ActivityConnect.getApplicationContext(),"房间布局获取错误",Toast.LENGTH_SHORT).show();
-                    Toast.makeText(ActivityConnect.getApplicationContext(),"可能性：图书馆服务器维护、账号短时间冻结",Toast.LENGTH_SHORT).show();
-                }
-            }
+                break;
+        }
 
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
+        //刷新列表
+        RefreshListenList();
+    };
 
-            }
-        }, ChooseHouseID);
-          //region 模拟返回
-//        roomList=new LinkedList<>();
-//        JsonInfo_HouseStats jh=new JsonInfo_HouseStats();
-//        JsonInfo_HouseStats.room r1=jh.new room(3,"测试房间1",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r2=jh.new room(5,"测试房间2",1,2,3,4,5,4);
-//        JsonInfo_HouseStats.room r4=jh.new room(7,"测试房间3",4,2,3,4,5,6);
-//        JsonInfo_HouseStats.room r5=jh.new room(9,"测试房间4",1,2,3,4,5,21);
-//        JsonInfo_HouseStats.room r6=jh.new room(11,"测试房间5",1,4,3,4,5,233);
-//        JsonInfo_HouseStats.room r7=jh.new room(17,"测试房间6",2,2,4,4,5,6);
-//        JsonInfo_HouseStats.room r8=jh.new room(12,"测试房间7",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r9=jh.new room(14,"测试房间8",5,4,3,4,5,5);
-//        JsonInfo_HouseStats.room r10=jh.new room(16,"测试房间9",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r11=jh.new room(16,"测试房间10",1,2,3,4,5,0);
-//        JsonInfo_HouseStats.room r12=jh.new room(16,"测试房间11",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r13=jh.new room(16,"测试房间12",1,3,4,4,5,43);
-//        JsonInfo_HouseStats.room r14=jh.new room(16,"测试房间13",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r15=jh.new room(16,"测试房间14",3,2,3,4,5,1);
-//        roomList.add(r1);
-//        roomList.add(r2);
-//        roomList.add(r4);
-//        roomList.add(r5);
-//        roomList.add(r6);
-//        roomList.add(r7);
-//        roomList.add(r8);
-//        roomList.add(r9);
-//        roomList.add(r10);
-//        roomList.add(r11);
-//        roomList.add(r12);
-//        roomList.add(r13);
-//        roomList.add(r14);
-//        roomList.add(r15);
-//        roomAdapter=new RoomAdapter(ActivityConnect,roomList);
-//        RoomGrid.setAdapter(roomAdapter);
-        //endregion
-
-    }
-
-    /**************************
-     * UI核心方法 开始监听
-     * ************************
+    /**
+     * 刷新监听列表 显示在RecyclerView上
      */
-    private int LoopCount=1; //轮次计数器
-    public void StartListen(String sT,String eT)
+    public void RefreshListenList()
     {
-        if (!NetService.LIB_SEATSSTATUS.equals("success"))
+        //刷新List中每个Item的启用情况 关闭非法选项
+        boolean IsOvertoday=TimeHelp.IsOverTime("22:45");
+
+        for (ListenItem i:ListenItem.ItemList)
         {
-            //显示等待对话框吗?
-            if(!progressDialog.isShowing())
+            if(i.dateType== ListenDateType.Today && IsOvertoday)
             {
-                progressDialog.show();
-                progressDialog.setCanceledOnTouchOutside(false);
+                i.SetEnable(false);
+                continue;
             }
 
-            //region 一些回调接口的实现
-
-            //监听座位进度回调
-            onProgressReturn progressReturn=(Object... data)->
+            if(i.dateType==ListenDateType.Tomorrow && !IsOvertoday)
             {
-                try
-                {
-                    int total=(Integer)data[0];
-                    int now=(Integer)data[1];
-                    progressDialog.setMax(total);
-                    progressDialog.setProgress(now);
-                }
-                catch (Exception e)
-                {
-                    Log.e("StartListen_GetProgress", "获取当前进度时发生错误" );
-                }
+                i.SetEnable(false);
+                continue;
+            }
+        }
 
-            };
-            //检查了一轮了之后的结果的回调
-            onTaskResultReturn CheckOnceReturn=new onTaskResultReturn()
+        listenItemAdapter=new ListenItemAdapter(ListenItem.ItemList,deleteButtonClick,switchClck);
+        LinearLayoutManager layoutManager=new LinearLayoutManager(ActivityConnect);
+        rcvListenrooms.setLayoutManager(layoutManager);
+        rcvListenrooms.setAdapter(listenItemAdapter);
+        rcvListenrooms.refreshDrawableState();
+    }
+
+
+
+    //监听座位任务回调接口
+    onTaskResultReturn ListenResult=new onTaskResultReturn()
+    {
+        @Override
+        public void OnTaskSucceed(Object... data)
+        {
+            Toast.makeText(ActivityConnect, "本轮监听成功", Toast.LENGTH_SHORT).show();
+            SuccessDialog successDialog=new SuccessDialog(ActivityConnect, NetService.LIB_BOOKRETURNINFO);
+            successDialog.show();
+            progressDialog.dismiss();
+        }
+
+        @Override
+        public void OnTaskFailed(Object... data)
+        {
+            progressDialog.dismiss();
+            AlertDialog listenFailed =new AlertDialog.Builder(ActivityConnect)
+                    .setMessage("监听结束 未找到合适座位或出现异常")
+                    .create();
+            listenFailed.show();
+        }
+    };
+
+
+    /**
+     * 核心方法 开始监听
+     */
+    private int LoopCount=1; //全局变量 循环次数
+    private JsonInfo_MobileFiltrate mobileFiltrate; //本次移动端过滤结果
+
+    public void StartListen()
+    {
+
+        LoopCount=1;
+        //构建临时中转列表 排除掉没有启用的项目
+        List<ListenItem> tmpItemList=new LinkedList<>();
+        for(ListenItem i:ListenItem.ItemList)
+        {
+            if(i.IsEnable)
+                tmpItemList.add(i);
+        }
+
+        //创建内部类
+        class ListenRoomTask extends ResultsTask<Void, String, Boolean>
+        {
+            public ListenRoomTask(onTaskResultReturn i, String name)
             {
-                @Override
-                public void OnTaskSucceed(Object... data)
-                {
-                    Toast.makeText(ActivityConnect, "本轮监听成功", Toast.LENGTH_SHORT).show();
-                    SuccessDialog successDialog=new SuccessDialog(ActivityConnect, NetService.LIB_BOOKRETURNINFO);
-                    successDialog.show();
-                    progressDialog.dismiss();
-                }
+                super(i, name);
+            }
 
-                @Override
-                public void OnTaskFailed(Object... data)
+            @Override
+            protected void onPreExecute()
+            {
+                super.onPreExecute();
+
+                //显示等待对话框吗?
+                if(!progressDialog.isShowing())
                 {
-                    //如果用户选择不循环监听
-                    if(!ChooseTimeDialog.ISLOOP)
+                    progressDialog.show();
+                    progressDialog.setCanceledOnTouchOutside(false);
+                }
+                progressDialog.setTitle("开始监听啦");
+                progressDialog.setMessage("正在筛选和查找符合要求的座位(轮次"+LoopCount+")");
+            }
+
+            @Override
+            protected void onCancelled()
+            {
+                super.onCancelled();
+                Log.e("ListenRoomTask","任务被取消");
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids)
+            {
+                //列表为空直接溜了
+                if(tmpItemList.size()==0)
+                    return false;
+
+                //如果当前没有预约成功的状态
+                if (!NetService.LIB_SEATSSTATUS.equals("success"))
+                {
+
+                    //开始遍历链表来查找
+                    try
                     {
-                        //Toast.makeText(ActivityConnect, "监听结束 未找到合适座位", Toast.LENGTH_SHORT).show();
+                        OUTLOOP:
+                        while (LoopCount<MAXLOOPCOUNT)
+                        {
+                            for(ListenItem i:tmpItemList)
+                            {
+
+
+                                if(NetService.LIB_SEATSSTATUS.equals("success"))
+                                    break OUTLOOP;
+
+                                //如果未启用该项则跳过
+                                if(i.IsEnable=false)
+                                    continue;
+
+                                onProgressUpdate("0","开始监听:"+i.Location);
+                                onProgressUpdate("1","正在筛选和查找符合要求的座位(轮次"+LoopCount+")");
+
+                                //构建计算参数
+                                String st=Integer.toString(i.starttime);
+                                String et=Integer.toString(i.endtime);
+
+                                //同步方式获取过滤结果
+                                String Filterstr=ActivityConnect.mbinder.SeatsFiltrate_Mobile_Sync(i.getDate(),i.HouseID ,i.RoomID ,st ,et );
+                                mobileFiltrate=JsonHelp.GetMFiltrateSeats(Filterstr);
+
+                                //开始根据过滤结果监听
+                                if(ActivityConnect.mbinder.StartListenRoomOnce_Sync(mobileFiltrate, st, et, i.getDate()))
+                                return true;
+
+                                LoopCount++;
+                            }
+
+                            //如果用户选择不循环
+                            if(!ChooseTimeDialog.ISLOOP)
+                            {
+                                return false;
+                            }
+                        }
+
+                        //能够运行到此处说明超过上限了
                         progressDialog.dismiss();
                         AlertDialog listenFailed =new AlertDialog.Builder(ActivityConnect)
-                                .setMessage("监听结束 未找到合适座位")
+                                .setMessage(String.format("监听次数达到上限%d 未找到合适座位",MAXLOOPCOUNT))
                                 .create();
                         listenFailed.show();
                         LoopCount=1;
-                    }
-                    else
-                    {
-
-                        LoopCount++;
-                        //注意这里的迭代调用哦~~~
-                        if(LoopCount<MAXLOOPCOUNT)
-                        StartListen(sT, eT);
-                        else
-                        {
-                            progressDialog.dismiss();
-                            AlertDialog listenFailed =new AlertDialog.Builder(ActivityConnect)
-                                    .setMessage(String.format("监听次数达到上限%d 未找到合适座位",MAXLOOPCOUNT))
-                                    .create();
-                            listenFailed.show();
-                            LoopCount=1;
-                        }
-                    }
-
-                }
-            };
-
-            //endregion
-
-            // region 弃用的遍历模式
-
-//            if (!ChooseTimeDialog.ISFTYPE)
-//            {
-//                progressDialog.setTitle("开始监听啦~(遍历模式)");
-//                progressDialog.setMessage("正在监听符合要求的座位(轮次"+LoopCount+")");
-//                //先检查房间布局 然后根据布局文件进行监听
-//                ActivityConnect.mbinder_b.CheckRoomStats(new onTaskResultReturn()
-//                {
-//                    @Override
-//                    public void OnTaskSucceed(Object... data)
-//                    {
-//                        try
-//                        {
-//                            JsonInfo_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
-//                            //注意这里又要嵌套一层回调 没有办法 谁叫这是异步操作呢 这里是使用mbinder的开始监听房间
-//                            ActivityConnect.mbinder_b.StartListenRoomOnce(roomLayout, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
-//                        } catch (Exception e)
-//                        {
-//                            Log.e("ListenFragment", "接收房间布局错误" + e.getMessage());
-//                            Toast.makeText(ActivityConnect, "接收房间布局错误 请重试", Toast.LENGTH_SHORT);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void OnTaskFailed(Object... data)
-//                    {
-//
-//                    }
-//                }, ChooseRoomID, ChooseDate);
-//            }
-            //endregion
-            progressDialog.setTitle("开始监听啦");
-            progressDialog.setMessage("正在筛选和查找符合要求的座位(轮次"+LoopCount+")");
-            //调用筛选 回调中开始监听
-            ActivityConnect.mbinder.SeatsFiltrate_Mobile(ChooseDate, ChooseHouseID, ChooseRoomID, sT, eT, new onTaskResultReturn()
-            {
-                @Override
-                public void OnTaskSucceed(Object... data)
-                {
-                    try
-                    {
-                        JsonInfo_MobileFiltrate filtrateresult=JsonHelp.GetMFiltrateSeats((String)data[0]);
-                        ActivityConnect.mbinder.StartListenRoomOnce(filtrateresult, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
+                        return false;
                     }
                     catch (Exception e)
                     {
-                       Log.e("ListenFragment", "筛选座位发生错误" + e.getMessage());
-                       Toast.makeText(ActivityConnect, "筛选座位发生错误", Toast.LENGTH_SHORT);
+                        Log.e("ListenFragment", e.getMessage());
                     }
                 }
 
-                    @Override
-                    public void OnTaskFailed(Object... data)
-                    {
+                //如果当前预约状态为成功
+                else
+                {
+                    Toast.makeText(ActivityConnect,"当前是不是已经有成功的预约啦？有就不要点了啦" , Toast.LENGTH_LONG).show();
+                    return null;
+                }
+                return null;
+            }
 
-                    }
-            });
-        }
-        else
-        {
-            Toast.makeText(ActivityConnect,"当前是不是已经有成功的预约啦？有就不要点了啦" , Toast.LENGTH_LONG).show();
-        }
+            @Override
+            protected void onProgressUpdate(String... values)
+            {
+                super.onProgressUpdate(values);
+                /*这里刷新进度对话框中的文字
+                   规则："0"-标题 "1"-消息
+                 */
+                if(values[0].equals("0"))
+                {
+                    progressDialog.setTitle(values[1]);
+                }
+                else if(values[0].equals("1"))
+                {
+                    progressDialog.setMessage(values[1]);
+                }
+            }
 
+            @Override
+            protected void onPostExecute(Boolean isscuess)
+            {
+                super.onPostExecute(isscuess);
+                if(isscuess==null)
+                    return;
+
+                if(isscuess)
+                {
+                    ResultReturn.OnTaskSucceed();
+                }
+                else
+                {
+                    ResultReturn.OnTaskFailed();
+                }
+            }
+        };
+
+        ListenRoomTask tmp=new ListenRoomTask(ListenResult,"ListenRoomTask");
+        tmp.execute();
     }
 }

@@ -110,17 +110,12 @@ public class SettingFragment extends Fragment
         try
         {
             //五个延时
-            NetService.DELAY_NEWSEATS= BaseActivity.AppSetting.ListenSetting.getInt("DELAY_NEWSEATS",NetService.DELAY_NEWSEATS_DEFAULT);
-            NetService.DELAY_BEFORESTARTTIME =BaseActivity.AppSetting.ListenSetting.getInt("DELAY_BEFORESTARTTIME",NetService.DELAY_BEFORESTARTTIME_DEFAULT);
-            NetService.DELAY_BEFOREENDTIME =BaseActivity.AppSetting.ListenSetting.getInt("DELAY_BEFOREENDTIME",NetService.DELAY_BEFOREENDTIME_DEFAULT);
             NetService.DELAY_SENDBOOK =BaseActivity.AppSetting.ListenSetting.getInt("DELAY_SENDBOOK",NetService.DELAY_SENDBOOK_DEFAULT);
             NetService.DELAY_BEFOREFILTRATE =BaseActivity.AppSetting.ListenSetting.getInt("DELAY_BEFOREFILTRATE",NetService.DELAY_BEFOREFILTRATE_DEFAULT);
             //最大循环次数
-            ListenFragment.MAXLOOPCOUNT =BaseActivity.AppSetting.ListenSetting.getInt("MAXLOOPCOUNT",ListenFragment.MAXLOOPCOUT_DEFAULT);
+            ListenFragment.MAXLOOPCOUNT =BaseActivity.AppSetting.ListenSetting.getInt("MAXLOOPCOUNT", ListenFragment_old.MAXLOOPCOUT_DEFAULT);
 
-//            et_newSeatDelay.setText(Integer.toString(NetService.DELAY_NEWSEATS));
-//            et_startTimeDelay.setText( Integer.toString(NetService.DELAY_BEFORESTARTTIME));
-//            et_endTimeDelay.setText( Integer.toString(NetService.DELAY_BEFOREENDTIME));
+            //显示文字
             et_bookDelay.setText(Integer.toString(NetService.DELAY_SENDBOOK));
             et_DelayFiltrate.setText(Integer.toString(NetService.DELAY_BEFOREFILTRATE));
             et_MaxLoop.setText(Integer.toString(ListenFragment.MAXLOOPCOUNT));
@@ -136,19 +131,14 @@ public class SettingFragment extends Fragment
     {
         try
         {
-//            NetService.DELAY_NEWSEATS=Integer.parseInt(et_newSeatDelay.getText().toString());
-//            NetService.DELAY_BEFORESTARTTIME =Integer.parseInt(et_startTimeDelay.getText().toString());
-//            NetService.DELAY_BEFOREENDTIME =Integer.parseInt(et_endTimeDelay.getText().toString());
+
             NetService.DELAY_SENDBOOK =Integer.parseInt(et_bookDelay.getText().toString());
             NetService.DELAY_BEFOREFILTRATE =Integer.parseInt(et_DelayFiltrate.getText().toString());
-            ListenFragment.MAXLOOPCOUNT =Integer.parseInt(et_MaxLoop.getText().toString());
+            ListenFragment_old.MAXLOOPCOUNT =Integer.parseInt(et_MaxLoop.getText().toString());
 
-            BaseActivity.AppSetting.ListenSettingEditor.putInt("DELAY_NEWSEATS",NetService.DELAY_NEWSEATS);
-            BaseActivity.AppSetting.ListenSettingEditor.putInt("DELAY_BEFORESTARTTIME",NetService.DELAY_BEFORESTARTTIME);
-            BaseActivity.AppSetting.ListenSettingEditor.putInt("DELAY_BEFOREENDTIME",NetService.DELAY_BEFOREENDTIME);
             BaseActivity.AppSetting.ListenSettingEditor.putInt("DELAY_SENDBOOK",NetService.DELAY_SENDBOOK);
             BaseActivity.AppSetting.ListenSettingEditor.putInt("DELAY_BEFOREFILTRATE",NetService.DELAY_BEFOREFILTRATE);
-            BaseActivity.AppSetting.ListenSettingEditor.putInt("MAXLOOPCOUNT",ListenFragment.MAXLOOPCOUNT);
+            BaseActivity.AppSetting.ListenSettingEditor.putInt("MAXLOOPCOUNT", ListenFragment_old.MAXLOOPCOUNT);
 
             BaseActivity.AppSetting.ListenSettingEditor.apply();
             Toast.makeText(ActivityConnect,"保存成功" ,Toast.LENGTH_SHORT ).show();

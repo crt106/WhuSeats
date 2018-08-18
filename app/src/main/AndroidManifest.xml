@@ -133,6 +133,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.TimeChangeActivity"></activity>
+        <activity android:name=".Activity.ListenActivity"></activity>
     </application>
 
 </manifest>

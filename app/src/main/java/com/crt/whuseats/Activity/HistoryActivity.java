@@ -51,6 +51,7 @@ public class HistoryActivity extends BaseActivity {
             {
                 String datastr=(String)data[0];
                 JsonInfo_HistoryList his=JsonHelp.GetHistoryList(datastr);
+
                 //初始化Adapter
                 Re_adapter=new ReservationAdapter(his.reservationsList);
                 //设置两类按键事件

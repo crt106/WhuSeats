@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.crt.whuseats.Activity.AutoCreatSettingActivity;
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.Activity.LoginActivity;
 import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.SeatsActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
@@ -34,6 +35,10 @@ import com.crt.whuseats.Service.BookService;
 import com.crt.whuseats.Utils.TimeHelp;
 
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -120,7 +125,7 @@ public class BookFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        //绑定控件
+        //region 绑定控件和事件
         tvBookinfoHouse = (TextView) getView().findViewById(R.id.tv_bookinfo_house);
         tvBookinfoRoom = (TextView) getView().findViewById(R.id.tv_bookinfo_room);
         tvBookinfoTime = (TextView) getView().findViewById(R.id.tv_bookinfo_time);
@@ -156,12 +161,14 @@ public class BookFragment extends Fragment
             Toast.makeText(ActivityConnect,"敬请期待~" , Toast.LENGTH_SHORT).show();
             buttonView.setChecked(false);
         });
+        //endregion
 
-
-        //创建的时候尝试刷新预约
+        //创建的时候尝试各类初始化
         try
         {
             RefreshClockInfo();
+            InitBookInfo();
+            CheckIfCompetition();
         }
         catch (Exception e)
         {
@@ -171,27 +178,18 @@ public class BookFragment extends Fragment
     }
 
     @Override
-    public void onResume()
+    public void onDestroyView()
     {
-        super.onResume();
-        InitBookInfo();
-        RefreshClockInfo();
-        CheckIfCompetition();
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
+        super.onDestroyView();
         EndClockTextrefresh();
     }
+
 
     @Override
     public void onDestroy()
     {
         super.onDestroy();
         EndClockTextrefresh();
-        ActivityConnect.unbindService(serviceConnection);
     }
 
     //初始化用户已经设置好的预约信息 显示到TextView中
@@ -244,10 +242,9 @@ public class BookFragment extends Fragment
                     BaseActivity.AppSetting.BookSettingEditor.putBoolean("IsClockon", true).apply();
 
                     //region 向服务器添加预约信息
-                    int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",0 );
-                    String usernumber= BaseActivity.AppSetting.UserAndPwd.getString("Username", "");
-                    if(seatID!=0&&!usernumber.isEmpty())
-                    ActivityConnect.mbinder.AddTomorrowInfo(seatID, usernumber, new onTaskResultReturn()
+                    int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",-1 );
+                    if(seatID!=-1)
+                    ActivityConnect.mbinder.AddTomorrowInfo(seatID, LoginActivity.USERNAME, new onTaskResultReturn()
                     {
                         @Override
                         public void OnTaskSucceed(Object... data)
@@ -264,6 +261,7 @@ public class BookFragment extends Fragment
                         }
                     });
                     //endregion
+
                     RefreshClockInfo();
                 }
                 else
@@ -286,18 +284,18 @@ public class BookFragment extends Fragment
             //设置取消预约按钮
             btnaddBook.setOnClickListener(v->{
                 mbinder_b.DeleteClock();
+
                 //region 向服务器删除预约信息
-                int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",0 );
-                String usernumber= BaseActivity.AppSetting.UserAndPwd.getString("Username", "");
-                if(seatID!=0&&!usernumber.isEmpty())
-                    ActivityConnect.mbinder.DeleteTomorrowInfo(seatID, usernumber, new onTaskResultReturn()
+                int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",-1 );
+                if(seatID!=-1)
+                    ActivityConnect.mbinder.DeleteTomorrowInfo(seatID, LoginActivity.USERNAME, new onTaskResultReturn()
                     {
                         @Override
                         public void OnTaskSucceed(Object... data)
                         {
                             JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
                             String message= info.message;
-                            Log.e("book_addtomoinfo", message);
+                            Log.e("book_deletetomoinfo", message);
                         }
 
                         @Override
@@ -307,6 +305,7 @@ public class BookFragment extends Fragment
                         }
                     });
                 //endregion
+
                 RefreshClockInfo();
             });
         }
@@ -390,7 +389,10 @@ public class BookFragment extends Fragment
     {
        istextrunning=true;
        textrefreshTask=new Textrefresh();
-       textrefreshTask.execute();
+       //给这个任务单独创建一个线程池
+        BlockingQueue<Runnable> queue = new LinkedBlockingDeque<Runnable>();
+        ThreadPoolExecutor exec = new ThreadPoolExecutor(10, 10, 1, TimeUnit.DAYS, queue);
+        textrefreshTask.executeOnExecutor(exec);
     }
 
     //结束预约时间间隔文字刷新

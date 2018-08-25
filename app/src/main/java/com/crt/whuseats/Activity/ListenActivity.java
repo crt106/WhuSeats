@@ -250,21 +250,7 @@ public class ListenActivity extends BaseActivity
                 //Toast.makeText(ActivityConnect.getApplicationContext(),"建筑布局获取错误",Toast.LENGTH_SHORT).show();
             }
         });
-        //region 模拟返回
 
-
-//        JsonInfo_Fliters jf=new JsonInfo_Fliters();
-//        JsonInfo_Fliters.buildings t1= jf.new buildings(1,"信息科学分馆");
-//        JsonInfo_Fliters.buildings t2= jf.new buildings(2,"总馆");
-//        JsonInfo_Fliters.buildings t3= jf.new buildings(3,"医学分馆");
-//        JsonInfo_Fliters.buildings t4= jf.new buildings(4,"工学分馆");
-//        testlist.add(t1);
-//        testlist.add(t2);
-//        testlist.add(t3);
-//        testlist.add(t4);
-//        bdSpinnerAdapter=new BuildingAdapter(testlist);
-//        buildingSpinner.setAdapter(bdSpinnerAdapter);
-        //endregion
     }
 
     //通过活动发起建筑内房间布局

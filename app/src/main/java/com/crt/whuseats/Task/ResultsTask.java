@@ -30,5 +30,6 @@ public abstract class ResultsTask<Params, Progress, Result> extends AsyncTask<Pa
         super.onPostExecute(result);
         BaseActivity.taskManager.RemoveTask(taskname);
     }
+
 }
 

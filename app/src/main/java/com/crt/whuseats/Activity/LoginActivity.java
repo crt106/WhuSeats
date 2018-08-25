@@ -45,8 +45,8 @@ public class LoginActivity extends BaseActivity
     public TextView JoinQQGroup;
     //endregion
 
-    private static String USERNAME;
-    private static String PASSWORD;
+    public static String USERNAME;     //用户名
+    public static String PASSWORD;     //密码
     private boolean IsneedUpdate;
 
 
@@ -67,6 +67,7 @@ public class LoginActivity extends BaseActivity
         {
             String user=AppSetting.UserAndPwd.getString("Username","" );
             String pwd=AppSetting.UserAndPwd.getString("Password","" );
+
             Username.setText(user);
             Password.setText(pwd);
         }
@@ -119,7 +120,8 @@ public class LoginActivity extends BaseActivity
     //简单的登陆效果
     public void ButtonLogin_Click(View v)
     {
-        if(TimeHelp.IsOverTime("23:50"))
+        //检查是不是处于维护状态
+        if(TimeHelp.IsOverTime("23:50")||!TimeHelp.IsOverTime("0:30"))
         {
             AlertDialog temp=new AlertDialog.Builder(this)
                     .setTitle("提示")
@@ -142,7 +144,7 @@ public class LoginActivity extends BaseActivity
                     try
                     {
                         JsonInfo_User userdata= JsonHelp.GetUserInfo((String)data[0]);
-                        //保存
+                        //保存用户姓名
                         AppSetting.UserAndPwdEditor.putString("name",userdata.name).apply();
                     } catch (Exception e)
                     {
@@ -164,8 +166,6 @@ public class LoginActivity extends BaseActivity
                 {
                     try
                     {
-//                      if(!IsLoginpc.isChecked())
-                        //如果不需要PC登录,则在这个回调方法里面启动主界面 否则在PC登录来处理
                         mbinder.GetUserInfo(UserInfoResult);
                        Toast.makeText(getApplicationContext(), "登录成功~", Toast.LENGTH_SHORT).show();
                        Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
@@ -185,56 +185,12 @@ public class LoginActivity extends BaseActivity
                     Toast.makeText(getApplicationContext(), "登录失败,看看是不是输错密码啥的..", Toast.LENGTH_SHORT).show();
                 }
             };
+
             //移动端登录
             USERNAME=Username.getText().toString();
             PASSWORD=Password.getText().toString();
             mbinder.login(USERNAME,PASSWORD,Result);
 
-            // region 弃用【是否要登录PC端】
-//            if(IsLoginpc.isChecked())
-//            {
-//                LoginpcDialog loginpc=new LoginpcDialog(this,this);
-//
-//                //显示对话框
-//                loginpc.show();
-//
-//                //创建[PC登录]回调
-//                onTaskResultReturn LoginPCReturn=new onTaskResultReturn()
-//                {
-//                    @Override
-//                    public void OnTaskSucceed(Object... data)
-//                    {
-//                        //成功 进入主界面
-//                        if(NetService.LIB_TOKEN.length()>0)
-//                            Toast.makeText(getApplicationContext(), "从双端登录成功", Toast.LENGTH_SHORT).show();
-//                        else
-//                            Toast.makeText(getApplicationContext(), "警告!只从web登录成功!请重新登录!", Toast.LENGTH_SHORT).show();
-//
-//                        Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
-//                        startActivity(StartMain);
-//                    }
-//
-//                    @Override
-//                    public void OnTaskFailed(Object... data)
-//                    {
-//                        Toast.makeText(getApplicationContext(), "可能验证码输错了?", Toast.LENGTH_SHORT).show();
-//                        //**********注意！！！这里要清空Cookies以重新登录！！！******
-//                        mbinder_b.CleanCookies();
-//                    }
-//                };
-//                //设置登录PC对话框的确定按钮点击事件
-//                loginpc.setButtonLoginPc_Click((View v1)->
-//                {
-//                    mbinder_b.LoginPc(USERNAME, PASSWORD, loginpc.getInputcaptcha(), LoginPCReturn);
-//                    loginpc.dismiss();
-//                });
-//                //解决对话框无法弹出软键盘
-//                loginpc.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-//                //加上下面这一行弹出对话框时软键盘随之弹出
-//                loginpc.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-//
-//            }
-            //endregion
 
             //检查是否保存密码 是则保存到那啥里面
             if (IsSavePassword.isChecked())
@@ -254,6 +210,7 @@ public class LoginActivity extends BaseActivity
 //        //调试时的跳过登陆
 //        Intent StartMain=new Intent(LoginActivity.this,MainActivity.class);
 //        startActivity(StartMain);
+
     }
     //endregion
 
@@ -315,6 +272,7 @@ public class LoginActivity extends BaseActivity
         {
             downloadDialog.dismiss();
             File downloadApk=(File)data[0];
+
             if(downloadApk!=null)
             InstallApk(downloadApk);
             //下载更新错误 弹出一个错误提示框

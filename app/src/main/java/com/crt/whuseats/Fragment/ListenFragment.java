@@ -75,15 +75,15 @@ public class ListenFragment extends Fragment
     {
         ActivityConnect=(MainActivity)getActivity();
         ListenItem.ReadFromFile(ActivityConnect);
+
         return inflater.inflate(R.layout.frag_listen, container, false);
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
-
-        //获取控件以及绑定他们的事件们
+        super.onViewCreated(view, savedInstanceState);
+        //region 获取控件以及绑定他们的事件们
         rcvListenrooms = (RecyclerView) getView().findViewById(R.id.rcv_listenrooms);
         btnAddroom = (Button) getView().findViewById(R.id.btn_addroom);
         btnStartlistenlist = (Button) getView().findViewById(R.id.btn_startlistenlist);
@@ -119,21 +119,19 @@ public class ListenFragment extends Fragment
 
         swIsloopListen.setChecked(ChooseTimeDialog.ISLOOP);
         swIsloopListen.setOnCheckedChangeListener((compbutton,ischecked)->{ChooseTimeDialog.ISLOOP=ischecked;});
-    }
+        //endregion
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
+        //初始化完成之后的操作
         RefreshListenList();
     }
 
     @Override
-    public void onDestroy()
+    public void onDestroyView()
     {
-        super.onDestroy();
+        super.onDestroyView();
         ListenItem.Save2File(ActivityConnect);
     }
+
 
     //删除按钮按下操作
     ListenItemAdapter.OnDeleteButtonClick deleteButtonClick=(id->{
@@ -222,6 +220,7 @@ public class ListenFragment extends Fragment
             SuccessDialog successDialog=new SuccessDialog(ActivityConnect, NetService.LIB_BOOKRETURNINFO);
             successDialog.show();
             progressDialog.dismiss();
+            RefreshListenList();
         }
 
         @Override
@@ -232,6 +231,7 @@ public class ListenFragment extends Fragment
                     .setMessage("监听结束 未找到合适座位或出现异常")
                     .create();
             listenFailed.show();
+            RefreshListenList();
         }
     };
 

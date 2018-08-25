@@ -57,9 +57,10 @@ public class HomeFragment extends Fragment
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
+
         //region 获取可爱的控件们以及注册他们的事件
         ButtonCheckIn=(Button)getView().findViewById(R.id.btn_checkin);
         ButtonLeave=(Button)getView().findViewById(R.id.btn_leave_back);
@@ -98,19 +99,20 @@ public class HomeFragment extends Fragment
         ButtonHistroy.setOnClickListener((v)->{
             Intent intent=new Intent(ActivityConnect, HistoryActivity.class);
             startActivity(intent);
-                });
+        });
 
         //endregion
+        //endregion
+
         //检查是不是新版本 然后来清除设置
         CheckIfNewVersion();
+        RefreshRE();
     }
 
-
     @Override
-    public void onResume()
+    public void onDestroyView()
     {
-        super.onResume();
-        RefreshRE();
+        super.onDestroyView();
     }
 
     //region 公共回调事件们~

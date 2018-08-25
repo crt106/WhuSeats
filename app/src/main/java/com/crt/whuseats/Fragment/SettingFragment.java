@@ -62,11 +62,6 @@ public class SettingFragment extends Fragment
 
 
     //在活动创建后调用控件以及注册啥的
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
@@ -95,12 +90,6 @@ public class SettingFragment extends Fragment
         ImportDelaySetting();
         //保存当前版本号
         BaseActivity.AppSetting.ListenSettingEditor.putInt("AppVersion",BaseActivity.VERSIONCODE);
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
     }
 
     //导入已经保存的设置

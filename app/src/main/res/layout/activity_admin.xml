@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activity.AdminActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="当前红包吱口令"
+            android:textColor="@android:color/background_dark" />
+
+        <EditText
+            android:id="@+id/et_zhicode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textMultiLine" />
+
+        <Button
+            android:id="@+id/btn_zhicode_get"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="刷新" />
+
+        <Button
+            android:id="@+id/button_zhicode_put"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="更新吱口令" />
+
+        <TextView
+            android:id="@+id/tv_zhicode_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="吱口令刷新文字" />
+
+    </LinearLayout>
+</LinearLayout>

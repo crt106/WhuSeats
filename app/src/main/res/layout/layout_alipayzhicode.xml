@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/alipayhongbao" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="95dp"
+        android:layout_marginTop="180dp"
+        android:singleLine="false"
+        android:text="领个红包咋样啊~"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_dark"
+        android:textSize="25sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="288dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_zhicode_ok"
+            android:layout_width="60dp"
+            android:layout_height="25dp"
+            android:background="@drawable/green_btn_selector"
+            android:text="好呀" />
+
+        <Button
+            android:id="@+id/btn_zhicode_cancel"
+            android:layout_width="60dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/green_btn_selector"
+            android:text="好呀" />
+    </LinearLayout>
+
+</RelativeLayout>

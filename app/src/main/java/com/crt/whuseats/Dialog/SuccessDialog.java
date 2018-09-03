@@ -8,8 +8,10 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.JsonHelps.JsonInfo_BookReturn;
 import com.crt.whuseats.R;
+import com.crt.whuseats.Utils.TimeHelp;
 
 public class SuccessDialog extends Dialog
 {
@@ -23,11 +25,14 @@ public class SuccessDialog extends Dialog
     //endregion
     //注意 这个Dialog只接受BookReturn类的info
     JsonInfo_BookReturn bookReturn;
+
+    private Context Dialogcontext;
     //构造函数
     public SuccessDialog(@NonNull Context context,JsonInfo_BookReturn returnInfo)
     {
         super(context, R.style.Theme_AppCompat_Dialog);
         bookReturn=returnInfo;
+        Dialogcontext=context;
     }
 
     @Override
@@ -44,6 +49,18 @@ public class SuccessDialog extends Dialog
         buttonOK=(Button)findViewById(R.id.btn_success_ok);
         buttonOK.setOnClickListener((v)->
         {
+
+            //如果是预约成功状态 则判断要不要弹出吱口令窗口
+            if(tv_successTitle.getText().equals(Dialogcontext.getString(R.string.dialog_title)))
+            {
+               boolean isshown=BaseActivity.AppSetting.UserAndPwd.getBoolean("Alipay_"+ TimeHelp.GetTodayStr(), false);
+               //展示支付宝对话框
+               if(!isshown)
+               {
+                   AlipayDialog alipayDialog=new AlipayDialog(Dialogcontext);
+                   alipayDialog.show();
+               }
+            }
             this.dismiss();
         });
     }

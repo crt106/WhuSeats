@@ -98,7 +98,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="15dp"
+                android:layout_marginLeft="10dp"
                 android:layout_weight="1.0"
                 android:maxLines="1"
                 android:text="@string/预约延时"
@@ -266,7 +266,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15.0dip"
                 android:layout_weight="1.0"
-                android:text="说明和其他"
+                android:text="说明和日志"
+                android:textColor="@color/gray_font" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:background="@drawable/go_right_pressed" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/morefuction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10.0dip"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center|left"
+                android:background="@drawable/morefuc" />
+
+            <TextView
+                android:layout_width="0.0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15.0dip"
+                android:layout_weight="1.0"
+                android:text="更多..."
                 android:textColor="@color/gray_font" />
 
             <ImageView

@@ -56,6 +56,7 @@ public class WebViewActivity extends BaseActivity
                 handler.proceed();
             }
         });
+
         wb.setWebChromeClient(new WebChromeClient()
         {
             @Override
@@ -73,6 +74,7 @@ public class WebViewActivity extends BaseActivity
         WebSettings wbsetting=wb.getSettings();
         wbsetting.setJavaScriptEnabled(true);
         wbsetting.setDomStorageEnabled(true);
+
         //这里在api21以下跳过
         if(Build.VERSION.SDK_INT>21)
         wbsetting.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);

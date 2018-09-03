@@ -12,7 +12,7 @@ public class Settings
     public static SharedPreferences UserAndPwd;
     public static SharedPreferences.Editor ListenSettingEditor;   //控制监听的设置编辑器
     public static SharedPreferences ListenSetting;
-    public static SharedPreferences.Editor BookSettingEditor;  //控制预约信息的编辑器
+    public static SharedPreferences.Editor BookSettingEditor;     //控制预约信息的编辑器
     public static SharedPreferences BookSetting;
 
     public Settings()

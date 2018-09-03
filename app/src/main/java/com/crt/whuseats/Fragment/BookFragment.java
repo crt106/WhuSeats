@@ -58,7 +58,7 @@ public class BookFragment extends Fragment
     private Button btnautostart;
     private TextView tvClockinfo;
     private TextView tvClockIntroduce;
-    private Switch swUsecloud;
+
 
 
 
@@ -135,7 +135,6 @@ public class BookFragment extends Fragment
         btnautostart=(Button)getView().findViewById(R.id.btn_autostart);
         tvClockinfo = (TextView) getView().findViewById(R.id.tv_clockinfo);
         tvClockIntroduce = (TextView) getView().findViewById(R.id.tv_clock_introduce);
-        swUsecloud = (Switch) getView().findViewById(R.id.sw_usecloud);
         //绑定事件们
 
         tvIsseatcomp.setVisibility(View.INVISIBLE);
@@ -148,6 +147,12 @@ public class BookFragment extends Fragment
         });
         //编辑绑定的座位按钮
         btnEditbook.setOnClickListener((v)->{
+            //如果用户未登录
+            if(!LoginActivity.IsLoginIN)
+            {
+                Toast.makeText(ActivityConnect, "用户未登陆", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent intent=new Intent(ActivityConnect, SeatsActivity.class);
             startActivity(intent);
         });
@@ -156,11 +161,13 @@ public class BookFragment extends Fragment
             Intent intent=new Intent(ActivityConnect, AutoCreatSettingActivity.class);
             startActivity(intent);
         });
-        //云预约开关的事件
-        swUsecloud.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked)->{
-            Toast.makeText(ActivityConnect,"敬请期待~" , Toast.LENGTH_SHORT).show();
-            buttonView.setChecked(false);
-        });
+
+//        //云预约开关的事件
+//        swUsecloud.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked)->{
+//            Toast.makeText(ActivityConnect,"敬请期待~" , Toast.LENGTH_SHORT).show();
+//            buttonView.setChecked(false);
+//        });
+
         //endregion
 
         //创建的时候尝试各类初始化
@@ -175,6 +182,15 @@ public class BookFragment extends Fragment
 
         }
 
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        RefreshClockInfo();
+        InitBookInfo();
+        CheckIfCompetition();
     }
 
     @Override

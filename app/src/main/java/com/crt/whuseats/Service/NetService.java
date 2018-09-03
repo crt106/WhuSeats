@@ -193,6 +193,9 @@ public class NetService extends Service
     static final String URL_TOMORROWINFO_GET="/whuseatsapi/api/getinfo";
     static final String URL_TOMORROWINFO_ADD="/whuseatsapi/api/add";
     static final String URL_TOMORROWINFO_DELETE="/whuseatsapi/api/delete";
+    static final String URL_PREHEAT="/whuseatsapi/api/preheat";
+    static final String URL_ZHICODE="/whuseatsapi/api/alipay/zhicode";
+    static final String URL_PUTZHICODE="/whuseatsapi/api/alipay/putzhicode";
 
     //endregion
 
@@ -350,7 +353,11 @@ public class NetService extends Service
             NetService.this.DownLoadUpdateByHttp(r,p );
         }
 
-
+        //预热ASP.NET
+        public void ASPNETpreheat()
+        {
+            NetService.this.ASPNETpreheat();
+        }
         //获取第二天座位信息
         public void GetTomorrowInfo(onTaskResultReturn r)
         {
@@ -369,6 +376,16 @@ public class NetService extends Service
             NetService.this.DeleteTomorrowInfo(seatID,usernumber,r);
         }
 
+        //获取吱口令
+        public String GetZhicode()
+        {
+            return NetService.this.GetZhicode();
+        }
+        //推送吱口令
+        public String PutZhicode(String value)
+        {
+            return NetService.this.PutZhicode(value);
+        }
         //清除NetService中存在的Cookies
         public void CleanCookies()
         {
@@ -1686,6 +1703,34 @@ public class NetService extends Service
     }
 
     /**
+     * 给服务器端的ASP.NET程序敲个闹钟
+     */
+    public void ASPNETpreheat()
+    {
+        String requestUrl=CRT_HOST+URL_TOMORROWINFO_GET+"?date="+TimeHelp.GetTomorrowStr();
+        Request request=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+
+        CommonTask tmpTask=new CommonTask(new onTaskResultReturn()
+        {
+            @Override
+            public void OnTaskSucceed(Object... data)
+            {
+                Log.e("Preheat","预热成功");
+            }
+
+            @Override
+            public void OnTaskFailed(Object... data)
+            {
+
+            }
+        }, "PreheatTask", request);
+
+        tmpTask.execute();
+    }
+    /**
      * 获取明天的预约情况(全部座位)
      */
     public void GetTomorrowInfo(onTaskResultReturn r)
@@ -1778,6 +1823,51 @@ public class NetService extends Service
 
     }
 
+    /**
+     * 获取服务器上储存的吱口令(同步)
+     * @return
+     */
+    public String GetZhicode()
+    {
+        String requestUrl=CRT_HOST+URL_ZHICODE;
+        Request getzhi=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(getzhi).execute();
+            return response.body().string();
+        }
+        catch (IOException e)
+        {
+            Log.e("GetZhicode:", e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 刷新服务器上的吱口令(同步)
+     * @return
+     */
+    public String PutZhicode(String value)
+    {
+        String requestUrl=CRT_HOST+URL_PUTZHICODE+"?value="+value;
+        Request putzhi=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(putzhi).execute();
+            return response.body().string();
+        }
+        catch (IOException e)
+        {
+            Log.e("PutZhicode:", e.getMessage());
+            return "";
+        }
+    }
     /**
      * 检查更新,用于弹出对话框(同步)
      * @param IsneedWinform 这个参数用于干预本次判断要不要检测服务器上的服务端winform程序的存活情况

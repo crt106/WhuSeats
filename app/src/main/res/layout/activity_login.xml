@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/login_bg"
+    android:background="@drawable/login_bg3"
     android:orientation="vertical">
 
     <LinearLayout
@@ -46,7 +46,7 @@
 
     <LinearLayout
         android:id="@+id/center"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginLeft="40.0dip"
@@ -96,7 +96,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="4"
                     android:checked="true"
-                    android:text="@string/remember_password" />
+                    android:text="@string/remember_password"
+                    android:textColor="@android:color/background_light" />
 
                 <TextView
                     android:id="@+id/tv_JoinQQGroup"
@@ -104,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/JoinQQGroup"
-                    android:textColor="@color/green_font"
+                    android:textColor="@android:color/holo_orange_light"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -114,6 +115,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_marginTop="10.0dip">
 
 
@@ -128,6 +130,14 @@
                 android:textColor="@color/white"
                 android:textSize="16.0sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_login_pass"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/loginpass"
+                android:textAlignment="viewEnd" />
         </LinearLayout>
     </LinearLayout>
 
@@ -140,18 +150,18 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/copyRight"
-            android:textColor="@color/gray_font"
-            android:textSize="12.0sp" />
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/copyRight"-->
+            <!--android:textColor="@color/gray_font"-->
+            <!--android:textSize="12.0sp" />-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/en_copyRight"
-            android:textColor="@color/gray_font"
-            android:textSize="10.0sp" />
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/en_copyRight"-->
+            <!--android:textColor="@color/gray_font"-->
+            <!--android:textSize="10.0sp" />-->
     </LinearLayout>
 </RelativeLayout>

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.MainActivity;
+import com.crt.whuseats.Activity.MoreFucActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
@@ -45,6 +46,10 @@ public class SettingFragment extends Fragment
     public View LearnAboutus;
     public View MoreInfo;
     public View Announce;
+    private View morefuction;
+
+
+
 
     public SettingFragment()
     {
@@ -79,11 +84,13 @@ public class SettingFragment extends Fragment
         LearnAboutus=getView().findViewById(R.id.ll_us);
         MoreInfo=getView().findViewById(R.id.instruction);
         Announce=getView().findViewById(R.id.announce);
+        morefuction = getView().findViewById(R.id.morefuction);
 
         SaveDelaySetting.setOnClickListener(SaveDelaySettingClick);
         LearnAboutus.setOnClickListener(learnusClick);
         MoreInfo.setOnClickListener(moreInfoClick);
         Announce.setOnClickListener(AnnounceClick);
+        morefuction.setOnClickListener(morefucClick);
 
 
         CheckIfNewVersion();
@@ -138,6 +145,7 @@ public class SettingFragment extends Fragment
     };
 
     //region关于按钮的响应
+
     //关于按钮相应
     public View.OnClickListener learnusClick=(v)->
     {
@@ -172,6 +180,10 @@ public class SettingFragment extends Fragment
             public void OnTaskSucceed(Object... data)
             {
                 String announce= JsonHelp.Getannounce((String)data[0]);
+                if(announce.contains("请勿使用程序脚本等非正常方式使用本系统"))
+                {
+                    announce+="\n看到没有 叫你不要用脚本程序!";
+                }
                 AlertDialog temp=new AlertDialog.Builder(ActivityConnect)
                         .setTitle("公告")
                         .setMessage(announce)
@@ -186,6 +198,12 @@ public class SettingFragment extends Fragment
             }
         });
 
+    };
+
+    //更多功能点击按钮
+    public View.OnClickListener morefucClick=v->{
+        Intent intent=new Intent(ActivityConnect, MoreFucActivity.class);
+        startActivity(intent);
     };
 
     //endregion

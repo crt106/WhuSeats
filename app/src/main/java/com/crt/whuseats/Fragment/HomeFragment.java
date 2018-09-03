@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.HistoryActivity;
+import com.crt.whuseats.Activity.LoginActivity;
 import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.TimeChangeActivity;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
@@ -110,6 +111,13 @@ public class HomeFragment extends Fragment
     }
 
     @Override
+    public void onStart()
+    {
+        super.onStart();
+        RefreshRE();
+    }
+
+    @Override
     public void onDestroyView()
     {
         super.onDestroyView();
@@ -151,6 +159,13 @@ public class HomeFragment extends Fragment
     //刷新用户相关的状态
     public void RefreshRE()
     {
+        //如果未登录
+        if(!LoginActivity.IsLoginIN)
+        {
+            tv_Reshow.setText("用户未登录");
+            SwitchButton(false);
+            return;
+        }
         ActivityConnect.mbinder.CheckReservations(new onTaskResultReturn()
         {
             @Override
@@ -196,6 +211,16 @@ public class HomeFragment extends Fragment
     //改变某些Button的状况
     public void SwitchButton(boolean isenable)
     {
+        //如果用户压根就没登陆
+        if(!LoginActivity.IsLoginIN)
+        {
+            ButtonCheckIn.setEnabled(false);
+            ButtonLeave.setEnabled(false);
+            ButtonExtend.setEnabled(false);
+            ButtonStop.setEnabled(false);
+            ButtonHistroy.setEnabled(false);
+            return;
+        }
         if(isenable)
         {
             ButtonCheckIn.setEnabled(true);

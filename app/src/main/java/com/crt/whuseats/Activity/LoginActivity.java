@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
+import com.crt.whuseats.Dialog.AlipayDialog;
 import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.UpdateDialog;
 import com.crt.whuseats.Interface.onProgressReturn;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 public class LoginActivity extends BaseActivity
 {
 
+    public static boolean IsLoginIN=true;                 //判断用户是否已登录进入
     public static final int ANDROID_M_PERMISSION=1;
     //region 控件
     public EditText Username;
@@ -43,6 +45,7 @@ public class LoginActivity extends BaseActivity
     public CustomProgressDialog downloadDialog;
     public UpdateDialog ConfimDialog;
     public TextView JoinQQGroup;
+    private TextView tvLoginPass;
     //endregion
 
     public static String USERNAME;     //用户名
@@ -61,6 +64,7 @@ public class LoginActivity extends BaseActivity
         IsSavePassword=(CheckBox)findViewById(R.id.if_remember_password);
 //        IsLoginpc=(CheckBox)findViewById(R.id.if_loginpc);
         JoinQQGroup=(TextView)findViewById(R.id.tv_JoinQQGroup);
+        tvLoginPass = (TextView) findViewById(R.id.tv_login_pass);
 
         //读取已经保存的用户名和密码
         try
@@ -77,7 +81,19 @@ public class LoginActivity extends BaseActivity
         }
         //绑定加入QQ群文字点击事件
         JoinQQGroup.setOnClickListener((v)->{joinQQGroup();});
+
+        //跳过登陆按钮点击之后 跳过登陆
+
+        tvLoginPass.setOnClickListener(v->{
+            //直接进入主界面
+            IsLoginIN=false;
+            Toast.makeText(getApplicationContext(), "跳过登录 功能受限~", Toast.LENGTH_SHORT).show();
+            Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(StartMain);});
+
+        //获取权限
         getPersimmions();
+
 
         //向百度统计发送数据
         try
@@ -90,6 +106,7 @@ public class LoginActivity extends BaseActivity
             e.printStackTrace();
         }
 
+
         //实现通知点击的自动登录
         try
         {
@@ -99,6 +116,7 @@ public class LoginActivity extends BaseActivity
                 //直接进入主界面
                 Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(StartMain);
+                IsLoginIN=true;
             }
         }
 
@@ -115,6 +133,7 @@ public class LoginActivity extends BaseActivity
     {
         super.onServiceBinded();
         CheckUpdate();
+        WebPreheat();
     }
 
     //简单的登陆效果
@@ -170,7 +189,7 @@ public class LoginActivity extends BaseActivity
                        Toast.makeText(getApplicationContext(), "登录成功~", Toast.LENGTH_SHORT).show();
                        Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
                        startActivity(StartMain);
-
+                       IsLoginIN=true;
                     }
                     catch (Exception e)
                     {
@@ -361,6 +380,17 @@ public class LoginActivity extends BaseActivity
             // 未安装手Q或安装的版本不支持
             return false;
         }
+    }
+
+    //和服务器的预热,以及获取吱口令
+    public void WebPreheat()
+    {
+        mbinder.ASPNETpreheat();
+        Thread t1=new Thread(()->{
+           AlipayDialog.Zhicodestr=mbinder.GetZhicode();
+        });
+        t1.start();
+
     }
 
     //region 安卓6.0动态检查权限

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.ListenActivity;
+import com.crt.whuseats.Activity.LoginActivity;
 import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Adapter.ListenItemAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
@@ -108,12 +109,24 @@ public class ListenFragment extends Fragment
 
         //添加房间按钮响应事件
         btnAddroom.setOnClickListener(v->{
+            //如果用户未登录
+            if(!LoginActivity.IsLoginIN)
+            {
+                Toast.makeText(ActivityConnect, "用户未登陆", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent start=new Intent(ActivityConnect, ListenActivity.class);
             ActivityConnect.startActivity(start);
         });
 
         //开始监听按钮响应事件
         btnStartlistenlist.setOnClickListener(v->{
+            //如果用户未登录
+            if(!LoginActivity.IsLoginIN)
+            {
+                Toast.makeText(ActivityConnect, "用户未登陆", Toast.LENGTH_SHORT).show();
+                return;
+            }
             StartListen();
         });
 
@@ -132,6 +145,13 @@ public class ListenFragment extends Fragment
         ListenItem.Save2File(ActivityConnect);
     }
 
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        RefreshListenList();
+    }
 
     //删除按钮按下操作
     ListenItemAdapter.OnDeleteButtonClick deleteButtonClick=(id->{

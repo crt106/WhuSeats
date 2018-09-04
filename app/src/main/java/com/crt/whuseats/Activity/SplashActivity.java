@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TencentAD;
 import com.qq.e.ads.splash.SplashAD;
@@ -168,6 +169,8 @@ public class SplashActivity extends Activity implements SplashADListener {
     @Override
     public void onADClicked() {
         Log.i("AD_DEMO", "SplashADClicked");
+        //统计开屏广告
+        StatService.onEvent(this, "Event_adClick", "开屏广告被点击", 1);
     }
 
     /**

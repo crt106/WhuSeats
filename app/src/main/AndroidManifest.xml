@@ -23,6 +23,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--百度自动更新元数据-->
+        <meta-data android:name="BDAPPID" android:value="你的 appid"/>
+        <meta-data android:name="BDAPPKEY" android:value="你的 appkey"/>
+        <!--百度移动统计-->
         <meta-data
             android:name="BaiduMobAd_STAT_ID"
             android:value="d69142014f" />

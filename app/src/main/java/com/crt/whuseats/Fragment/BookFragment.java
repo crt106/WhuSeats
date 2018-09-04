@@ -250,7 +250,7 @@ public class BookFragment extends Fragment
 
             //设置添加预约按钮
             btnaddBook.setOnClickListener(v->{
-                if(!TimeHelp.IsOverTime("22:45"))
+                if(!TimeHelp.IsOverTime("22:45")&&LoginActivity.IsLoginIN)
                 {
                     //注意这里是直接startService而不是Bind
                     Intent bookService=new Intent(ActivityConnect, BookService.class);
@@ -282,7 +282,7 @@ public class BookFragment extends Fragment
                 }
                 else
                 {
-                    Toast.makeText(ActivityConnect, "当前已经超过预约时间,请改用监听座位",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityConnect, "当前添加预约信息不可用",Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -302,24 +302,27 @@ public class BookFragment extends Fragment
                 mbinder_b.DeleteClock();
 
                 //region 向服务器删除预约信息
-                int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",-1 );
-                if(seatID!=-1)
-                    ActivityConnect.mbinder.DeleteTomorrowInfo(seatID, LoginActivity.USERNAME, new onTaskResultReturn()
-                    {
-                        @Override
-                        public void OnTaskSucceed(Object... data)
+                if(LoginActivity.IsLoginIN)
+                {
+                    int seatID=BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID",-1 );
+                    if(seatID!=-1)
+                        ActivityConnect.mbinder.DeleteTomorrowInfo(seatID, LoginActivity.USERNAME, new onTaskResultReturn()
                         {
-                            JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
-                            String message= info.message;
-                            Log.e("book_deletetomoinfo", message);
-                        }
+                            @Override
+                            public void OnTaskSucceed(Object... data)
+                            {
+                                JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
+                                String message= info.message;
+                                Log.e("book_deletetomoinfo", message);
+                            }
 
-                        @Override
-                        public void OnTaskFailed(Object... data)
-                        {
+                            @Override
+                            public void OnTaskFailed(Object... data)
+                            {
 
-                        }
-                    });
+                            }
+                        });
+                }
                 //endregion
 
                 RefreshClockInfo();

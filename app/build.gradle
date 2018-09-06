@@ -31,16 +31,17 @@ android {
     //渠道们
     productFlavors
             {
-                crt {
-                    manifestPlaceholders = [CHANNEL_NAME: "crt"]
-                    flavorDimensions "versionCode"
-                }
-
                 baidu
                         {
                             manifestPlaceholders = [CHANNEL_NAME: "BaiduMarket"]
                             flavorDimensions "versionCode"
                         }
+
+                crt {
+                    manifestPlaceholders = [CHANNEL_NAME: "crt"]
+                    flavorDimensions "versionCode"
+                }
+
 
 
             }
@@ -60,4 +61,11 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation 'com.baidu.mobstat:mtj-sdk:latest.integration'
     implementation 'com.android.support:design:25.1.0'
+    implementation(name: 'bd_autoupdate_sdk_release_1_3_1', ext: 'aar')
+}
+
+repositories {
+    flatDir{
+        dirs 'libs'
+    }
 }

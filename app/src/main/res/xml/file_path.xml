@@ -5,8 +5,10 @@
         path="."/>
 
     <paths>
-        <external-path
-            name="external_files"
-            path="." />
+        <external-path name="external_files" path="." />
+        <external-files-path name="extfiles" path="autoupdatecache/" />
+        <external-cache-path name="extcachs" path="autoupdatecache/" />
+        <cache-path name="intcachs" path="autoupdatecache/" />
     </paths>
+
 </resources>

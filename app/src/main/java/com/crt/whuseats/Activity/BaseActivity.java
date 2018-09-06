@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.Log;
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
 import com.crt.whuseats.Service.NetService;
+import com.crt.whuseats.Utils.Flavors;
 import com.crt.whuseats.Utils.Settings;
 import com.crt.whuseats.Task.TaskManager;
 import com.crt.whuseats.Utils.TimeHelp;
@@ -24,10 +26,12 @@ import com.crt.whuseats.Utils.TimeHelp;
 public class BaseActivity extends AppCompatActivity
 {
 
+    public static boolean IsInit=false;        //当前活动是否已经初始化
 
-    public static String PACKAGENAME;
-    public static int VERSIONCODE;
-    public static String VERSIONNAME;
+    public static String PACKAGENAME;          //包名
+    public static int VERSIONCODE;             //版本号
+    public static String VERSIONNAME;          //版本名
+    public static Flavors appFlavors;
     public static Settings AppSetting;  //主程序设置
     public static TaskManager taskManager=new TaskManager();
     public static TimeHelp timeHelp;    //时间转换
@@ -60,23 +64,33 @@ public class BaseActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Intent serviceintent=new Intent(BaseActivity.this,NetService.class);
-        ApplicationContext=getApplicationContext();
-        timeHelp=new TimeHelp();
-        AppSetting=new Settings();
-        try
+        //App初始化过程
+        if(!IsInit)
         {
-            //获取当前版本号
-
-            PackageManager m= getPackageManager();
-            PACKAGENAME=getPackageName();
-            PackageInfo i=m.getPackageInfo(PACKAGENAME, 0);
-            VERSIONCODE=i.versionCode;
-            VERSIONNAME=i.versionName;
-        }
-        catch (Exception e)
-        {
-            Log.e("Base_GetVersion", e.getMessage());
+            ApplicationContext=getApplicationContext();
+            timeHelp=new TimeHelp();
+            AppSetting=new Settings();
+            try
+            {
+                //获取当前版本号
+                PackageManager m= getPackageManager();
+                PACKAGENAME=getPackageName();
+                PackageInfo i=m.getPackageInfo(PACKAGENAME, 0);
+                VERSIONCODE=i.versionCode;
+                VERSIONNAME=i.versionName;
+                //获取当前渠道名称
+                ApplicationInfo ai= getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+                String Flavorname=ai.metaData.getString("BaiduMobAd_CHANNEL");
+                if(Flavorname.equals("crt"))
+                    appFlavors=Flavors.crt;
+                else if(Flavorname.equals("BaiduMarket"))
+                    appFlavors=Flavors.BaiduMarket;
+            }
+            catch (Exception e)
+            {
+                Log.e("Base_GetVersion", e.getMessage());
+            }
+            IsInit=true;
         }
 
         // region 注册广播接收机
@@ -86,7 +100,7 @@ public class BaseActivity extends AppCompatActivity
         localreceiver=new ReservationChangeReciver();
         localBroadcastManager.registerReceiver(localreceiver,intentFilter );
         //endregion
-
+        Intent serviceintent=new Intent(BaseActivity.this,NetService.class);
         //在基类中绑定服务
         bindService(serviceintent,serviceConnection,BIND_AUTO_CREATE );
     }

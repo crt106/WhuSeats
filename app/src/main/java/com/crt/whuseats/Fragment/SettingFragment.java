@@ -24,6 +24,7 @@ import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.R;
+import com.crt.whuseats.Utils.UpdateHelp;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +48,7 @@ public class SettingFragment extends Fragment
     public View MoreInfo;
     public View Announce;
     private View morefuction;
+    private View Checkupdate;
 
 
 
@@ -85,12 +87,14 @@ public class SettingFragment extends Fragment
         MoreInfo=getView().findViewById(R.id.instruction);
         Announce=getView().findViewById(R.id.announce);
         morefuction = getView().findViewById(R.id.morefuction);
+        Checkupdate=getView().findViewById(R.id.checkUpdate);
 
         SaveDelaySetting.setOnClickListener(SaveDelaySettingClick);
         LearnAboutus.setOnClickListener(learnusClick);
         MoreInfo.setOnClickListener(moreInfoClick);
         Announce.setOnClickListener(AnnounceClick);
         morefuction.setOnClickListener(morefucClick);
+        Checkupdate.setOnClickListener(CheckupdateClick);
 
 
         CheckIfNewVersion();
@@ -153,7 +157,7 @@ public class SettingFragment extends Fragment
         AlertDialog tempdialog=new AlertDialog.Builder(ActivityConnect)
                 .setTitle("关于？什么关于")
                 .setMessage("炒鸡辣鸡的抢座系统v" +BaseActivity.VERSIONNAME+"("+BaseActivity.VERSIONCODE+")"+
-                        "\n Madeby crt106\n我欲升天 法力无边")
+                        "\n Madeby crt106\n我欲升天 法力无边\n"+"渠道来源:"+BaseActivity.appFlavors)
                 .setPositiveButton("加入QQ群",(DialogInterface dialog, int which)->
                 {
                     dialog.dismiss();
@@ -204,6 +208,15 @@ public class SettingFragment extends Fragment
     public View.OnClickListener morefucClick=v->{
         Intent intent=new Intent(ActivityConnect, MoreFucActivity.class);
         startActivity(intent);
+    };
+
+    //检查更新按钮响应
+    public View.OnClickListener CheckupdateClick=v->{
+        UpdateHelp updateHelp=new UpdateHelp(ActivityConnect,false);
+        if(!updateHelp.CheckUpdate())
+        {
+            Toast.makeText(ActivityConnect, "当前没有可用版本",Toast.LENGTH_SHORT).show();
+        }
     };
 
     //endregion

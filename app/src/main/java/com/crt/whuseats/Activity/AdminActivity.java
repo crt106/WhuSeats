@@ -56,6 +56,7 @@ public class AdminActivity extends BaseActivity
     {
         Thread t=new Thread(()->{
             Zhicode=mbinder.GetZhicode();
+            Zhicode=Zhicode.replaceAll("\"","" );
         });
         try
         {

@@ -6,12 +6,14 @@ import android.os.Bundle;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.crt.whuseats.Dialog.AlipayDialog;
 import com.crt.whuseats.Fragment.BookFragment;
 import com.crt.whuseats.Fragment.HomeFragment;
 import com.crt.whuseats.Fragment.ListenFragment;
 import com.crt.whuseats.Fragment.ListenFragment_old;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Fragment.SettingFragment;
+import com.crt.whuseats.Utils.TimeHelp;
 
 
 //主界面 承载多个碎片
@@ -47,12 +49,24 @@ public class MainActivity extends BaseActivity
         listen=(RadioButton)findViewById(R.id.rb_3);
         settings=(RadioButton)findViewById(R.id.rb_4);
         downGruop.setOnCheckedChangeListener(downGroupChange);
+
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
+        //如果收到了展示吱口令的消息
+        if(getIntent().getBooleanExtra("ShowAlipay", false))
+        {
+            boolean isshown=BaseActivity.AppSetting.UserAndPwd.getBoolean("Alipay_"+ TimeHelp.GetTodayStr(), false);
+            //展示支付宝对话框
+            if(!isshown)
+            {
+                AlipayDialog alipayDialog=new AlipayDialog(this);
+                alipayDialog.show();
+            }
+        }
 
     }
 

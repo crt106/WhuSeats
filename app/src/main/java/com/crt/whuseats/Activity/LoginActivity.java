@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -19,17 +18,13 @@ import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Dialog.AlipayDialog;
-import com.crt.whuseats.Dialog.CustomProgressDialog;
-import com.crt.whuseats.Dialog.UpdateDialog;
-import com.crt.whuseats.Interface.onProgressReturn;
+import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.JsonHelps.JsonInfo_User;
-import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.Utils.TimeHelp;
+import com.crt.whuseats.Utils.UpdateHelp;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class LoginActivity extends BaseActivity
@@ -41,9 +36,7 @@ public class LoginActivity extends BaseActivity
     public EditText Username;
     public EditText Password;
     public CheckBox IsSavePassword;
-//  public CheckBox IsLoginpc;
-    public CustomProgressDialog downloadDialog;
-    public UpdateDialog ConfimDialog;
+
     public TextView JoinQQGroup;
     private TextView tvLoginPass;
     //endregion
@@ -115,6 +108,7 @@ public class LoginActivity extends BaseActivity
             {
                 //直接进入主界面
                 Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
+                StartMain.putExtra("ShowAlipay",true );
                 startActivity(StartMain);
                 IsLoginIN=true;
             }
@@ -259,106 +253,16 @@ public class LoginActivity extends BaseActivity
     //region 检查更新
     public void CheckUpdate()
     {
-
-        try
-        {
-            Thread t=new Thread(()->{IsneedUpdate=mbinder.CheckUpdate_IsShowDialog(false);});
-            t.start();
-            t.join();
-        }
-        catch (Exception e)
-        {
-            Log.e("Login_Checkupdate", e.toString());
-        }
-        if(!IsneedUpdate)
-            return;
-
-        //显示确定对话框
-        ConfimDialog=new UpdateDialog(LoginActivity.this,NetService.ISFORCEUPDATE);
-        ConfimDialog.show();
-        ConfimDialog.setButtonOKListenner(ConfimDialog_OK);
+        UpdateHelp updateHelp=new UpdateHelp(this,true);
+        boolean isneedUptade=updateHelp.CheckUpdate();
     }
 
-    //下载更新进度回调
-    onProgressReturn downloadProgress=(data)->{
-        downloadDialog.setProgress(((Number)data[0]).intValue());
-    };
-    //下载完成结果回调
-    onTaskResultReturn downloadTaskReturn=new onTaskResultReturn()
-    {
-        @Override
-        public void OnTaskSucceed(Object... data)
-        {
-            downloadDialog.dismiss();
-            File downloadApk=(File)data[0];
 
-            if(downloadApk!=null)
-            InstallApk(downloadApk);
-            //下载更新错误 弹出一个错误提示框
-            else
-            {
-                AlertDialog tempDialog=new AlertDialog.Builder(LoginActivity.this)
-                        .setTitle("淦！")
-                        .setMessage("好像更新过程中粗了什么问题哒!")
-                        .setPositiveButton("查看解决方案不?", (dialog,v)->{
-                            //跳转说明书
-                            Intent intent=new Intent(LoginActivity.this, WebViewActivity.class);
-                            intent.putExtra("Uri","http://120.79.7.230/WhuSeats_info.html#update");
-                            startActivity(intent);
-                            dialog.dismiss();
-                        })
-                        .create();
-                tempDialog.show();
-            }
-        }
-
-        @Override
-        public void OnTaskFailed(Object... data)
-        {
-            downloadDialog.dismiss();
-            Toast.makeText(LoginActivity.this, "下载更新失败哒！淦！",Toast.LENGTH_LONG);
-        }
-    };
-
-    //弹出的确认下载对话框确定回调
-    View.OnClickListener ConfimDialog_OK=(view)->{
-
-        if(ConfimDialog.isShowing())
-            ConfimDialog.dismiss();
-        downloadDialog=new CustomProgressDialog(LoginActivity.this);
-        downloadDialog.show();
-        downloadDialog.setTitle("正在更新");
-        downloadDialog.setCanceledOnTouchOutside(false); //设置该对话框不能通过点击取消
-        downloadDialog.setMessage("不要催了不要催了..服务器小水管");
-
-        //开始执行下载
-        mbinder.DownLoadUpdateByHttp(downloadTaskReturn,downloadProgress);
-    };
 
     //endregion
 
 
-    //调用系统程序安装apk
-    public void InstallApk(File f)
-    {
-        Uri fileUri;
-        Intent installapk=new Intent(Intent.ACTION_VIEW);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)//安卓7.0之前的操作
-        {
-            fileUri = Uri.fromFile(f);
-            installapk.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
-        else
-        {
-            //兼容android7.0 使用共享文件的形式
-            fileUri= FileProvider.getUriForFile(getApplicationContext(),getPackageName(),f);
-            installapk.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            installapk.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
-        installapk.setDataAndType(fileUri,"application/vnd.android.package-archive" );
-        startActivity(installapk);
-        System.exit(0);
-    }
+
 
     /****************
      *

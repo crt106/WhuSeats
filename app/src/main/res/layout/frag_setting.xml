@@ -275,6 +275,33 @@
                 android:layout_gravity="center|right"
                 android:background="@drawable/go_right_pressed" />
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/checkUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10.0dip"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center|left"
+                android:background="@drawable/more_version" />
+
+            <TextView
+                android:layout_width="0.0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15.0dip"
+                android:layout_weight="1.0"
+                android:text="检查更新"
+                android:textColor="@color/gray_font" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:background="@drawable/go_right_pressed" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/morefuction"

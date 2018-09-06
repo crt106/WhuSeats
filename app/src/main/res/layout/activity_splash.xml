@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:src="@drawable/splash_logo"
         />
 
     <!-- 2.开屏广告容器区域：-->
@@ -53,5 +54,15 @@
         android:layout_height="match_parent"
         android:layout_above="@id/app_logo"
         android:scaleType="fitXY"
+
         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:text="看不到广告的话直接跳过吧~还没有通过审核~"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 </RelativeLayout>

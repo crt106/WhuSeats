@@ -161,10 +161,18 @@ public class NetService extends Service
     //endregion
 
     //region 静态URL字段
+    static final String LIB_WHU_URL="http://seat.lib.whu.edu.cn";
+    static final String LIB_GXU_URL="http://seat.gxu.edu.cn";
+
     static final String LIB_URL="http://seat.lib.whu.edu.cn";
     static final String LIB_URLWITHPORT="https://seat.lib.whu.edu.cn:8443";
+
+    static final String LIB_HOST_WHU="seat.lib.whu.edu.cn";
+    static final String LIB_HOST_GXU="seat.gxu.edu.cn";
+
     static final String LIB_HOST="seat.lib.whu.edu.cn";
-    static final String LIB_FREEBOOK="http://seat.lib.whu.edu.cn/rest/v2/freeBook";
+    //static final String LIB_FREEBOOK="http://seat.lib.whu.edu.cn/rest/v2/freeBook";
+    static final String LIB_FREEBOOK=LIB_URL+"/rest/v2/freeBook";
     static final String CRT_HOST="http://120.79.7.230";
     static final String CRT_OSS="https://bucket-crt106.oss-cn-shenzhen.aliyuncs.com";
     static final String URL_LOGIN="/rest/auth";
@@ -196,6 +204,10 @@ public class NetService extends Service
     static final String URL_PREHEAT="/whuseatsapi/api/preheat";
     static final String URL_ZHICODE="/whuseatsapi/api/alipay/zhicode";
     static final String URL_PUTZHICODE="/whuseatsapi/api/alipay/putzhicode";
+    static final String URL_CHECKPROCESS="/whuseatsapi/api/winform/checkprocess";
+    static final String URL_KILLPROCESS="/whuseatsapi/api/winform/killprocess";
+    static final String URL_RESTARTPROCESS="/whuseatsapi/api/winform/restart";
+    static final String URL_GETLOG="/whuseatsapi/api/winform/getlog";
 
     //endregion
 
@@ -203,7 +215,6 @@ public class NetService extends Service
     public class NetBinder extends Binder
     {
         //以下的方法看是都是返回void 不过实际上都是有返回值的 是在实现的接口中处理的咯
-
 
         //登陆
         public void login(String user,String pwd,onTaskResultReturn r)
@@ -340,6 +351,11 @@ public class NetService extends Service
         {
            return NetService.this.CheckUpdate_IsShowDialog(isneedwinform);
         }
+        //检查Winform进程是否活跃 是的话把输入输出流实例化
+        public boolean IsWinFormActive()
+        {
+            return NetService.this.IsWinFormActive();
+        }
 
         //下载更新
         public void DownLoadUpdate(onTaskResultReturn r,onProgressReturn p)
@@ -397,6 +413,30 @@ public class NetService extends Service
         public void GetAnnounce(onTaskResultReturn r)
         {
             NetService.this.GetAnnounce(r);
+        }
+
+        //检查远端服务器winform进程是否存活(同步)
+        public boolean CheckProcessAlive()
+        {
+            return NetService.this.CheckProcessAlive();
+        }
+
+        //杀死服务器进程
+        public String killProcess()
+        {
+            return NetService.this.killProcess();
+        }
+
+        //重启服务器进程
+        public String RestartProcess()
+        {
+            return NetService.this.RestartProcess();
+        }
+
+        //获取服务器日志
+        public String GetLog()
+        {
+            return NetService.this.GetLog();
         }
 
 
@@ -469,6 +509,7 @@ public class NetService extends Service
     }
 
     //endregion
+
 
     //region 相关实现方法
 
@@ -1707,7 +1748,7 @@ public class NetService extends Service
      */
     public void ASPNETpreheat()
     {
-        String requestUrl=CRT_HOST+URL_TOMORROWINFO_GET+"?date="+TimeHelp.GetTomorrowStr();
+        String requestUrl=CRT_HOST+URL_PREHEAT;
         Request request=new Request.Builder()
                 .get()
                 .url(requestUrl)
@@ -1903,24 +1944,31 @@ public class NetService extends Service
 
         if(IsneedWinform)
         {
-            //再检查与服务器winform的连接
-            try
-            {
-                //绑定本地套接字并且连接
-                ClientSocket=new Socket(ServerIP1,7777);
-                Clientop=ClientSocket.getOutputStream();
-                Clientin=ClientSocket.getInputStream();
-            }
-            catch (Exception e)
-            {
-                Log.e("CheckUpdate","连接到服务器失败\n"+e.getMessage());
-                return false;
-            }
-            return true;
+            return IsWinFormActive();
         }
        return true;
     }
 
+    /**
+     * 检查服务端的Winform是否处在可连接状态(同步)
+     * @return
+     */
+    public boolean IsWinFormActive()
+    {
+        try
+        {
+            //绑定本地套接字并且连接
+            ClientSocket=new Socket(ServerIP1,7777);
+            Clientop=ClientSocket.getOutputStream();
+            Clientin=ClientSocket.getInputStream();
+        }
+        catch (Exception e)
+        {
+            Log.e("CheckUpdate","连接到服务器失败\n"+e.getMessage());
+            return false;
+        }
+        return true;
+    }
     /**
      * 下载更新(异步)
      */
@@ -2221,6 +2269,101 @@ public class NetService extends Service
         tempTask.execute();
     }
 
+    /**
+     * 检查远端服务器winform进程是否存活(同步)
+     * @return
+     */
+    public boolean CheckProcessAlive()
+    {
+        String requestUrl=CRT_HOST+URL_CHECKPROCESS;
+        Request checkprocess=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(checkprocess).execute();
+            JSONObject responseJobj=new JSONObject(response.body().string());
+            return responseJobj.getBoolean("data");
+
+        } catch (Exception e)
+        {
+            Log.e("CheckProcessAlive", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 杀死服务器上的进程(同步)
+     * @return 返回服务器message
+     */
+    public String killProcess()
+    {
+        String requestUrl=CRT_HOST+URL_KILLPROCESS;
+        Request killprocess=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(killprocess).execute();
+            JSONObject responseJobj=new JSONObject(response.body().string());
+            return responseJobj.getString("message");
+
+        } catch (Exception e)
+        {
+            Log.e("CheckProcessAlive", e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 重启服务器上的进程(同步)
+     * @return
+     */
+    public String RestartProcess()
+    {
+        String requestUrl=CRT_HOST+URL_RESTARTPROCESS;
+        Request restartprocess=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(restartprocess).execute();
+            JSONObject responseJobj=new JSONObject(response.body().string());
+            return responseJobj.getString("message");
+
+        } catch (Exception e)
+        {
+            Log.e("CheckProcessAlive", e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 获取服务器上的窗口文字(同步)
+     * @return
+     */
+    public String GetLog()
+    {
+        String requestUrl=CRT_HOST+URL_GETLOG;
+        Request getlog=new Request.Builder()
+                .get()
+                .url(requestUrl)
+                .build();
+        try
+        {
+            Response response=httpClient.newCall(getlog).execute();
+            JSONObject responseJobj=new JSONObject(response.body().string());
+            return responseJobj.getString("data");
+
+        } catch (Exception e)
+        {
+            Log.e("CheckProcessAlive", e.getMessage());
+            return "";
+        }
+    }
     //endregion
 
 

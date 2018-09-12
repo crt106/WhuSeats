@@ -18,6 +18,10 @@ public class MoreFucActivity extends BaseActivity
     private LinearLayout moreJavascript;
     private LinearLayout moreTrainingroom;
     private LinearLayout moreAdmin;
+    private LinearLayout moreGeifen;
+
+
+
 
 
 
@@ -33,6 +37,7 @@ public class MoreFucActivity extends BaseActivity
         moreJavascript = (LinearLayout) findViewById(R.id.more_javascript);
         moreTrainingroom = (LinearLayout) findViewById(R.id.more_trainingroom);
         moreAdmin = (LinearLayout) findViewById(R.id.more_admin);
+        moreGeifen = (LinearLayout) findViewById(R.id.more_geifen);
 
         //打开Javascript版whuseats
         moreJavascript.setOnClickListener(v->{
@@ -50,6 +55,7 @@ public class MoreFucActivity extends BaseActivity
             startActivity(webIntent);
         });
 
+        //打开管理员Activity
         moreAdmin.setOnClickListener(v->{
             String user=AppSetting.UserAndPwd.getString("Username","" );
             if(user.equals("2016301610110"))
@@ -69,7 +75,14 @@ public class MoreFucActivity extends BaseActivity
 
         });
 
-        //打开管理员Activity
+        //打开给分页面
+        moreGeifen.setOnClickListener(v->{
+            Intent intent=new Intent(this,WebViewActivity.class);
+            intent.putExtra("Uri","http://120.79.7.230/whuseats_web/geifen.html" );
+            startActivity(intent);
+        });
+
+
 
         //endregion
     }

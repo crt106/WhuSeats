@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TimeHelp;
@@ -48,6 +49,8 @@ public class AlipayDialog extends AlertDialog
         btnZhicodeCancel.setOnClickListener(v->{this.dismiss();});
         btnZhicodeOk.setOnClickListener(v->{
 
+            //发送百度统计消息
+            StatService.onEvent(Dialogcontext, "Event_AlipayDialogOK", "Event_AlipayDialogOK", 1);
             //复制吱口令到剪贴板 并且启动支付宝
 
             //获取剪贴板管理器：

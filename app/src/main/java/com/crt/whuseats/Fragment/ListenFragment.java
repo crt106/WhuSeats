@@ -375,7 +375,8 @@ public class ListenFragment extends Fragment
                 //如果当前预约状态为成功
                 else
                 {
-                    Toast.makeText(ActivityConnect,"当前是不是已经有成功的预约啦？有就不要点了啦" , Toast.LENGTH_LONG).show();
+                    //这里要在主线程toast
+                    btnAddroom.post(()->{Toast.makeText(ActivityConnect,"当前是不是已经有成功的预约啦？有就不要点了啦" , Toast.LENGTH_LONG).show();});
                     return null;
                 }
                 return null;

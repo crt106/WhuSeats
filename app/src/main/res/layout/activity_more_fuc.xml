@@ -55,6 +55,26 @@
                     android:textColor="@android:color/white" />
 
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/more_geifen"
+                android:layout_marginLeft="20dp"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/score" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:textAlignment="center"
+                    android:text="查给分 "
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
 
         </TableRow>
 

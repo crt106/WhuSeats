@@ -7,6 +7,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
@@ -23,7 +24,7 @@ import com.crt.whuseats.R;
 //显示网页的Activity
 public class WebViewActivity extends BaseActivity
 {
-
+    private static final String TAG = "WebViewActivity";
     //region 控件们
     WebView wb;
     ProgressBar pb;
@@ -39,6 +40,7 @@ public class WebViewActivity extends BaseActivity
         //endregion
         //获取Intent提供的Uri
         String uri=getIntent().getStringExtra("Uri");
+
         //region 初始化Webview
         wb.setWebViewClient(new WebViewClient()
         {
@@ -79,9 +81,9 @@ public class WebViewActivity extends BaseActivity
         if(Build.VERSION.SDK_INT>21)
         wbsetting.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
-        wbsetting.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        wb.clearCache(true);
-        wb.clearHistory();
+        wbsetting.setCacheMode(WebSettings.LOAD_DEFAULT);
+//        wb.clearCache(true);
+//        wb.clearHistory();
         //提供一个JavaScript接口
 
         wb.addJavascriptInterface(new WebviewJavaScript(), "test");
@@ -94,17 +96,25 @@ public class WebViewActivity extends BaseActivity
     protected void onResume()
     {
         super.onResume();
-        //wb.loadUrl("www.baidu.com");
+
     }
 
     //javaScript接口类
     public class WebviewJavaScript
     {
+        //通过JavaScript跳转Activity
         @JavascriptInterface
-        public void jumptoAutoSetting()
+        public void jump2Activity(String name)
         {
-            Intent i=new Intent(WebViewActivity.this,AutoCreatSettingActivity.class);
-            startActivity(i);
+            try
+            {
+                Class<?> ac=Class.forName("com.crt.whuseats.Activity."+name);
+                Intent i=new Intent(WebViewActivity.this,ac);
+                startActivity(i);
+            } catch (ClassNotFoundException e)
+            {
+                Log.e(TAG, "jump2Activity:"+e.getMessage() );
+            }
         }
 
         @JavascriptInterface

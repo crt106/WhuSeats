@@ -1,7 +1,9 @@
 package com.crt.whuseats.Activity;
 
+import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -73,7 +75,6 @@ public class AdminActivity extends BaseActivity
 
         btnGetlog.setOnClickListener(v->{GetLog();});
 
-
     }
 
 
@@ -88,6 +89,30 @@ public class AdminActivity extends BaseActivity
         checkprocessAlive();
         checkprocessActive();
     }
+
+//    /**
+//     * 身份验证 不是管理员不能进入哦~
+//     */
+//    public void AuthCheck()
+//    {
+//        String user=AppSetting.UserAndPwd.getString("Username","" );
+//        if(!user.equals("2016301610110"))
+//        {
+//            AlertDialog tmp=new AlertDialog.Builder(this)
+//                    .setTitle("提示")
+//                    .setMessage("您没有权限进入此页面哦~但是你能进到这里很不错了哦~是看了源码还是运气好碰到了呢~\n" +
+//                            "嘛反正不管咋样 可以找我来领红包哦~")
+//                    .setCancelable(false)
+//                    .setNegativeButton("", ()->Jump2QQ())
+//                    .create();
+//
+//            tmp.show();
+//        }
+//    }
+
+
+
+    //region 管理方法
 
     //从服务端刷新吱口令到EditText
     public void GetZhicodeFromServer()
@@ -208,4 +233,16 @@ public class AdminActivity extends BaseActivity
         });
         t.start();
     }
+
+    //endregion
+
+    /**
+     * 跳到QQ和本傻子对话
+     */
+    public void Jump2QQ()
+    {
+        String url="mqqwpa://im/chat?chat_type=wpa&uin=814909233";
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    }
+
 }

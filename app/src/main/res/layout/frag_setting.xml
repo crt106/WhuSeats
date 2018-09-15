@@ -233,10 +233,10 @@
                 android:gravity="center_vertical">
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_gravity="center|left"
-                    android:background="@drawable/more_us" />
+                    android:background="@android:drawable/btn_star" />
 
                 <TextView
                     android:layout_width="0.0dip"
@@ -271,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="15.0dip"
                     android:layout_weight="1.0"
-                    android:text="说明和日志"
+                    android:text="说明和更新日志"
                     android:textColor="@color/gray_font" />
 
                 <ImageView
@@ -280,6 +280,7 @@
                     android:layout_gravity="center|right"
                     android:background="@drawable/go_right_pressed" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/checkUpdate"
                 android:layout_width="match_parent"
@@ -300,6 +301,17 @@
                     android:layout_weight="1.0"
                     android:text="检查更新"
                     android:textColor="@color/gray_font" />
+
+                <TextView
+                    android:id="@+id/tv_isnewversion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15.0dip"
+                    android:layout_weight="1.0"
+                    android:text="检测到新版本"
+                    android:visibility="invisible"
+                    android:textAlignment="gravity"
+                    android:textColor="@android:color/holo_blue_dark" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -327,6 +339,44 @@
                     android:layout_marginLeft="15.0dip"
                     android:layout_weight="1.0"
                     android:text="百宝盒"
+                    android:textColor="@color/gray_font" />
+
+                <TextView
+                    android:id="@+id/tv_box_message"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15.0dip"
+                    android:layout_weight="1.0"
+                    android:text="有没有啥新消息呢"
+                    android:textAlignment="gravity"
+                    android:textColor="@android:color/holo_blue_dark" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|right"
+                    android:background="@drawable/go_right_pressed" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/Advice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10.0dip"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center|left"
+                    android:background="@drawable/more_us" />
+
+                <TextView
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15.0dip"
+                    android:layout_weight="1.0"
+                    android:text="意见和建议~或者什么新点子"
                     android:textColor="@color/gray_font" />
 
                 <ImageView

@@ -319,7 +319,8 @@ public class ListenFragment extends Fragment
                     try
                     {
                         OUTLOOP:
-                        while (LoopCount<MAXLOOPCOUNT)
+                        //这里一定要判断一个任务有没有被取消
+                        while (LoopCount<MAXLOOPCOUNT&&!isCancelled())
                         {
                             for(ListenItem i:tmpItemList)
                             {
@@ -376,7 +377,11 @@ public class ListenFragment extends Fragment
                 else
                 {
                     //这里要在主线程toast
-                    btnAddroom.post(()->{Toast.makeText(ActivityConnect,"当前是不是已经有成功的预约啦？有就不要点了啦" , Toast.LENGTH_LONG).show();});
+                    btnAddroom.post(() ->
+                    {
+                        Toast.makeText(ActivityConnect, "当前是不是已经有成功的预约啦？有就不要点了啦", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                    });
                     return null;
                 }
                 return null;
@@ -386,8 +391,9 @@ public class ListenFragment extends Fragment
             protected void onProgressUpdate(String... values)
             {
                 super.onProgressUpdate(values);
-                /*这里刷新进度对话框中的文字
-                   规则："0"-标题 "1"-消息
+                /**
+                 * 这里刷新进度对话框中的文字
+                 *  规则："0"-标题 "1"-消息
                  */
                 if(values[0].equals("0"))
                 {

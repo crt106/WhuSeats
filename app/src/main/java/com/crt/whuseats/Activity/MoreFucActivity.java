@@ -11,6 +11,7 @@ import com.crt.whuseats.R;
 
 import org.jsoup.Connection;
 
+@Deprecated
 public class MoreFucActivity extends BaseActivity
 {
 

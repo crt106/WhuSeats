@@ -84,6 +84,12 @@ public class LoginActivity extends BaseActivity
             Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(StartMain);});
 
+        //长按进入管理
+        tvLoginPass.setOnLongClickListener(v->{
+            IsLoginIN=false;
+            Intent StartMain = new Intent(LoginActivity.this, AdminActivity.class);
+            startActivity(StartMain);return true;});
+
         //获取权限
         getPersimmions();
 

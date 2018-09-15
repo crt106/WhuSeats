@@ -17,8 +17,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.crt.whuseats.R;
+
+import javax.security.auth.login.LoginException;
 
 
 //显示网页的Activity
@@ -82,7 +85,7 @@ public class WebViewActivity extends BaseActivity
         wbsetting.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
         wbsetting.setCacheMode(WebSettings.LOAD_DEFAULT);
-//        wb.clearCache(true);
+        wb.clearCache(true);
 //        wb.clearHistory();
         //提供一个JavaScript接口
 
@@ -102,9 +105,10 @@ public class WebViewActivity extends BaseActivity
     //javaScript接口类
     public class WebviewJavaScript
     {
-        //通过JavaScript跳转Activity
+
+        //通过JavaScript跳转包内的Activity
         @JavascriptInterface
-        public void jump2Activity(String name)
+        public void jumpActivity(String name)
         {
             try
             {
@@ -117,12 +121,30 @@ public class WebViewActivity extends BaseActivity
             }
         }
 
+        //加入QQ群
         @JavascriptInterface
         public void JoinQQGroup()
         {
             Intent intent = new Intent();
             intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + "mo5gO56OIB_tQ1idGlZDAItUqbPPHHDL"));
             startActivity(intent);
+        }
+
+        //呼出浏览器
+        @JavascriptInterface
+        public void CallBrowser(String uri)
+        {
+            try
+            {
+                Intent webIntent=new Intent("android.intent.action.VIEW");
+                Uri euri=Uri.parse(uri);
+                webIntent.setData(euri);
+                startActivity(webIntent);
+            } catch (Exception e)
+            {
+                Log.e(TAG, "CallBrowser:"+e.getMessage());
+                Toast.makeText(WebViewActivity.this, "啊嘞 遇到什么错误了呢",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

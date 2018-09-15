@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
@@ -44,13 +45,21 @@ public class SettingFragment extends Fragment
     public EditText et_DelayFiltrate;
     public EditText et_MaxLoop;
     public Button SaveDelaySetting;
+    public TextView IsNewVersion;
     public View LearnAboutus;
     public View MoreInfo;
     public View Announce;
     private View morefuction;
     private View Checkupdate;
+    private TextView tvBoxMessage;
+    private View Advice;
 
 
+
+
+
+    //更新帮助
+    UpdateHelp updateHelp;
 
 
     public SettingFragment()
@@ -76,9 +85,6 @@ public class SettingFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
 
         //获取控件
-//        et_newSeatDelay=(EditText)getView().findViewById(R.id.et_Delay_newSeats);
-//        et_startTimeDelay=(EditText)getView().findViewById(R.id.et_Delay_StartTime);
-//        et_endTimeDelay=(EditText)getView().findViewById(R.id.et_Delay_EndTime);
         et_bookDelay=(EditText)getView().findViewById(R.id.et_Delay_Book);
         et_DelayFiltrate = (EditText) getView().findViewById(R.id.et_Delay_Filtrate);
         et_MaxLoop = (EditText)getView().findViewById(R.id.et_MaxLoop);
@@ -88,6 +94,9 @@ public class SettingFragment extends Fragment
         Announce=getView().findViewById(R.id.announce);
         morefuction = getView().findViewById(R.id.morefuction);
         Checkupdate=getView().findViewById(R.id.checkUpdate);
+        IsNewVersion=(TextView) getView().findViewById(R.id.tv_isnewversion);
+        tvBoxMessage = (TextView) getView().findViewById(R.id.tv_box_message);
+        Advice =  getView().findViewById(R.id.Advice);
 
         SaveDelaySetting.setOnClickListener(SaveDelaySettingClick);
         LearnAboutus.setOnClickListener(learnusClick);
@@ -95,10 +104,15 @@ public class SettingFragment extends Fragment
         Announce.setOnClickListener(AnnounceClick);
         morefuction.setOnClickListener(morefucClick);
         Checkupdate.setOnClickListener(CheckupdateClick);
+        Advice.setOnClickListener(AdviceClick);
+
+        //初始化UpdateHelp
+        updateHelp=new UpdateHelp(ActivityConnect,false);
 
 
         CheckIfNewVersion();
         ImportDelaySetting();
+        IsShowUpdateText();
         //保存当前版本号
         BaseActivity.AppSetting.ListenSettingEditor.putInt("AppVersion",BaseActivity.VERSIONCODE);
     }
@@ -172,7 +186,7 @@ public class SettingFragment extends Fragment
     public View.OnClickListener moreInfoClick=(v)->{
 
         Intent intent=new Intent(ActivityConnect, WebViewActivity.class);
-        intent.putExtra("Uri","http://120.79.7.230/WhuSeats_info.html");
+        intent.putExtra("Uri",NetService.CRT_HOST+"/WhuSeats_info.html");
         startActivity(intent);
     };
 
@@ -204,19 +218,27 @@ public class SettingFragment extends Fragment
 
     };
 
-    //更多功能点击按钮
+    //百宝盒点击按钮
     public View.OnClickListener morefucClick=v->{
-        Intent intent=new Intent(ActivityConnect, MoreFucActivity.class);
+        Intent intent=new Intent(ActivityConnect, WebViewActivity.class);
+        intent.putExtra("Uri",NetService.CRT_HOST+"/Whuseats_web/morefuc.html");
         startActivity(intent);
     };
 
     //检查更新按钮响应
     public View.OnClickListener CheckupdateClick=v->{
-        UpdateHelp updateHelp=new UpdateHelp(ActivityConnect,false);
+
         if(!updateHelp.CheckUpdate())
         {
             Toast.makeText(ActivityConnect, "当前没有可用版本",Toast.LENGTH_SHORT).show();
         }
+    };
+
+    //提意见按钮响应
+    public View.OnClickListener AdviceClick=v->{
+        Intent intent=new Intent(ActivityConnect, WebViewActivity.class);
+        intent.putExtra("Uri",NetService.CRT_HOST+"/Whuseats_web/advice.html");
+        startActivity(intent);
     };
 
     //endregion
@@ -240,6 +262,17 @@ public class SettingFragment extends Fragment
         {
             Log.e("SettingFragment",e.getMessage());
         }
+    }
+
+    /**
+     * 是否需要显示当前有新版本的textview
+     */
+    public void IsShowUpdateText()
+    {
+        Thread t = new Thread(() ->
+        {
+            this.getView().post(()->{IsNewVersion.setVisibility(updateHelp.CheckUpdate()?View.VISIBLE:View.INVISIBLE);});
+        });
     }
 
     /****************

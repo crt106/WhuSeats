@@ -62,6 +62,8 @@ import okhttp3.Response;
 public class NetService extends Service
 {
 
+    private static final String TAG = "NetService";
+
     public NetService()
     {
 
@@ -70,10 +72,10 @@ public class NetService extends Service
     //region 类字段
 
     //OkHttp客户端
-    OkHttpClient httpClient=new OkHttpClient.Builder()
+    OkHttpClient httpClient = new OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .cookieJar(new CookieJar()
-            //设置cookieJar
+                    //设置cookieJar
             {
                 //保存Cookies
                 @Override
@@ -85,10 +87,10 @@ public class NetService extends Service
                     //这应该是shiro相关的权限设置 不是很懂 所以这里只存能够让你进行操作的那个cookies
                     //不是很懂为什么浏览器接收到这个Header之后Cookies并没有什么变化
                     // 可能浏览器是添加而不是替换 这个以后再研究
-                    if(!ISLOGINPCCOOKIESGET&&cookies.get(0).name().equals("JSESSIONID"))
+                    if (!ISLOGINPCCOOKIESGET && cookies.get(0).name().equals("JSESSIONID"))
                     {
                         cookiestore.put(url.host(), cookies);
-                        ISLOGINPCCOOKIESGET=true;
+                        ISLOGINPCCOOKIESGET = true;
                     }
                 }
 
@@ -98,196 +100,216 @@ public class NetService extends Service
                 {
                     List<Cookie> cookies = cookiestore.get(url.host());
                     //根据查询到的cookies是否为空来返回
-                    return cookies!=null? cookies:new ArrayList<Cookie>();
+                    return cookies != null ? cookies : new ArrayList<Cookie>();
                 }
             })
             .build();
 
     //TCP客户端(用于检查更新等)
     //region 套接字和IP地址
-    public Socket ClientSocket=new Socket();
+    public Socket ClientSocket = new Socket();
     //套接字输出流和输入流
-    public OutputStream  Clientop;
-    public InputStream   Clientin;
-    String ServerIP1="120.79.7.230";//阿里云服务器ip
-    String ServerIP2="10.133.1.126";//寝室crt的ip
-    String ServerIP3="10.135.97.4";//图书馆crt的ip
-    String ServerIP4="192.168.43.94";//热点的crt的ip
-    String ServerIP5="192.168.137.1";//热点代理
-    String LocalServerIP="127.0.0.1";
+    public OutputStream Clientop;
+    public InputStream Clientin;
+    String ServerIP1 = "120.79.7.230";//阿里云服务器ip
+    String ServerIP2 = "10.133.1.126";//寝室crt的ip
+    String ServerIP3 = "10.135.97.4";//图书馆crt的ip
+    String ServerIP4 = "192.168.43.94";//热点的crt的ip
+    String ServerIP5 = "192.168.137.1";//热点代理
+    String LocalServerIP = "127.0.0.1";
     //endregion
     //某些静态字段
-    private static HashMap<String,List<Cookie>> cookiestore=new HashMap<>();   //储存网页登录产生的Cookies的东东
-    public static String LIB_TOKEN="";  //返回的登录字段
-    public static String LIB_COOKIE_JSESSIONID=""; //网页登陆的cookies内容
+    private static HashMap<String, List<Cookie>> cookiestore = new HashMap<>();   //储存网页登录产生的Cookies的东东
+    public static String LIB_TOKEN = "";  //返回的登录字段
+    public static String LIB_COOKIE_JSESSIONID = ""; //网页登陆的cookies内容
 
-    public static String LIB_SEATSSTATUS=""; //指示全局的座位预约状况
+    public static String LIB_SEATSSTATUS = ""; //指示全局的座位预约状况
     public static String LIB_MESSAGE; //指示一个返回的Message;
     public static JsonInfo_BookReturn LIB_BOOKRETURNINFO; //指示全局预约返回内容
     public static int REMOTEVERSION;  //指示远程版本号
-    public static boolean ISFORCEUPDATE=false;//指示当前远程版本是不是强制更新
+    public static boolean ISFORCEUPDATE = false;//指示当前远程版本是不是强制更新
 
     //region 弃用的字段
     //开始查询一个新的座位之前的延迟
     @Deprecated
-    public static int DELAY_NEWSEATS_DEFAULT=400;
+    public static int DELAY_NEWSEATS_DEFAULT = 400;
     @Deprecated
-    public static int DELAY_NEWSEATS=400;
+    public static int DELAY_NEWSEATS = 400;
 
     //请求开始时间之前的延迟
     @Deprecated
-    public static int DELAY_BEFORESTARTTIME =850;
+    public static int DELAY_BEFORESTARTTIME = 850;
     @Deprecated
-    public static int DELAY_BEFORESTARTTIME_DEFAULT =850;
+    public static int DELAY_BEFORESTARTTIME_DEFAULT = 850;
 
     //请求结束时间之前的延迟
     @Deprecated
-    public static int DELAY_BEFOREENDTIME =550;
+    public static int DELAY_BEFOREENDTIME = 550;
     @Deprecated
-    public static int DELAY_BEFOREENDTIME_DEFAULT =550;
+    public static int DELAY_BEFOREENDTIME_DEFAULT = 550;
     //endregion
 
     // 发送预约请求前后的延迟
-    public static int DELAY_SENDBOOK =300;
-    public static int DELAY_SENDBOOK_DEFAULT =300;
+    public static int DELAY_SENDBOOK = 300;
+    public static int DELAY_SENDBOOK_DEFAULT = 300;
 
     //发起筛选请求之前的延迟
-    public static int DELAY_BEFOREFILTRATE=1500;
-    public static int DELAY_BEFOREFILTRATE_DEFAULT=1500;
+    public static int DELAY_BEFOREFILTRATE = 1500;
+    public static int DELAY_BEFOREFILTRATE_DEFAULT = 1500;
 
     //判断PC登录是否已经获取到了Cookies
-    public static boolean ISLOGINPCCOOKIESGET=false;
+    public static boolean ISLOGINPCCOOKIESGET = false;
 
     //endregion
 
     //region 静态URL字段
-    static final String LIB_WHU_URL="http://seat.lib.whu.edu.cn";
-    static final String LIB_GXU_URL="http://seat.gxu.edu.cn";
+    static final String LIB_WHU_URL = "http://seat.lib.whu.edu.cn";
+    static final String LIB_GXU_URL = "http://seat.gxu.edu.cn";
 
-    static final String LIB_URL="http://seat.lib.whu.edu.cn";
-    static final String LIB_URLWITHPORT="https://seat.lib.whu.edu.cn:8443";
+    static final String LIB_URL = "http://seat.lib.whu.edu.cn";
+    static final String LIB_URLWITHPORT = "https://seat.lib.whu.edu.cn:8443";
 
-    static final String LIB_HOST_WHU="seat.lib.whu.edu.cn";
-    static final String LIB_HOST_GXU="seat.gxu.edu.cn";
+    static final String LIB_HOST_WHU = "seat.lib.whu.edu.cn";
+    static final String LIB_HOST_GXU = "seat.gxu.edu.cn";
 
-    static final String LIB_HOST="seat.lib.whu.edu.cn";
+    static final String LIB_HOST = "seat.lib.whu.edu.cn";
     //static final String LIB_FREEBOOK="http://seat.lib.whu.edu.cn/rest/v2/freeBook";
-    static final String LIB_FREEBOOK=LIB_URL+"/rest/v2/freeBook";
-    static final String CRT_HOST="http://120.79.7.230";
-    static final String CRT_OSS="https://bucket-crt106.oss-cn-shenzhen.aliyuncs.com";
-    static final String URL_LOGIN="/rest/auth";
+    static final String LIB_FREEBOOK = LIB_URL + "/rest/v2/freeBook";
+    public static final String CRT_HOST = "http://120.79.7.230";
+    static final String CRT_OSS = "https://bucket-crt106.oss-cn-shenzhen.aliyuncs.com";
+    static final String URL_LOGIN = "/rest/auth";
     @Deprecated
-    static final String URL_LOGIN_PC="/login";
+    static final String URL_LOGIN_PC = "/login";
 
-    static final String URL_CAPTCHA="/simpleCaptcha/captcha";
-    static final String URL_USER="/rest/v2/user";
-    static final String URL_CHECKNOWRE="/rest/v2/user/reservations";
-    static final String URL_FREEFILTERS="/rest/v2/free/filters";
-    static final String URL_CHECKIN="/rest/v2/checkIn";
-    static final String URL_LEAVE="/rest/v2/leave";
-    static final String URL_STOP="/rest/v2/stop";
+    static final String URL_CAPTCHA = "/simpleCaptcha/captcha";
+    static final String URL_USER = "/rest/v2/user";
+    static final String URL_CHECKNOWRE = "/rest/v2/user/reservations";
+    static final String URL_FREEFILTERS = "/rest/v2/free/filters";
+    static final String URL_CHECKIN = "/rest/v2/checkIn";
+    static final String URL_LEAVE = "/rest/v2/leave";
+    static final String URL_STOP = "/rest/v2/stop";
     //TODO 处理请求多页历史
-    static final String URL_HISTORY="/rest/v2/history/1/10";
-    static final String URL_CANCEL="/rest/v2/cancel";
-    static final String URL_HISTORYONEVIEW="/rest/view/";
-    static final String URL_CHECKHOUSESTATS="/rest/v2/room/stats2";
-    static final String URL_CHECKROOMSTATS="/rest/v2/room/layoutByDate";
-    static final String URL_GETSEATSTARTTIME="/rest/v2/startTimesForSeat";
-    static final String URL_GETSEATENDTIME="/rest/v2/endTimesForSeat";
-    static final String URL_AJAXSEARCH="/freeBook/ajaxSearch";
-    static final String URL_MOBILESEARCH="/rest/v2/searchSeats";
-    static final String URL_ANNOUNCE="/rest/v2/announce";
-    static final String URL_UPDATE="/whuseatsapi/download.html";
-    static final String URL_TOMORROWINFO_GET="/whuseatsapi/api/getinfo";
-    static final String URL_TOMORROWINFO_ADD="/whuseatsapi/api/add";
-    static final String URL_TOMORROWINFO_DELETE="/whuseatsapi/api/delete";
-    static final String URL_PREHEAT="/whuseatsapi/api/preheat";
-    static final String URL_ZHICODE="/whuseatsapi/api/alipay/zhicode";
-    static final String URL_PUTZHICODE="/whuseatsapi/api/alipay/putzhicode";
-    static final String URL_CHECKPROCESS="/whuseatsapi/api/winform/checkprocess";
-    static final String URL_KILLPROCESS="/whuseatsapi/api/winform/killprocess";
-    static final String URL_RESTARTPROCESS="/whuseatsapi/api/winform/restart";
-    static final String URL_GETLOG="/whuseatsapi/api/winform/getlog";
+    static final String URL_HISTORY = "/rest/v2/history/1/10";
+    static final String URL_CANCEL = "/rest/v2/cancel";
+    static final String URL_HISTORYONEVIEW = "/rest/view/";
+    static final String URL_CHECKHOUSESTATS = "/rest/v2/room/stats2";
+    static final String URL_CHECKROOMSTATS = "/rest/v2/room/layoutByDate";
+    static final String URL_GETSEATSTARTTIME = "/rest/v2/startTimesForSeat";
+    static final String URL_GETSEATENDTIME = "/rest/v2/endTimesForSeat";
+    static final String URL_AJAXSEARCH = "/freeBook/ajaxSearch";
+    static final String URL_MOBILESEARCH = "/rest/v2/searchSeats";
+    static final String URL_ANNOUNCE = "/rest/v2/announce";
+    //API地址
+    static final String URL_UPDATE = "/whuseatsapi/download.html";
+    static final String URL_TOMORROWINFO_GET = "/whuseatsapi/api/getinfo";
+    static final String URL_TOMORROWINFO_ADD = "/whuseatsapi/api/add";
+    static final String URL_TOMORROWINFO_DELETE = "/whuseatsapi/api/delete";
+    static final String URL_PREHEAT = "/whuseatsapi/api/preheat";
+    static final String URL_ZHICODE = "/whuseatsapi/api/alipay/zhicode";
+    static final String URL_PUTZHICODE = "/whuseatsapi/api/alipay/putzhicode";
+    static final String URL_CHECKPROCESS = "/whuseatsapi/api/winform/checkprocess";
+    static final String URL_KILLPROCESS = "/whuseatsapi/api/winform/killprocess";
+    static final String URL_RESTARTPROCESS = "/whuseatsapi/api/winform/restart";
+    static final String URL_GETLOG = "/whuseatsapi/api/winform/getlog";
+    static final String URL_GETVERSION = "/whuseatsapi/api/versionget";
+    static final String URL_SETVERSION = "/whuseatsapi/api/versionset";
+    static final String URL_GETMOREFUCMSG = "/whuseatsapi/api/morefucmessage";
+    static final String URL_SETMOREFUCMSG = "/whuseatsapi/api/setmorefucmessage";
+    static final String URL_GETEGCODE = "/whuseatsapi/api/getEgCode";
+    static final String URL_SETEGCODE = "/whuseatsapi/api/setEgCode";
 
     //endregion
 
     //与Activity绑定的Binder;
     public class NetBinder extends Binder
     {
-        //以下的方法看是都是返回void 不过实际上都是有返回值的 是在实现的接口中处理的咯
+        //以下的方法很多看是都是返回void 不过实际上都是有返回值的 是在实现的接口中处理的咯
 
         //登陆
-        public void login(String user,String pwd,onTaskResultReturn r)
+        public void login(String user, String pwd, onTaskResultReturn r)
         {
-            NetService.this.login(user, pwd,r);
+            NetService.this.login(user, pwd, r);
         }
+
         //pc登录获取验证码
         @Deprecated
         public void Getcaptcha(onTaskResultReturn r)
         {
             NetService.this.Getcaptcha(r);
         }
+
         //pc登录
         @Deprecated
-        public void LoginPc(String user,String pwd,String captcha,onTaskResultReturn r)
+        public void LoginPc(String user, String pwd, String captcha, onTaskResultReturn r)
         {
-            NetService.this.LoginPc(user,pwd ,captcha ,r );
+            NetService.this.LoginPc(user, pwd, captcha, r);
         }
+
         //pc筛选座位
         @Deprecated
-        public void SeatsFiltrate(String onDate,int buildingID,int roomID,String ST,String ET,onTaskResultReturn r)
+        public void SeatsFiltrate(String onDate, int buildingID, int roomID, String ST, String ET, onTaskResultReturn r)
         {
-            NetService.this.SeatsFiltrate(onDate,buildingID,roomID,ST,ET,r);
+            NetService.this.SeatsFiltrate(onDate, buildingID, roomID, ST, ET, r);
         }
+
         //获取用户信息
         public void GetUserInfo(onTaskResultReturn r)
         {
             NetService.this.GetUserInfo(r);
         }
+
         //移动端筛选座位
-        public void SeatsFiltrate_Mobile(String onDate,int buildingID,int roomID,String ST,String ET,onTaskResultReturn r)
+        public void SeatsFiltrate_Mobile(String onDate, int buildingID, int roomID, String ST, String ET, onTaskResultReturn r)
         {
-            NetService.this.SeatsFiltrate_Mobile(onDate,buildingID,roomID,ST,ET,r);
+            NetService.this.SeatsFiltrate_Mobile(onDate, buildingID, roomID, ST, ET, r);
         }
+
         //移动端筛选座位-同步
-        public String SeatsFiltrate_Mobile_Sync(String onDate,int buildingID,int roomID,String ST,String ET)
+        public String SeatsFiltrate_Mobile_Sync(String onDate, int buildingID, int roomID, String ST, String ET)
         {
-            return NetService.this.SeatsFiltrate_Mobile_Sync(onDate,buildingID,roomID,ST,ET);
+            return NetService.this.SeatsFiltrate_Mobile_Sync(onDate, buildingID, roomID, ST, ET);
         }
+
         //检查当前预约情况
         public void CheckReservations(onTaskResultReturn r)
         {
             NetService.this.CheckReservations(r);
         }
+
         //签到
         public void CheckIn(onTaskResultReturn r)
         {
             NetService.this.CheckIn(r);
         }
+
         //暂离
         public void Leave(onTaskResultReturn r)
         {
             NetService.this.Leave(r);
         }
+
         //结束使用
         public void Stop(onTaskResultReturn r)
         {
             NetService.this.Stop(r);
         }
+
         //取消预约
-        public void Cancel(String ReID,onTaskResultReturn r)
+        public void Cancel(String ReID, onTaskResultReturn r)
         {
-            NetService.this.Cancel(ReID,r);
+            NetService.this.Cancel(ReID, r);
         }
+
         //取得预约历史
         public void GetHistory(onTaskResultReturn r)
         {
             NetService.this.GetHistory(r);
         }
+
         //取得单个的历史记录视图
-        public void GetHistoryOneView(String ReID,onTaskResultReturn r)
+        public void GetHistoryOneView(String ReID, onTaskResultReturn r)
         {
-            NetService.this.GetHistoryOneView(ReID,r);
+            NetService.this.GetHistoryOneView(ReID, r);
         }
 
         //检查图书馆总房间布局
@@ -295,49 +317,55 @@ public class NetService extends Service
         {
             NetService.this.GetFilters(r);
         }
+
         //检查某个馆如信息学部分馆布局
-        public void CheckHouseStats(onTaskResultReturn r,int id)
+        public void CheckHouseStats(onTaskResultReturn r, int id)
         {
-            NetService.this.CheckHouseStats(r,id);
+            NetService.this.CheckHouseStats(r, id);
         }
+
         //检查某个具体房间的情况
-        public void CheckRoomStats(onTaskResultReturn r,int roomID,String date)
+        public void CheckRoomStats(onTaskResultReturn r, int roomID, String date)
         {
-            NetService.this.CheckRoomStats(r,roomID,date);
+            NetService.this.CheckRoomStats(r, roomID, date);
         }
+
         //开始监听一次房间(遍历)
         @Deprecated
         public void StartListenRoomOnce(JsonInfo_RoomLayout roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
         {
-            NetService.this.StartListenRoomOnce(roomInfo,startTime,endTime,Date,r,p);
+            NetService.this.StartListenRoomOnce(roomInfo, startTime, endTime, Date, r, p);
         }
+
         //开始监听一次房间(筛选)
         @Deprecated
         public void StartListenRoomOnce(JsonInfo_WebFiltrate roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
         {
-            NetService.this.StartListenRoomOnce(roomInfo,startTime,endTime,Date,r,p);
+            NetService.this.StartListenRoomOnce(roomInfo, startTime, endTime, Date, r, p);
         }
 
         //获取座位开始时间
-        public void GetSeatStartTime(int SeatID,String Date,onTaskResultReturn r)
+        public void GetSeatStartTime(int SeatID, String Date, onTaskResultReturn r)
         {
-            NetService.this.GetSeatStartTime(SeatID ,Date,r);
+            NetService.this.GetSeatStartTime(SeatID, Date, r);
         }
+
         //开始监听一次房间(移动端筛选)
         public void StartListenRoomOnce(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
         {
-            NetService.this.StartListenRoomOnce(FiltrateInfo,startTime,endTime,Date,r,p);
+            NetService.this.StartListenRoomOnce(FiltrateInfo, startTime, endTime, Date, r, p);
         }
+
         //同步监听一次房间(移动端筛选)
         public boolean StartListenRoomOnce_Sync(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
         {
-            return NetService.this.StartListenRoomOnce_Sync(FiltrateInfo,startTime,endTime,Date);
+            return NetService.this.StartListenRoomOnce_Sync(FiltrateInfo, startTime, endTime, Date);
         }
 
         //发起同步预约请求
-        public void FreeBookSync(int SeatID,String startTime,String endTime,String Date)
+        public void FreeBookSync(int SeatID, String startTime, String endTime, String Date)
         {
-            NetService.this.FreeBookSync(SeatID,startTime,endTime,Date);
+            NetService.this.FreeBookSync(SeatID, startTime, endTime, Date);
         }
 
         //检查登陆权限
@@ -349,8 +377,9 @@ public class NetService extends Service
         //检查更新1 是否弹出对话框
         public boolean CheckUpdate_IsShowDialog(boolean isneedwinform)
         {
-           return NetService.this.CheckUpdate_IsShowDialog(isneedwinform);
+            return NetService.this.CheckUpdate_IsShowDialog(isneedwinform);
         }
+
         //检查Winform进程是否活跃 是的话把输入输出流实例化
         public boolean IsWinFormActive()
         {
@@ -358,15 +387,15 @@ public class NetService extends Service
         }
 
         //下载更新
-        public void DownLoadUpdate(onTaskResultReturn r,onProgressReturn p)
+        public void DownLoadUpdate(onTaskResultReturn r, onProgressReturn p)
         {
-            NetService.this.DownLoadUpdate(r,p);
+            NetService.this.DownLoadUpdate(r, p);
         }
 
         //利用okhttp3下载更新
-        public void DownLoadUpdateByHttp(onTaskResultReturn r,onProgressReturn p)
+        public void DownLoadUpdateByHttp(onTaskResultReturn r, onProgressReturn p)
         {
-            NetService.this.DownLoadUpdateByHttp(r,p );
+            NetService.this.DownLoadUpdateByHttp(r, p);
         }
 
         //预热ASP.NET
@@ -374,6 +403,7 @@ public class NetService extends Service
         {
             NetService.this.ASPNETpreheat();
         }
+
         //获取第二天座位信息
         public void GetTomorrowInfo(onTaskResultReturn r)
         {
@@ -381,15 +411,15 @@ public class NetService extends Service
         }
 
         //添加第二天预约信息
-        public void AddTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+        public void AddTomorrowInfo(int seatID, String usernumber, onTaskResultReturn r)
         {
-            NetService.this.AddTomorrowInfo(seatID,usernumber,r);
+            NetService.this.AddTomorrowInfo(seatID, usernumber, r);
         }
 
         //删除第二天预约信息
-        public void DeleteTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+        public void DeleteTomorrowInfo(int seatID, String usernumber, onTaskResultReturn r)
         {
-            NetService.this.DeleteTomorrowInfo(seatID,usernumber,r);
+            NetService.this.DeleteTomorrowInfo(seatID, usernumber, r);
         }
 
         //获取吱口令
@@ -397,16 +427,18 @@ public class NetService extends Service
         {
             return NetService.this.GetZhicode();
         }
+
         //推送吱口令
         public String PutZhicode(String value)
         {
             return NetService.this.PutZhicode(value);
         }
+
         //清除NetService中存在的Cookies
         public void CleanCookies()
         {
             cookiestore.clear();
-            ISLOGINPCCOOKIESGET=false;
+            ISLOGINPCCOOKIESGET = false;
         }
 
         //获取更新公告
@@ -439,6 +471,42 @@ public class NetService extends Service
             return NetService.this.GetLog();
         }
 
+        //获取服务器上的版本文件(异步)
+        public void GetVersionCode(onTaskResultReturn r)
+        {
+            NetService.this.GetVersionCode(r);
+        }
+
+        //刷新服务器上的版本文件(异步)
+        public void SetVersionCode(String str, onTaskResultReturn r)
+        {
+            NetService.this.SetVersionCode(str, r);
+        }
+
+        //获得百宝盒消息文字(同步)
+        public String GetMoreFucMsg()
+        {
+            return NetService.this.GetMoreFucMsg();
+        }
+
+        //刷新百宝盒消息文字(同步)
+        public void SetMoreFucMsg(String msg)
+        {
+            NetService.this.SetMoreFucMsg(msg);
+        }
+
+        //获得彩蛋消息文字(同步)
+        public String GetEasterEggCode()
+        {
+            return NetService.this.GetEasterEggCode();
+        }
+
+        //刷新彩蛋消息文字(同步)
+        public void SetEasterEggCode(String msg)
+        {
+
+            NetService.this.SetEasterEggCode(msg);
+        }
 
     }
 
@@ -446,14 +514,14 @@ public class NetService extends Service
     @Override
     public IBinder onBind(Intent intent)
     {
-        Log.e("NetService", intent.getComponent().getClassName()+"请求绑定服务成功");
+        Log.e("NetService", intent.getComponent().getClassName() + "请求绑定服务成功");
         return new NetBinder();
     }
 
     @Override
     public boolean onUnbind(Intent intent)
     {
-        Log.e("NetService", intent.getComponent().getClassName()+"取消绑定服务");
+        Log.e("NetService", intent.getComponent().getClassName() + "取消绑定服务");
         return super.onUnbind(intent);
     }
 
@@ -462,42 +530,41 @@ public class NetService extends Service
     public void onCreate()
     {
         super.onCreate();
-        Log.e("NetService","服务创建成功");
+        Log.e("NetService", "服务创建成功");
         //实例化广播接收器
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Log.e("NetService","服务由OnstartCommand启动");
+        Log.e("NetService", "服务由OnstartCommand启动");
         //如果这次接受到的Intent里面要求启动定时预约
         try
         {
-            if(intent.getBooleanExtra("IsDoBook", false))
+            if (intent.getBooleanExtra("IsDoBook", false))
             {
                 final Bitmap largeIcon = ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_launcher)).getBitmap();
                 //这里服务启动的时候可能是没有activity的 所以修改文件内容的时候要绕一圈
                 this.getSharedPreferences("bookdata", Context.MODE_PRIVATE).edit().putBoolean("IsClockon", false).apply();
-                Log.e("NetService","接收到Dobook要求");
+                Log.e("NetService", "接收到Dobook要求");
                 //region 创建一个准备抢座位的通知
-                NotificationManager manager=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                NotificationCompat.Builder builder=new NotificationCompat.Builder(NetService.this);
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(NetService.this);
                 builder.setContentTitle("当当当当~");
                 builder.setContentText("看到这条消息说明APP服务还活着 正在执行座位预约~");
                 builder.setSmallIcon(R.drawable.ic_launcher);
                 builder.setLargeIcon(largeIcon);
                 builder.setDefaults(NotificationCompat.DEFAULT_ALL);
                 builder.setWhen(System.currentTimeMillis());
-                Notification n=builder.build();
+                Notification n = builder.build();
                 manager.notify(1, n);
                 //endregion
                 DoBook();
             }
             return super.onStartCommand(intent, flags, startId);
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            Log.e("NetonStart",e.toString() );
+            Log.e("NetonStart", e.toString());
             return super.onStartCommand(intent, flags, startId);
         }
     }
@@ -517,20 +584,20 @@ public class NetService extends Service
      * 移动端登陆 比如
      * http://seat.lib.whu.edu.cn/rest/auth?username={0}&password={1}
      */
-    public void login(String user,String pwd,onTaskResultReturn r)
+    public void login(String user, String pwd, onTaskResultReturn r)
     {
-        String loginurl=LIB_URL+URL_LOGIN+"?username="+user+"&password="+pwd;
-        Request loginRequest=new Request.Builder()
+        String loginurl = LIB_URL + URL_LOGIN + "?username=" + user + "&password=" + pwd;
+        Request loginRequest = new Request.Builder()
                 .get()
                 .url(loginurl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
-        class LoginTask extends ResultsTask<Void,Void,Boolean>
+        class LoginTask extends ResultsTask<Void, Void, Boolean>
         {
             public LoginTask(onTaskResultReturn i)
             {
-                super(i,"LoginTask");
+                super(i, "LoginTask");
             }
 
             @Override
@@ -538,25 +605,23 @@ public class NetService extends Service
             {
                 try
                 {
-                    Response re=httpClient.newCall(loginRequest).execute();
-                    String ResponseStr=re.body().string();
-                    JsonInfo_Login info= JsonHelp.GetLogin(ResponseStr);
+                    Response re = httpClient.newCall(loginRequest).execute();
+                    String ResponseStr = re.body().string();
+                    JsonInfo_Login info = JsonHelp.GetLogin(ResponseStr);
                     //判断是否登陆成功咯~
-                    if(info.status.equals("success"))
+                    if (info.status.equals("success"))
                     {
-                        LIB_TOKEN=info.token;
-                        Log.e("Net:Login","移动端返回Token:"+LIB_TOKEN);
+                        LIB_TOKEN = info.token;
+                        Log.e("Net:Login", "移动端返回Token:" + LIB_TOKEN);
                         return true;
-                    }
-                    else
+                    } else
                     {
                         Log.e("Net:Login", "移动端登陆失败");
                         return false;
                     }
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
-                    Log.e("Net:Login", e.getMessage() );
+                    Log.e("Net:Login", e.getMessage());
                     return false;
                 }
             }
@@ -565,7 +630,7 @@ public class NetService extends Service
             protected void onPostExecute(Boolean aBoolean)
             {
                 super.onPostExecute(aBoolean);
-                if(aBoolean==null||!aBoolean)
+                if (aBoolean == null || !aBoolean)
                     ResultReturn.OnTaskFailed();
                 else
                     ResultReturn.OnTaskSucceed(LIB_TOKEN);
@@ -574,80 +639,80 @@ public class NetService extends Service
         }
 
         //这是内部类之外的代码
-        LoginTask tempTask=new LoginTask(r);
+        LoginTask tempTask = new LoginTask(r);
         tempTask.execute();
 
     }
 
     /**
      * 用于移动端自动登陆和重新登陆的方法 (***同步***)
+     *
      * @return 判断是否登陆成功
      */
     public boolean login_auto()
     {
         //读取已经保存的用户名和密码 注意这里在Activity已经死掉的情况下是无法调用BaseActivity的
-        SharedPreferences temp=this.getSharedPreferences("pwddata", Context.MODE_PRIVATE);
-        String user=temp.getString("Username","" );
-        String pwd=temp.getString("Password","" );
-        if(user.equals("")||pwd.equals(""))
+        SharedPreferences temp = this.getSharedPreferences("pwddata", Context.MODE_PRIVATE);
+        String user = temp.getString("Username", "");
+        String pwd = temp.getString("Password", "");
+        if (user.equals("") || pwd.equals(""))
         {
-            Log.e("login_auto", "获取已经保存的用户名密码错误" );
+            Log.e("login_auto", "获取已经保存的用户名密码错误");
             return false;
         }
         try
         {
-            String loginurl=LIB_URL+URL_LOGIN+"?username="+user+"&password="+pwd;
-            Request loginRequest=new Request.Builder()
+            String loginurl = LIB_URL + URL_LOGIN + "?username=" + user + "&password=" + pwd;
+            Request loginRequest = new Request.Builder()
                     .get()
                     .url(loginurl)
                     .addHeader("Host", LIB_HOST)
                     .addHeader("Connection", "Keep-Alive")
                     .build();
-            Response re=httpClient.newCall(loginRequest).execute();
-            String ResponseStr=re.body().string();
-            JsonInfo_Login info= JsonHelp.GetLogin(ResponseStr);
-            LIB_TOKEN=info.token;
+            Response re = httpClient.newCall(loginRequest).execute();
+            String ResponseStr = re.body().string();
+            JsonInfo_Login info = JsonHelp.GetLogin(ResponseStr);
+            LIB_TOKEN = info.token;
             return true;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
-            Log.e("login_auto", e.toString() );
+            Log.e("login_auto", e.toString());
             return false;
         }
     }
 
     /**
      * Pc登录获取验证码图片
+     *
      * @param r
      */
     public void Getcaptcha(onTaskResultReturn r)
     {
-        String loginurl=LIB_URL+URL_CAPTCHA;     //构建验证码登录链接
+        String loginurl = LIB_URL + URL_CAPTCHA;     //构建验证码登录链接
         //JSESSIONID=7CCAAB16D89854A78D3E206B08A7DD80
-        Request loginrequest=new Request.Builder()
+        Request loginrequest = new Request.Builder()
                 .get()
                 .url(loginurl)
                 .build();
 
-        class GetcaptchaTask extends ResultsTask<Void,Void,Object>
+        class GetcaptchaTask extends ResultsTask<Void, Void, Object>
         {
 
             public GetcaptchaTask(onTaskResultReturn i)
             {
-                super(i,"GetcaptchaTask");
+                super(i, "GetcaptchaTask");
             }
 
             @Override
             protected Object doInBackground(Void... voids)
             {
-                Bitmap b= null;
+                Bitmap b = null;
                 try
                 {
-                    Response re=httpClient.newCall(loginrequest).execute();
-                    InputStream inputStream=re.body().byteStream();
+                    Response re = httpClient.newCall(loginrequest).execute();
+                    InputStream inputStream = re.body().byteStream();
                     b = BitmapFactory.decodeStream(inputStream);
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     e.printStackTrace();
                 }
@@ -661,15 +726,15 @@ public class NetService extends Service
                 ResultReturn.OnTaskSucceed(o);
             }
         }
-        GetcaptchaTask tempTask=new GetcaptchaTask(r);
+        GetcaptchaTask tempTask = new GetcaptchaTask(r);
         tempTask.execute();
 
     }
 
     /**
-     *pc端登录的方法 pc登录之后 可以利用网页端的筛选功能加快查找速度
+     * pc端登录的方法 pc登录之后 可以利用网页端的筛选功能加快查找速度
      */
-    public void LoginPc(String user,String pwd,String captcha,onTaskResultReturn r)
+    public void LoginPc(String user, String pwd, String captcha, onTaskResultReturn r)
     {
         String requestUrl = LIB_URL + "/auth/signIn";
         RequestBody postBody = new FormBody.Builder()
@@ -690,7 +755,7 @@ public class NetService extends Service
         {
             public LoginPctask(onTaskResultReturn i)
             {
-                super(i,"LoginPctask");
+                super(i, "LoginPctask");
             }
 
             @Override
@@ -733,29 +798,30 @@ public class NetService extends Service
      */
     public void GetUserInfo(onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_USER;
-        Request GetUserInforequest=new Request.Builder()
+        String url = LIB_URL + URL_USER;
+        Request GetUserInforequest = new Request.Builder()
                 .get()
                 .addHeader("token", LIB_TOKEN)
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"GetUserInfoTask",GetUserInforequest);
+        CommonTask tempTask = new CommonTask(r, "GetUserInfoTask", GetUserInforequest);
         tempTask.execute();
     }
+
     /**
      * 通过web端向服务器请求过滤后的座位信息
      * 按理说可能会返回超过一页的内容 不过既然合要求的座位都超过一页了 那还管后面干嘛 赶紧抢啊
      * 所以只请求第一页的内容
      */
     @Deprecated
-    public void SeatsFiltrate(String onDate,int buildingID,int roomID,String ST,String ET,onTaskResultReturn r)//ST和ET是数字形式
+    public void SeatsFiltrate(String onDate, int buildingID, int roomID, String ST, String ET, onTaskResultReturn r)//ST和ET是数字形式
     {
-        String requesturl=LIB_URL+URL_AJAXSEARCH+"?"+"onDate="+onDate+"&building="+buildingID+"&room="+roomID+"&hour=null"+"&power=null&startMin="+ST+"&endMin="+ET+"&offset=0";
-        Request FiltrateRequest=new Request.Builder()
+        String requesturl = LIB_URL + URL_AJAXSEARCH + "?" + "onDate=" + onDate + "&building=" + buildingID + "&room=" + roomID + "&hour=null" + "&power=null&startMin=" + ST + "&endMin=" + ET + "&offset=0";
+        Request FiltrateRequest = new Request.Builder()
                 .get()
                 .url(requesturl)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"SeatsFiltrateTask",FiltrateRequest);
+        CommonTask tempTask = new CommonTask(r, "SeatsFiltrateTask", FiltrateRequest);
         tempTask.execute();
     }
 
@@ -763,25 +829,25 @@ public class NetService extends Service
      * 通过移动端向服务器请求过滤之后的座位信息
      * https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/2018-06-08/1200/1320 HTTP/1.1
      */
-    public void SeatsFiltrate_Mobile(String onDate,int buildingID,int roomID,String ST,String ET,onTaskResultReturn r)//ST和ET是数字形式
+    public void SeatsFiltrate_Mobile(String onDate, int buildingID, int roomID, String ST, String ET, onTaskResultReturn r)//ST和ET是数字形式
     {
         //组成一个Post请求
-        String requestUrl=LIB_URL+URL_MOBILESEARCH+"/"+onDate+"/"+ST+"/"+ET;
-        RequestBody FiltrateRequestBody=new FormBody.Builder()
+        String requestUrl = LIB_URL + URL_MOBILESEARCH + "/" + onDate + "/" + ST + "/" + ET;
+        RequestBody FiltrateRequestBody = new FormBody.Builder()
 
                 .add("t", "1")
                 .add("roomId", Integer.toString(roomID))
                 .add("buildingId", Integer.toString(buildingID))
-                .add("batch","9999")
+                .add("batch", "9999")
                 .add("page", "1")
-                .add("t2","2")
+                .add("t2", "2")
                 .build();
-        Request FiltrateRequest=new Request.Builder()
+        Request FiltrateRequest = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("token", LIB_TOKEN)
                 .post(FiltrateRequestBody)
                 .build();
-        CommonTask SeatsFiltrateTask=new CommonTask(r,"SeatsFiltrateTask",FiltrateRequest);
+        CommonTask SeatsFiltrateTask = new CommonTask(r, "SeatsFiltrateTask", FiltrateRequest);
         SeatsFiltrateTask.execute();
     }
 
@@ -789,43 +855,44 @@ public class NetService extends Service
      * 通过移动端向服务器请求过滤之后的座位信息--------同步
      * https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/2018-06-08/1200/1320 HTTP/1.1
      */
-    public String SeatsFiltrate_Mobile_Sync(String onDate,int buildingID,int roomID,String ST,String ET)
+    public String SeatsFiltrate_Mobile_Sync(String onDate, int buildingID, int roomID, String ST, String ET)
     {
         //组成一个Post请求
-        String requestUrl=LIB_URL+URL_MOBILESEARCH+"/"+onDate+"/"+ST+"/"+ET;
-        RequestBody FiltrateRequestBody=new FormBody.Builder()
+        String requestUrl = LIB_URL + URL_MOBILESEARCH + "/" + onDate + "/" + ST + "/" + ET;
+        RequestBody FiltrateRequestBody = new FormBody.Builder()
 
                 .add("t", "1")
                 .add("roomId", Integer.toString(roomID))
                 .add("buildingId", Integer.toString(buildingID))
-                .add("batch","9999")
+                .add("batch", "9999")
                 .add("page", "1")
-                .add("t2","2")
+                .add("t2", "2")
                 .build();
-        Request FiltrateRequest=new Request.Builder()
+        Request FiltrateRequest = new Request.Builder()
                 .url(requestUrl)
                 .addHeader("token", LIB_TOKEN)
                 .post(FiltrateRequestBody)
                 .build();
         try
         {
-            Response response=httpClient.newCall(FiltrateRequest).execute();
+            Response response = httpClient.newCall(FiltrateRequest).execute();
             return response.body().string();
 
         } catch (IOException e)
         {
-            Log.e("SeatsFiltrate_Mobile",e.getMessage());
+            Log.e("SeatsFiltrate_Mobile", e.getMessage());
             return "";
         }
     }
+
     /**
      * 在token有效的情况下检查当前预约情况 比如
      * http://seat.lib.whu.edu.cn/rest/v2/user/reservations?token=8ZXSSXN3CC05154011
      */
     public void CheckReservations(onTaskResultReturn r)
     {
-        String requestUrl=LIB_URL+URL_CHECKNOWRE+"?"+"token="+LIB_TOKEN;
-        Request CheckreRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_CHECKNOWRE + "?" + "token=" + LIB_TOKEN;
+        Request CheckreRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
@@ -834,7 +901,7 @@ public class NetService extends Service
 
         //创建异步任务类  暂时返回String;
 
-        CommonTask tempTask=new CommonTask(r,"CheckReservationsTask",CheckreRequest);
+        CommonTask tempTask = new CommonTask(r, "CheckReservationsTask", CheckreRequest);
         tempTask.execute();
 
     }
@@ -844,12 +911,12 @@ public class NetService extends Service
      */
     public void CheckIn(onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_CHECKIN+"?token="+LIB_TOKEN;
-        Request checkinrequest=new Request.Builder()
+        String url = LIB_URL + URL_CHECKIN + "?token=" + LIB_TOKEN;
+        Request checkinrequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"CheckInTask",checkinrequest);
+        CommonTask tempTask = new CommonTask(r, "CheckInTask", checkinrequest);
         tempTask.execute();
     }
 
@@ -858,12 +925,12 @@ public class NetService extends Service
      */
     public void Leave(onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_LEAVE+"?token="+LIB_TOKEN;
-        Request Leaverequest=new Request.Builder()
+        String url = LIB_URL + URL_LEAVE + "?token=" + LIB_TOKEN;
+        Request Leaverequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"LeaveTask",Leaverequest);
+        CommonTask tempTask = new CommonTask(r, "LeaveTask", Leaverequest);
         tempTask.execute();
     }
 
@@ -872,26 +939,26 @@ public class NetService extends Service
      */
     public void Stop(onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_STOP+"?token="+LIB_TOKEN;
-        Request Stoprequest=new Request.Builder()
+        String url = LIB_URL + URL_STOP + "?token=" + LIB_TOKEN;
+        Request Stoprequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"StopTask",Stoprequest);
+        CommonTask tempTask = new CommonTask(r, "StopTask", Stoprequest);
         tempTask.execute();
     }
 
-   /**
-    *取消预约
-    */
-    public void Cancel(String ReID,onTaskResultReturn r)
+    /**
+     * 取消预约
+     */
+    public void Cancel(String ReID, onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_CANCEL+"/"+ReID+"?token="+LIB_TOKEN;
-        Request Cancelrequest=new Request.Builder()
+        String url = LIB_URL + URL_CANCEL + "/" + ReID + "?token=" + LIB_TOKEN;
+        Request Cancelrequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"CancelTask",Cancelrequest);
+        CommonTask tempTask = new CommonTask(r, "CancelTask", Cancelrequest);
         tempTask.execute();
     }
 
@@ -900,26 +967,26 @@ public class NetService extends Service
      */
     public void GetHistory(onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_HISTORY+"?token="+LIB_TOKEN;
-        Request GetHistoryrequest=new Request.Builder()
+        String url = LIB_URL + URL_HISTORY + "?token=" + LIB_TOKEN;
+        Request GetHistoryrequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"GetHistroyTask",GetHistoryrequest);
+        CommonTask tempTask = new CommonTask(r, "GetHistroyTask", GetHistoryrequest);
         tempTask.execute();
     }
 
     /**
      * 获得单个的历史记录
      */
-    public void GetHistoryOneView(String ReID,onTaskResultReturn r)
+    public void GetHistoryOneView(String ReID, onTaskResultReturn r)
     {
-        String url=LIB_URL+URL_HISTORYONEVIEW+ReID+"?token="+LIB_TOKEN;
-        Request GetHistoryOnerequest=new Request.Builder()
+        String url = LIB_URL + URL_HISTORYONEVIEW + ReID + "?token=" + LIB_TOKEN;
+        Request GetHistoryOnerequest = new Request.Builder()
                 .get()
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"GetHistroy_One_Task",GetHistoryOnerequest);
+        CommonTask tempTask = new CommonTask(r, "GetHistroy_One_Task", GetHistoryOnerequest);
         tempTask.execute();
     }
 
@@ -929,15 +996,15 @@ public class NetService extends Service
      */
     public void GetFilters(onTaskResultReturn r)
     {
-        String requestUrl=LIB_URL+URL_FREEFILTERS+"?"+"token="+LIB_TOKEN;
-        Request GetFiltersRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_FREEFILTERS + "?" + "token=" + LIB_TOKEN;
+        Request GetFiltersRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
 
-        CommonTask GetFiltersTask=new CommonTask(r,"GetFiltersTask",GetFiltersRequest);
+        CommonTask GetFiltersTask = new CommonTask(r, "GetFiltersTask", GetFiltersRequest);
         GetFiltersTask.execute();
 
     }
@@ -946,17 +1013,17 @@ public class NetService extends Service
      * 检查图书馆某个特定的馆的布局
      * http://seat.lib.whu.edu.cn/rest/v2/room/stats2/1?token=8ZXSSXN3CC05154011
      */
-    public void CheckHouseStats(onTaskResultReturn r,int HouseID)
+    public void CheckHouseStats(onTaskResultReturn r, int HouseID)
     {
-        String requestUrl=LIB_URL+URL_CHECKHOUSESTATS+"/"+HouseID+"?"+"token="+LIB_TOKEN;
-        Request CheckHSRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_CHECKHOUSESTATS + "/" + HouseID + "?" + "token=" + LIB_TOKEN;
+        Request CheckHSRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
 
-        CommonTask CheckHouseStstsTask=new CommonTask(r,"CheckHouseStats",CheckHSRequest);
+        CommonTask CheckHouseStstsTask = new CommonTask(r, "CheckHouseStats", CheckHSRequest);
         CheckHouseStstsTask.execute();
 
     }
@@ -966,17 +1033,17 @@ public class NetService extends Service
      * 检查具体房间情况
      * http://seat.lib.whu.edu.cn/rest/v2/room/layoutByDate/14/2018-05-15?token=8ZXSSXN3CC05154011
      */
-    public void CheckRoomStats(onTaskResultReturn r,int roomID,String Date)
+    public void CheckRoomStats(onTaskResultReturn r, int roomID, String Date)
     {
-        String requestUrl=LIB_URL+URL_CHECKROOMSTATS+"/"+roomID+"/"+Date+"?"+"token="+LIB_TOKEN;
-        Request CheckSRSRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_CHECKROOMSTATS + "/" + roomID + "/" + Date + "?" + "token=" + LIB_TOKEN;
+        Request CheckSRSRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
 
-        CommonTask CheckHouseStstsTask=new CommonTask(r,"CheckRoomStatsTask",CheckSRSRequest);
+        CommonTask CheckHouseStstsTask = new CommonTask(r, "CheckRoomStatsTask", CheckSRSRequest);
         CheckHouseStstsTask.execute();
     }
 
@@ -984,26 +1051,27 @@ public class NetService extends Service
      * 提交座位预约的请求(异步 注意频率)
      * POST http://seat.lib.whu.edu.cn/rest/v2/freeBook HTTP/1.1
      */
-    public void FreeBook(int SeatID,String startTime,String endTime,String Date,onTaskResultReturn r)
+    public void FreeBook(int SeatID, String startTime, String endTime, String Date, onTaskResultReturn r)
     {
         //组成一个Post请求
-        RequestBody bookRequestBody=new FormBody.Builder()
+        RequestBody bookRequestBody = new FormBody.Builder()
                 .add("token", LIB_TOKEN)
                 .add("startTime", startTime)
                 .add("endTime", endTime)
-                .add("seat",Integer.toString(SeatID) )
+                .add("seat", Integer.toString(SeatID))
                 .add("date", Date)
                 .build();
-        Request bookRequest=new Request.Builder()
+        Request bookRequest = new Request.Builder()
                 .url(LIB_FREEBOOK)
                 .post(bookRequestBody)
                 .build();
-        CommonTask bookTask=new CommonTask(r,"FreeBookSyncTask",bookRequest);
+        CommonTask bookTask = new CommonTask(r, "FreeBookSyncTask", bookRequest);
         bookTask.execute();
 
     }
+
     //这是一个供其他方法调用的异步预定座位回调接口
-    public onTaskResultReturn BookTaskReturn=new onTaskResultReturn()
+    public onTaskResultReturn BookTaskReturn = new onTaskResultReturn()
     {
         @Override
         public void OnTaskSucceed(Object... data) //注意 任务成功不代表预约成功
@@ -1011,13 +1079,12 @@ public class NetService extends Service
             JsonInfo_BookReturn bookReturn;
             try
             {
-                String rece=(String)data[0];
+                String rece = (String) data[0];
                 bookReturn = JsonHelp.GetBookReturn(rece);
-                LIB_SEATSSTATUS=bookReturn.status; //更改全局指示字段
-            }
-            catch (Exception e)
+                LIB_SEATSSTATUS = bookReturn.status; //更改全局指示字段
+            } catch (Exception e)
             {
-                Log.e("Net:BookReturn",e.getMessage() );
+                Log.e("Net:BookReturn", e.getMessage());
             }
         }
 
@@ -1032,9 +1099,9 @@ public class NetService extends Service
     /**
      * 提交座位预约的请求(同步 注意在子线程中调用)
      */
-    public void FreeBookSync(int SeatID,String startTime,String endTime,String Date)
+    public void FreeBookSync(int SeatID, String startTime, String endTime, String Date)
     {
-        if(!LIB_SEATSSTATUS.equals("success"))
+        if (!LIB_SEATSSTATUS.equals("success"))
         {
             RequestBody bookRequestBody = new FormBody.Builder()
                     .add("token", LIB_TOKEN)
@@ -1057,32 +1124,29 @@ public class NetService extends Service
                 {
                     LIB_SEATSSTATUS = "success";
                     LIB_BOOKRETURNINFO = bookReturn;
-                    LIB_MESSAGE=bookReturn.message;
+                    LIB_MESSAGE = bookReturn.message;
 
                     //region 向百度统计发送成功数据
                     try
                     {
                         Map<String, String> attributes = new HashMap<>();
                         //读取当前学号 姓名
-                        String username=getSharedPreferences("pwddata", Context.MODE_PRIVATE ).getString("Username", "");
-                        String name=getSharedPreferences("pwddata", Context.MODE_PRIVATE ).getString("name", "");
+                        String username = getSharedPreferences("pwddata", Context.MODE_PRIVATE).getString("Username", "");
+                        String name = getSharedPreferences("pwddata", Context.MODE_PRIVATE).getString("name", "");
                         attributes.put("学号", username);
                         attributes.put("姓名", name);
-                        StatService.onEvent(this, "Event_BookSuccess", "BookSuccess", 1,attributes);
-                    }
-                    catch (Exception e)
+                        StatService.onEvent(this, "Event_BookSuccess", "BookSuccess", 1, attributes);
+                    } catch (Exception e)
                     {
                         e.printStackTrace();
                     }
                     //endregion
-                }
-                else
+                } else
                 {
                     LIB_SEATSSTATUS = bookReturn.status;
-                    LIB_MESSAGE=bookReturn.message;
+                    LIB_MESSAGE = bookReturn.message;
                 }
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 Log.e("Net:FreeBookSync", e.getMessage());
             }
@@ -1094,27 +1158,27 @@ public class NetService extends Service
      * http://seat.lib.whu.edu.cn/rest/v2/startTimesForSeat/9520/2018-05-15?token=ECKITYFWD405155501
      */
 
-    public void GetSeatStartTime(int SeatID,String Date,onTaskResultReturn r)
+    public void GetSeatStartTime(int SeatID, String Date, onTaskResultReturn r)
     {
-        String requestUrl=LIB_URL+URL_GETSEATSTARTTIME+"/"+SeatID+"/"+Date+"?"+"token="+LIB_TOKEN;
-        Request GetStartTimeRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_GETSEATSTARTTIME + "/" + SeatID + "/" + Date + "?" + "token=" + LIB_TOKEN;
+        Request GetStartTimeRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
-        CommonTask startTimeTask=new CommonTask(r,"GetSeatStartTimeSyncTask",GetStartTimeRequest);
+        CommonTask startTimeTask = new CommonTask(r, "GetSeatStartTimeSyncTask", GetStartTimeRequest);
         startTimeTask.execute();
     }
 
     /**
-     *检查某个座位的开始时间(同步 请在子线程执行)
+     * 检查某个座位的开始时间(同步 请在子线程执行)
      */
 
     public JsonInfo_SeatTime_Start GetSeatStartTimeSync(int SeatID, String Date)
     {
-        String requestUrl=LIB_URL+URL_GETSEATSTARTTIME+"/"+SeatID+"/"+Date+"?"+"token="+LIB_TOKEN;
-        Request GetStartTimeRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_GETSEATSTARTTIME + "/" + SeatID + "/" + Date + "?" + "token=" + LIB_TOKEN;
+        Request GetStartTimeRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
@@ -1122,12 +1186,11 @@ public class NetService extends Service
                 .build();
         try
         {
-            Response re=httpClient.newCall(GetStartTimeRequest).execute();
-            String reStr=re.body().string();
+            Response re = httpClient.newCall(GetStartTimeRequest).execute();
+            String reStr = re.body().string();
             return new JsonInfo_SeatTime_Start(reStr);
 
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e("GetSeatsStart", e.getMessage());
             return null;
@@ -1140,16 +1203,16 @@ public class NetService extends Service
      * http://seat.lib.whu.edu.cn/rest/v2/endTimesForSeat/9185/2018-05-15/1320?token=ECKITYFWD405155501
      */
 
-    public void GetSeatEndTime(int SeatID,String startTime,String Date,onTaskResultReturn r)
+    public void GetSeatEndTime(int SeatID, String startTime, String Date, onTaskResultReturn r)
     {
-        String requestUrl=LIB_URL+URL_GETSEATENDTIME+"/"+SeatID+"/"+Date+"/"+startTime+"?"+"token="+LIB_TOKEN;
-        Request GetEndTimeRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_GETSEATENDTIME + "/" + SeatID + "/" + Date + "/" + startTime + "?" + "token=" + LIB_TOKEN;
+        Request GetEndTimeRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
                 .addHeader("Connection", "Keep-Alive")
                 .build();
-        CommonTask endTimeTask=new CommonTask(r,"GetSeatEndTimeSyncTask",GetEndTimeRequest);
+        CommonTask endTimeTask = new CommonTask(r, "GetSeatEndTimeSyncTask", GetEndTimeRequest);
         endTimeTask.execute();
     }
 
@@ -1158,8 +1221,8 @@ public class NetService extends Service
      */
     public JsonInfo_SeatTime_End GetSeatEndTimeSync(int SeatID, String startTime, String Date)
     {
-        String requestUrl=LIB_URL+URL_GETSEATENDTIME+"/"+SeatID+"/"+Date+"/"+startTime+"?"+"token="+LIB_TOKEN;
-        Request GetEndTimeRequest=new Request.Builder()
+        String requestUrl = LIB_URL + URL_GETSEATENDTIME + "/" + SeatID + "/" + Date + "/" + startTime + "?" + "token=" + LIB_TOKEN;
+        Request GetEndTimeRequest = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .addHeader("Host", LIB_HOST)
@@ -1167,12 +1230,11 @@ public class NetService extends Service
                 .build();
         try
         {
-            Response re=httpClient.newCall(GetEndTimeRequest).execute();
-            String reStr=re.body().string();
+            Response re = httpClient.newCall(GetEndTimeRequest).execute();
+            String reStr = re.body().string();
             return new JsonInfo_SeatTime_End(reStr);
 
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e("GetSeatsStart", e.getMessage());
             return null;
@@ -1180,15 +1242,17 @@ public class NetService extends Service
     }
 
 
-    int nowseatID=0; //给下个方法用的全局变量
-    /** *********************************************************************核心方法
-     *  开始监测一次某个房间的空位情况 有空就预约 没有就返回
-     *  现在感觉这个方法问题比较多 频率太快导致的临时冻结账号的现象比较严重2333
-     *  看样子要一定要设置间隔
-     *  *********************************************************************
+    int nowseatID = 0; //给下个方法用的全局变量
+
+    /**
+     * ********************************************************************核心方法
+     * 开始监测一次某个房间的空位情况 有空就预约 没有就返回
+     * 现在感觉这个方法问题比较多 频率太快导致的临时冻结账号的现象比较严重2333
+     * 看样子要一定要设置间隔
+     * *********************************************************************
      */
     @Deprecated
-    public void StartListenRoomOnce(JsonInfo_RoomLayout roomInfo, String startTime, String endTime, String Date, onTaskResultReturn r,onProgressReturn p)
+    public void StartListenRoomOnce(JsonInfo_RoomLayout roomInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
     {
 
         //region 用于异步的回调 不过这里子线程内打算用同步了
@@ -1241,20 +1305,21 @@ public class NetService extends Service
         */
         //endregion
 
-        class ListenRoomTask extends ResultsTask<Void,Integer,Void>
+        class ListenRoomTask extends ResultsTask<Void, Integer, Void>
         {
             public ListenRoomTask(onTaskResultReturn i)
             {
-                super(i,"ListenRoomTask");
+                super(i, "ListenRoomTask");
             }
+
             int TotalSeatsNumber;
-            int NowSeatNumber=0;
+            int NowSeatNumber = 0;
 
             @Override
             protected Void doInBackground(Void... voids)
             {
-                TotalSeatsNumber=roomInfo.seatList.size();
-                for (seat thisseat:roomInfo.seatList) //foreach
+                TotalSeatsNumber = roomInfo.seatList.size();
+                for (seat thisseat : roomInfo.seatList) //foreach
                 {
                     NowSeatNumber++;//座位计数器自增
                     publishProgress();
@@ -1264,8 +1329,7 @@ public class NetService extends Service
                         Log.e("NetService——Listen", "开启新座位的开头等待");
                         Thread.sleep(DELAY_NEWSEATS);
                         Log.e("NetService——Listen", "结束新座位的开头等待");
-                    }
-                    catch (InterruptedException e)
+                    } catch (InterruptedException e)
                     {
                         Log.e("NetService——Listen", "任务可能被中断?");
                         return null;
@@ -1273,28 +1337,28 @@ public class NetService extends Service
                     //endregion
 
                     //如果已经预定成功了直接跳出
-                    if(LIB_SEATSSTATUS.equals("success"))
+                    if (LIB_SEATSSTATUS.equals("success"))
                         break;
 
                     /*
                      本地检查座位状态
                      这个座位状态应该有 FREE IN_USE FULL AWAY
                     */
-                    if(!thisseat.seatstatus.equals("FULL"))
+                    if (!thisseat.seatstatus.equals("FULL"))
                     {
                         try
                         {
-                            nowseatID=thisseat.seatid;
+                            nowseatID = thisseat.seatid;
 
                             //region 请求开始时间等待
                             Log.e("NetService——Listen", "开启座位的请求结束时间等待");
                             Thread.sleep(DELAY_BEFORESTARTTIME);
                             Log.e("NetService——Listen", "结束等待");
                             //endregion
-                            JsonInfo_SeatTime_Start startinfo=GetSeatStartTimeSync(nowseatID, Date);
+                            JsonInfo_SeatTime_Start startinfo = GetSeatStartTimeSync(nowseatID, Date);
 
                             //如果请求的开始时间合乎要求 则请求结束时间
-                            if(JsonHelp.IsTimeAvaliable(startTime, startinfo.StartTimeList))
+                            if (JsonHelp.IsTimeAvaliable(startTime, startinfo.StartTimeList))
                             {
 
                                 //region 请求结束时间等待
@@ -1302,10 +1366,10 @@ public class NetService extends Service
                                 Thread.sleep(DELAY_BEFOREENDTIME);
                                 Log.e("NetService——Listen", "结束等待");
                                 //endregion
-                                JsonInfo_SeatTime_End endinfo=GetSeatEndTimeSync(nowseatID, startTime, Date);
+                                JsonInfo_SeatTime_End endinfo = GetSeatEndTimeSync(nowseatID, startTime, Date);
 
                                 //如果请求的结束时间合乎要求 则开始预订
-                                if(JsonHelp.IsTimeAvaliable(endTime, endinfo.EndTimeList))
+                                if (JsonHelp.IsTimeAvaliable(endTime, endinfo.EndTimeList))
                                 {
                                     //region 预约等待
                                     Thread.sleep(DELAY_SENDBOOK);
@@ -1317,13 +1381,11 @@ public class NetService extends Service
                                     //endregion
                                 }
                             }
-                        }
-                        catch (InterruptedException e)
+                        } catch (InterruptedException e)
                         {
-                            Log.e("ListenRoomOnce", "任务可能被中断?"+e.getMessage());
+                            Log.e("ListenRoomOnce", "任务可能被中断?" + e.getMessage());
                             return null;
-                        }
-                        catch (Exception e)
+                        } catch (Exception e)
                         {
                             Log.e("ListenRoomOnce", e.getMessage());
                             continue;
@@ -1338,7 +1400,7 @@ public class NetService extends Service
             protected void onProgressUpdate(Integer... values)
             {
                 //通过回调方法报告进度
-                p.OnSendProgress(TotalSeatsNumber,NowSeatNumber);
+                p.OnSendProgress(TotalSeatsNumber, NowSeatNumber);
             }
 
             //结束任务
@@ -1347,7 +1409,7 @@ public class NetService extends Service
             {
                 super.onPostExecute(aVoid);
 
-                if(LIB_SEATSSTATUS.equals("success"))
+                if (LIB_SEATSSTATUS.equals("success"))
                     ResultReturn.OnTaskSucceed();
                 else
                     ResultReturn.OnTaskFailed();
@@ -1369,14 +1431,15 @@ public class NetService extends Service
     {
 
 
-        class ListenRoomTask extends ResultsTask<Void,Integer,Void>
+        class ListenRoomTask extends ResultsTask<Void, Integer, Void>
         {
             public ListenRoomTask(onTaskResultReturn i)
             {
-                super(i,"ListenRoomTask");
+                super(i, "ListenRoomTask");
             }
+
             int TotalSeatsNumber;
-            int NowSeatNumber=0;
+            int NowSeatNumber = 0;
 
             @Override
             protected Void doInBackground(Void... voids)
@@ -1387,22 +1450,21 @@ public class NetService extends Service
                     Log.e("NetService——Listen", "开启新筛选的等待");
                     Thread.sleep(DELAY_BEFOREFILTRATE);
                     Log.e("NetService——Listen", "结束新筛选的等待");
-                }
-                catch (InterruptedException e)
+                } catch (InterruptedException e)
                 {
-                    Log.e("ListenRoomOnce_PC", "任务中断" );
+                    Log.e("ListenRoomOnce_PC", "任务中断");
                     return null;
                 }
                 //endregion
-                TotalSeatsNumber=FiltrateInfo.SuitableSeatsList.size();
+                TotalSeatsNumber = FiltrateInfo.SuitableSeatsList.size();
                 //如果筛选结果为空直接返回
-                if(TotalSeatsNumber<=0)
+                if (TotalSeatsNumber <= 0)
                     return null;
 
-                for (String thisseat:FiltrateInfo.SuitableSeatsList) //foreach
+                for (String thisseat : FiltrateInfo.SuitableSeatsList) //foreach
                 {
                     //把字符串形式转换为整数
-                    int thisseatId=Integer.parseInt(thisseat);
+                    int thisseatId = Integer.parseInt(thisseat);
                     NowSeatNumber++;//座位计数器自增
                     publishProgress();
 
@@ -1415,15 +1477,13 @@ public class NetService extends Service
                     {
                         FreeBookSync(thisseatId, startTime, endTime, Date);
                         //region 预约等待
-                        Thread.sleep(DELAY_SENDBOOK*3);
+                        Thread.sleep(DELAY_SENDBOOK * 3);
                         //endregion
-                    }
-                    catch (InterruptedException e)
+                    } catch (InterruptedException e)
                     {
-                        Log.e("ListenRoomOnce_PC", "任务中断" );
+                        Log.e("ListenRoomOnce_PC", "任务中断");
                         return null;
-                    }
-                    catch (Exception e)
+                    } catch (Exception e)
                     {
                         Log.e("ListenRoomOnce_PC", e.getMessage());
                         continue;
@@ -1438,7 +1498,7 @@ public class NetService extends Service
             protected void onProgressUpdate(Integer... values)
             {
                 //通过回调方法报告进度
-                p.OnSendProgress(TotalSeatsNumber,NowSeatNumber);
+                p.OnSendProgress(TotalSeatsNumber, NowSeatNumber);
             }
 
             //结束任务
@@ -1447,7 +1507,7 @@ public class NetService extends Service
             {
                 super.onPostExecute(aVoid);
 
-                if(LIB_SEATSSTATUS.equals("success"))
+                if (LIB_SEATSSTATUS.equals("success"))
                     ResultReturn.OnTaskSucceed();
                 else
                     ResultReturn.OnTaskFailed();
@@ -1466,14 +1526,15 @@ public class NetService extends Service
      */
     public void StartListenRoomOnce(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
     {
-        class ListenRoomTask extends ResultsTask<Void,Integer,Void>
+        class ListenRoomTask extends ResultsTask<Void, Integer, Void>
         {
             public ListenRoomTask(onTaskResultReturn i)
             {
-                super(i,"ListenRoomTask");
+                super(i, "ListenRoomTask");
             }
+
             int TotalSeatsNumber;
-            int NowSeatNumber=0;
+            int NowSeatNumber = 0;
 
             @Override
             protected Void doInBackground(Void... voids)
@@ -1485,23 +1546,22 @@ public class NetService extends Service
                     Log.e("NetService——Listen", "开启新筛选的等待");
                     Thread.sleep(DELAY_BEFOREFILTRATE);
                     Log.e("NetService——Listen", "结束新筛选的等待");
-                }
-                catch (InterruptedException e)
+                } catch (InterruptedException e)
                 {
-                    Log.e("ListenRoomOnce_PC", "任务中断" );
+                    Log.e("ListenRoomOnce_PC", "任务中断");
                     return null;
                 }
                 //endregion
 
-                TotalSeatsNumber=FiltrateInfo.seatList.size();
+                TotalSeatsNumber = FiltrateInfo.seatList.size();
                 //如果筛选结果为空直接返回
-                if(TotalSeatsNumber<=0)
+                if (TotalSeatsNumber <= 0)
                     return null;
 
-                for (seat thisseat:FiltrateInfo.seatList) //foreach
+                for (seat thisseat : FiltrateInfo.seatList) //foreach
                 {
                     //把字符串形式转换为整数
-                    int thisseatId=thisseat.seatid;
+                    int thisseatId = thisseat.seatid;
 
                     NowSeatNumber++;//座位计数器自增
                     publishProgress();
@@ -1515,15 +1575,13 @@ public class NetService extends Service
                     {
                         FreeBookSync(thisseatId, startTime, endTime, Date);
                         //region 预约等待
-                        Thread.sleep(DELAY_SENDBOOK*3);
+                        Thread.sleep(DELAY_SENDBOOK * 3);
                         //endregion
-                    }
-                    catch (InterruptedException e)
+                    } catch (InterruptedException e)
                     {
-                        Log.e("ListenRoomOnce_MF", "任务中断" );
+                        Log.e("ListenRoomOnce_MF", "任务中断");
                         return null;
-                    }
-                    catch (Exception e)
+                    } catch (Exception e)
                     {
                         Log.e("ListenRoomOnce_MF", e.getMessage());
                         continue;
@@ -1538,7 +1596,7 @@ public class NetService extends Service
             protected void onProgressUpdate(Integer... values)
             {
                 //通过回调方法报告进度
-                p.OnSendProgress(TotalSeatsNumber,NowSeatNumber);
+                p.OnSendProgress(TotalSeatsNumber, NowSeatNumber);
             }
 
             //结束任务
@@ -1547,7 +1605,7 @@ public class NetService extends Service
             {
                 super.onPostExecute(aVoid);
 
-                if(LIB_SEATSSTATUS.equals("success"))
+                if (LIB_SEATSSTATUS.equals("success"))
                     ResultReturn.OnTaskSucceed();
                 else
                     ResultReturn.OnTaskFailed();
@@ -1571,23 +1629,22 @@ public class NetService extends Service
             Log.e("NetService——Listen", "开启新筛选的等待");
             Thread.sleep(DELAY_BEFOREFILTRATE);
             Log.e("NetService——Listen", "结束新筛选的等待");
-        }
-        catch (InterruptedException e)
+        } catch (InterruptedException e)
         {
-            Log.e("ListenRoomOnce_PC", "任务中断" );
+            Log.e("ListenRoomOnce_PC", "任务中断");
             return false;
         }
         //endregion
 
-        int TotalSeatsNumber=FiltrateInfo.seatList.size();
+        int TotalSeatsNumber = FiltrateInfo.seatList.size();
         //如果筛选结果为空直接返回
-        if(TotalSeatsNumber<=0)
+        if (TotalSeatsNumber <= 0)
             return false;
 
-        for (seat thisseat:FiltrateInfo.seatList)
+        for (seat thisseat : FiltrateInfo.seatList)
         {
             //把字符串形式转换为整数
-            int thisseatId=thisseat.seatid;
+            int thisseatId = thisseat.seatid;
 
 
             //如果已经预定成功了直接跳出
@@ -1602,15 +1659,13 @@ public class NetService extends Service
                     return true;
 
                 //region 预约等待
-                Thread.sleep(DELAY_SENDBOOK*3);
+                Thread.sleep(DELAY_SENDBOOK * 3);
                 //endregion
-            }
-            catch (InterruptedException e)
+            } catch (InterruptedException e)
             {
-                Log.e("ListenRoomOnce_MFSync", "任务中断" );
+                Log.e("ListenRoomOnce_MFSync", "任务中断");
                 return false;
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
                 Log.e("ListenRoomOnce_MFSync", e.getMessage());
                 continue;
@@ -1625,11 +1680,13 @@ public class NetService extends Service
      * *****************************************************************
      */
     boolean isloginsuccess; //给下个方法用的全局变量
+
     public void DoBook()
     {
 
-        Thread reloginThread=new Thread(()->{
-            isloginsuccess=login_auto();
+        Thread reloginThread = new Thread(() ->
+        {
+            isloginsuccess = login_auto();
         });
         while (true)
         {
@@ -1641,38 +1698,38 @@ public class NetService extends Service
                 if (isloginsuccess)
                 {
                     //读取设置好的座位信息 注意！这里的Activity可能已死！
-                    int seatId=0;
-                    String st="",et="";
-                    if(BaseActivity.AppSetting!=null)
+                    int seatId = 0;
+                    String st = "", et = "";
+                    if (BaseActivity.AppSetting != null)
                     {
                         seatId = BaseActivity.AppSetting.BookSetting.getInt("ChooseSeatID", 0);
                         st = BaseActivity.AppSetting.ListenSetting.getString("startTimeValue", "");
                         et = BaseActivity.AppSetting.ListenSetting.getString("endTimeValue", "");
 
-                        Log.e("DoBook_front", "seatId="+seatId );
-                        Log.e("DoBook_front", "st="+st );
-                        Log.e("DoBook_front", "et="+et );
-                    }
-                    else
+                        Log.e("DoBook_front", "seatId=" + seatId);
+                        Log.e("DoBook_front", "st=" + st);
+                        Log.e("DoBook_front", "et=" + et);
+                    } else
                     {
-                        SharedPreferences tempBookSetting=this.getSharedPreferences("bookdata", Context.MODE_PRIVATE);
-                        SharedPreferences tempListenSetting=this.getSharedPreferences("listendata", Context.MODE_PRIVATE);
+                        SharedPreferences tempBookSetting = this.getSharedPreferences("bookdata", Context.MODE_PRIVATE);
+                        SharedPreferences tempListenSetting = this.getSharedPreferences("listendata", Context.MODE_PRIVATE);
 
-                        seatId=tempBookSetting.getInt("ChooseSeatID", 0);
-                        Log.e("DoBook_back", "seatId="+seatId );
+                        seatId = tempBookSetting.getInt("ChooseSeatID", 0);
+                        Log.e("DoBook_back", "seatId=" + seatId);
                         st = tempListenSetting.getString("startTimeValue", "");
-                        Log.e("DoBook_back", "st="+st );
+                        Log.e("DoBook_back", "st=" + st);
                         et = tempListenSetting.getString("endTimeValue", "");
-                        Log.e("DoBook_back", "et="+et );
+                        Log.e("DoBook_back", "et=" + et);
                     }
 
                     //构建Final中转变量*************** 注意！！！这里的字典可能没有实例化！******************
-                    TimeHelp tempTimeHelp=new TimeHelp();
-                    String st_final=(tempTimeHelp.Value2ID.get(st)).toString();
-                    String et_final=(tempTimeHelp.Value2ID.get(et)).toString();
-                    int seatId_final=seatId;
+                    TimeHelp tempTimeHelp = new TimeHelp();
+                    String st_final = (tempTimeHelp.Value2ID.get(st)).toString();
+                    String et_final = (tempTimeHelp.Value2ID.get(et)).toString();
+                    int seatId_final = seatId;
                     //开始构建线程
-                    Thread bookThread=new Thread(()->{
+                    Thread bookThread = new Thread(() ->
+                    {
                         //正式的预约
                         FreeBookSync(seatId_final, st_final, et_final, TimeHelp.GetTomorrowStr());
                         //测试用的预约
@@ -1683,8 +1740,8 @@ public class NetService extends Service
                     bookThread.join();
 
                     //region 预先构建通知
-                    NotificationManager manager=(NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder builder=new NotificationCompat.Builder(this);
+                    NotificationManager manager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                     builder.setSmallIcon(R.drawable.ic_launcher);
                     builder.setWhen(System.currentTimeMillis());
                     builder.setDefaults(NotificationCompat.DEFAULT_ALL);
@@ -1692,51 +1749,47 @@ public class NetService extends Service
                     //endregion
 
                     //一次预约执行完毕 判断结果
-                    if(LIB_SEATSSTATUS.equals("success")) //执行成功
+                    if (LIB_SEATSSTATUS.equals("success")) //执行成功
                     {
                         //构建自启动PendingIntent
-                        Intent autoin=new Intent(NetService.this, LoginActivity.class);
+                        Intent autoin = new Intent(NetService.this, LoginActivity.class);
                         autoin.putExtra("IsAutoLogin", true);
-                        PendingIntent autoinPending=PendingIntent.getActivity(this,0,autoin,PendingIntent.FLAG_CANCEL_CURRENT);
+                        PendingIntent autoinPending = PendingIntent.getActivity(this, 0, autoin, PendingIntent.FLAG_CANCEL_CURRENT);
 
                         //发送成功通知 点击之后可以进入程序
                         builder.setContentTitle("预约座位成功啦！");
                         builder.setContentText(LIB_BOOKRETURNINFO.location);
                         builder.setContentIntent(autoinPending); //点击之后进入界面
-                        Notification n=builder.build();
+                        Notification n = builder.build();
                         manager.notify(2, n);
                         break;
-                    }
-                    else if(LIB_MESSAGE.contains("登录失败: 用户名或密码不正确"))
+                    } else if (LIB_MESSAGE.contains("登录失败: 用户名或密码不正确"))
                     {
                         //这里是掉线了 尝试重新登陆
                         continue;
-                    }
-                    else if(LIB_MESSAGE.contains("预约失败"))
+                    } else if (LIB_MESSAGE.contains("预约失败"))
                     {
                         //发送失败通知
                         builder.setContentTitle("啊欧....");
                         builder.setContentText("好像没有抢到呢...,可能座位已经名花有主了...");
-                        Notification n=builder.build();
+                        Notification n = builder.build();
                         manager.notify(2, n);
                         break;
-                    }
-                    else
+                    } else
                     {
                         //发送失败通知
                         builder.setContentTitle("啊欧....");
                         builder.setContentText("好像没有抢到呢...发生其他错误呢");
-                        Log.e("AutoBook", LIB_MESSAGE );
-                        Notification n=builder.build();
+                        Log.e("AutoBook", LIB_MESSAGE);
+                        Notification n = builder.build();
                         manager.notify(2, n);
                         break;
                     }
 
                 }
-            }
-            catch (Exception e)
+            } catch (Exception e)
             {
-                Log.e("DoBook",e.toString());
+                Log.e("DoBook", e.toString());
                 break;
             }
         }
@@ -1748,18 +1801,18 @@ public class NetService extends Service
      */
     public void ASPNETpreheat()
     {
-        String requestUrl=CRT_HOST+URL_PREHEAT;
-        Request request=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_PREHEAT;
+        Request request = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
 
-        CommonTask tmpTask=new CommonTask(new onTaskResultReturn()
+        CommonTask tmpTask = new CommonTask(new onTaskResultReturn()
         {
             @Override
             public void OnTaskSucceed(Object... data)
             {
-                Log.e("Preheat","预热成功");
+                Log.e("Preheat", "预热成功");
             }
 
             @Override
@@ -1771,61 +1824,62 @@ public class NetService extends Service
 
         tmpTask.execute();
     }
+
     /**
      * 获取明天的预约情况(全部座位)
      */
     public void GetTomorrowInfo(onTaskResultReturn r)
     {
-        String requestUrl=CRT_HOST+URL_TOMORROWINFO_GET+"?date="+TimeHelp.GetTomorrowStr();
-        Request request=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_TOMORROWINFO_GET + "?date=" + TimeHelp.GetTomorrowStr();
+        Request request = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
-        CommonTask tmpTask=new CommonTask(r,"GetTomorrowInfoTask",request);
+        CommonTask tmpTask = new CommonTask(r, "GetTomorrowInfoTask", request);
         tmpTask.execute();
     }
 
     /**
      * 添加第二日预约信息
      */
-    public void AddTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+    public void AddTomorrowInfo(int seatID, String usernumber, onTaskResultReturn r)
     {
-        String requestURl=CRT_HOST+URL_TOMORROWINFO_ADD;
-        FormBody requestbody=new FormBody.Builder()
+        String requestURl = CRT_HOST + URL_TOMORROWINFO_ADD;
+        FormBody requestbody = new FormBody.Builder()
                 .add("seatID", Integer.toString(seatID))
                 .add("usernumber", usernumber)
-                .add("date",TimeHelp.GetTomorrowStr() )
+                .add("date", TimeHelp.GetTomorrowStr())
                 .build();
 
-        Request addrequest=new Request.Builder()
+        Request addrequest = new Request.Builder()
                 .url(requestURl)
                 .post(requestbody)
-                .addHeader("Content-Type","application/x-www-form-urlencoded")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
 
-        CommonTask commonTask=new CommonTask(r,"Addtomorowinfotask",addrequest);
+        CommonTask commonTask = new CommonTask(r, "Addtomorowinfotask", addrequest);
         commonTask.execute();
     }
 
     /**
      * 删除第二日预约信息
      */
-    public void DeleteTomorrowInfo(int seatID,String usernumber,onTaskResultReturn r)
+    public void DeleteTomorrowInfo(int seatID, String usernumber, onTaskResultReturn r)
     {
-        String requestURl=CRT_HOST+URL_TOMORROWINFO_DELETE;
-        FormBody requestbody=new FormBody.Builder()
+        String requestURl = CRT_HOST + URL_TOMORROWINFO_DELETE;
+        FormBody requestbody = new FormBody.Builder()
                 .add("seatID", Integer.toString(seatID))
                 .add("usernumber", usernumber)
-                .add("date",TimeHelp.GetTomorrowStr())
+                .add("date", TimeHelp.GetTomorrowStr())
                 .build();
 
-        Request addrequest=new Request.Builder()
+        Request addrequest = new Request.Builder()
                 .url(requestURl)
                 .post(requestbody)
-                .addHeader("Content-Type","application/x-www-form-urlencoded")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
 
-        CommonTask commonTask=new CommonTask(r,"Addtomorowinfotask",addrequest);
+        CommonTask commonTask = new CommonTask(r, "Addtomorowinfotask", addrequest);
         commonTask.execute();
     }
 
@@ -1834,29 +1888,28 @@ public class NetService extends Service
      */
     public boolean CheckPermissionTxT(String Username)
     {
-        String requestUrl="http://120.79.7.230/WhuSeats_per.txt";
-        Request CheckPeimission=new Request.Builder()
+        String requestUrl = "http://120.79.7.230/WhuSeats_per.txt";
+        Request CheckPeimission = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response re=httpClient.newCall(CheckPeimission).execute();
+            Response re = httpClient.newCall(CheckPeimission).execute();
 
-            String reStr=re.body().string();
-            String[] userArray=reStr.split("\r\n");
-            List<String> userList=new ArrayList<>(Arrays.asList(userArray));
+            String reStr = re.body().string();
+            String[] userArray = reStr.split("\r\n");
+            List<String> userList = new ArrayList<>(Arrays.asList(userArray));
 
             //如果第一行控制文本为false 代表关闭登录限制 故这个方法无条件返回true 不要绕晕了
-            if(userList.get(0).equals("false"))
+            if (userList.get(0).equals("false"))
                 return true;
 
-            if(userList.contains(Username))
+            if (userList.contains(Username))
                 return true;
             else return false;
 
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e("Net:CheckPermission", e.getMessage());
             return false;
@@ -1866,21 +1919,21 @@ public class NetService extends Service
 
     /**
      * 获取服务器上储存的吱口令(同步)
+     *
      * @return
      */
     public String GetZhicode()
     {
-        String requestUrl=CRT_HOST+URL_ZHICODE;
-        Request getzhi=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_ZHICODE;
+        Request getzhi = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(getzhi).execute();
+            Response response = httpClient.newCall(getzhi).execute();
             return response.body().string();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             Log.e("GetZhicode:", e.getMessage());
             return "";
@@ -1889,68 +1942,70 @@ public class NetService extends Service
 
     /**
      * 刷新服务器上的吱口令(同步)
+     *
      * @return
      */
     public String PutZhicode(String value)
     {
-        String requestUrl=CRT_HOST+URL_PUTZHICODE+"?value="+value;
-        Request putzhi=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_PUTZHICODE + "?value=" + value;
+        Request putzhi = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(putzhi).execute();
+            Response response = httpClient.newCall(putzhi).execute();
             return response.body().string();
-        }
-        catch (IOException e)
+        } catch (IOException e)
         {
             Log.e("PutZhicode:", e.getMessage());
             return "";
         }
     }
+
     /**
      * 检查更新,用于弹出对话框(同步)
+     *
      * @param IsneedWinform 这个参数用于干预本次判断要不要检测服务器上的服务端winform程序的存活情况
      * @return
      */
     public boolean CheckUpdate_IsShowDialog(boolean IsneedWinform)
     {
         //先检查当前版本 这一步用HTTP检查 如果不需要更新 则可以加快速度
-        String requestUrl="http://120.79.7.230/appVersion.txt";
+        String requestUrl = "http://120.79.7.230/appVersion.txt";
 
-        Request CheckUpdate=new Request.Builder()
+        Request CheckUpdate = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response re=httpClient.newCall(CheckUpdate).execute();
-            String reStr=re.body().string();
+            Response re = httpClient.newCall(CheckUpdate).execute();
+            String reStr = re.body().string();
             //获取远程版本号
-            JSONObject versionJobj=new JSONObject(reStr);
-            REMOTEVERSION=versionJobj.getInt(BaseActivity.ApplicationContext.getPackageName());
-            ISFORCEUPDATE=versionJobj.getBoolean(BaseActivity.ApplicationContext.getPackageName()+"_ISFORCE");
+            JSONObject versionJobj = new JSONObject(reStr);
+            REMOTEVERSION = versionJobj.getInt(BaseActivity.ApplicationContext.getPackageName());
+            ISFORCEUPDATE = versionJobj.getBoolean(BaseActivity.ApplicationContext.getPackageName() + "_ISFORCE");
 
             //如果本地版本号等于远端 返回false 即不用更新
-            if(BaseActivity.VERSIONCODE>=REMOTEVERSION)
+            if (BaseActivity.VERSIONCODE >= REMOTEVERSION)
                 return false;
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Log.e("Net:CheckUpdate", e.getMessage());
             return false;
         }
 
-        if(IsneedWinform)
+        if (IsneedWinform)
         {
             return IsWinFormActive();
         }
-       return true;
+        return true;
     }
 
     /**
      * 检查服务端的Winform是否处在可连接状态(同步)
+     *
      * @return
      */
     public boolean IsWinFormActive()
@@ -1958,24 +2013,24 @@ public class NetService extends Service
         try
         {
             //绑定本地套接字并且连接
-            ClientSocket=new Socket(ServerIP1,7777);
-            Clientop=ClientSocket.getOutputStream();
-            Clientin=ClientSocket.getInputStream();
-        }
-        catch (Exception e)
+            ClientSocket = new Socket(ServerIP1, 7777);
+            Clientop = ClientSocket.getOutputStream();
+            Clientin = ClientSocket.getInputStream();
+        } catch (Exception e)
         {
-            Log.e("CheckUpdate","连接到服务器失败\n"+e.getMessage());
+            Log.e("CheckUpdate", "连接到服务器失败\n" + e.getMessage());
             return false;
         }
         return true;
     }
+
     /**
      * 下载更新(异步)
      */
-    public void DownLoadUpdate(onTaskResultReturn r,onProgressReturn p)
+    public void DownLoadUpdate(onTaskResultReturn r, onProgressReturn p)
     {
         //任务执行匿名类
-        class DownloadTask extends ResultsTask<Void,Double,File>
+        class DownloadTask extends ResultsTask<Void, Double, File>
         {
             public DownloadTask(onTaskResultReturn i, String name)
             {
@@ -1989,22 +2044,21 @@ public class NetService extends Service
 
                 JSONObject job = new JSONObject();
 
-                String filename = BaseActivity.PACKAGENAME + "_" + REMOTEVERSION+".apk";//拼接文件名
+                String filename = BaseActivity.PACKAGENAME + "_" + REMOTEVERSION + ".apk";//拼接文件名
                 File ImageFile = new File(getExternalCacheDir(), filename);
                 //如果已经有了这个的完整安装包 则直接跳过下载
-                if(ImageFile.exists())
+                if (ImageFile.exists())
                 {
                     //读取保存好的文件正确的大小
-                    SharedPreferences apksp=getSharedPreferences("apkdata", MODE_PRIVATE);
-                    long RightapkLength=apksp.getLong(filename,0 );
+                    SharedPreferences apksp = getSharedPreferences("apkdata", MODE_PRIVATE);
+                    long RightapkLength = apksp.getLong(filename, 0);
                     //如果文件大小正确
-                    if(ImageFile.length()==RightapkLength)
+                    if (ImageFile.length() == RightapkLength)
                     {
                         try
                         {
                             ClientSocket.close();
-                        }
-                        catch (IOException e)
+                        } catch (IOException e)
                         {
                             e.printStackTrace();
                         }
@@ -2014,11 +2068,10 @@ public class NetService extends Service
                     try
                     {
                         ImageFile.delete();
-                        ImageFile=new File(getExternalCacheDir(), filename);
-                    }
-                    catch (Exception e)
+                        ImageFile = new File(getExternalCacheDir(), filename);
+                    } catch (Exception e)
                     {
-                        Log.e("DownLoadApk", e.toString() );
+                        Log.e("DownLoadApk", e.toString());
                     }
 
                 }
@@ -2054,7 +2107,7 @@ public class NetService extends Service
                     }
 
                     //这里把该文件的大小保存到SharedPreferences中 便于之后判断文件是否存在
-                    SharedPreferences.Editor apkSPeditor=getSharedPreferences("apkdata", MODE_PRIVATE).edit();
+                    SharedPreferences.Editor apkSPeditor = getSharedPreferences("apkdata", MODE_PRIVATE).edit();
                     apkSPeditor.putLong(filename, totalFileLength).apply();
 
 
@@ -2080,7 +2133,7 @@ public class NetService extends Service
                     Clientin.close();
                     Log.e("Net", String.format("文件写入完毕", recvlen * 100.0 / totalFileLength));
                     //region 利用Linux命令改变文件的权限 使其能够正常安装
-                    String[] command = {"chmod", "777", ImageFile.getPath() };
+                    String[] command = {"chmod", "777", ImageFile.getPath()};
                     ProcessBuilder builder = new ProcessBuilder(command);
                     builder.start();
                     //endregion
@@ -2113,16 +2166,16 @@ public class NetService extends Service
             }
         }
 
-        DownloadTask downloadTask=new DownloadTask(r,"DownLoadUpdateTask");
+        DownloadTask downloadTask = new DownloadTask(r, "DownLoadUpdateTask");
         downloadTask.execute();
     }
 
     /**
      * 利用OKHttp3 异步下载更新
      */
-    public void DownLoadUpdateByHttp(onTaskResultReturn r,onProgressReturn p)
+    public void DownLoadUpdateByHttp(onTaskResultReturn r, onProgressReturn p)
     {
-        class DownloadTask extends ResultsTask<Void,Double,File>
+        class DownloadTask extends ResultsTask<Void, Double, File>
         {
             public DownloadTask(onTaskResultReturn i, String name)
             {
@@ -2132,11 +2185,11 @@ public class NetService extends Service
             @Override
             protected File doInBackground(Void... voids)
             {
-                String filename = BaseActivity.PACKAGENAME + "_" + REMOTEVERSION+".apk";//拼接文件名
+                String filename = BaseActivity.PACKAGENAME + "_" + REMOTEVERSION + ".apk";//拼接文件名
                 File ImageFile = new File(getExternalCacheDir(), filename);
 
                 //如果已经有了这个的完整安装包 则直接跳过下载
-                if(ImageFile.exists())
+                if (ImageFile.exists())
                 {
                     //读取保存好的文件正确的大小
                     SharedPreferences apksp = getSharedPreferences("apkdata", MODE_PRIVATE);
@@ -2152,47 +2205,45 @@ public class NetService extends Service
                             e.printStackTrace();
                         }
                         return ImageFile;
-                    }
-                    else
+                    } else
                     {
                         try
                         {
                             ImageFile.delete();
-                            ImageFile=new File(getExternalCacheDir(), filename);
-                        }
-                        catch (Exception e)
+                            ImageFile = new File(getExternalCacheDir(), filename);
+                        } catch (Exception e)
                         {
-                            Log.e("DownLoadApk", e.toString() );
+                            Log.e("DownLoadApk", e.toString());
                         }
                     }
                 }
 
-                File ImageFile_Final=ImageFile; //构建的final中转量供内部类使用
+                File ImageFile_Final = ImageFile; //构建的final中转量供内部类使用
                 //正式开始下载请求
-                String requesturl=CRT_OSS+"/apks/"+filename;
-                Request downloadRequest=new Request.Builder()
+                String requesturl = CRT_OSS + "/apks/" + filename;
+                Request downloadRequest = new Request.Builder()
                         .get()
                         .url(requesturl)
                         .build();
                 try
                 {
-                    Response response=httpClient.newCall(downloadRequest).execute();
+                    Response response = httpClient.newCall(downloadRequest).execute();
 
                     //从head里面获取文件总长度
-                    long totalFileLength=Integer.parseInt(response.header("Content-Length"));
+                    long totalFileLength = Integer.parseInt(response.header("Content-Length"));
 
-                    if(totalFileLength==0)
+                    if (totalFileLength == 0)
                     {
                         throw new IOException("获取到的远端文件长度出错");
                     }
 
                     //这里把该文件的大小保存到SharedPreferences中 便于之后判断文件是否存在
-                    SharedPreferences.Editor apkSPeditor=getSharedPreferences("apkdata", MODE_PRIVATE).edit();
+                    SharedPreferences.Editor apkSPeditor = getSharedPreferences("apkdata", MODE_PRIVATE).edit();
                     apkSPeditor.putLong(filename, totalFileLength).apply();
 
 
                     byte[] buff = new byte[2048 * 60];            //缓冲池子
-                    Clientin=response.body().byteStream();        //构建输入流
+                    Clientin = response.body().byteStream();        //构建输入流
                     long recvlen = 0;                             //已接收的文件长度
                     int len = 0;                                  //本次缓冲接收的文件长度
                     //创建输出文件流
@@ -2216,15 +2267,14 @@ public class NetService extends Service
                     Log.e("Net", String.format("文件写入完毕", recvlen * 100.0 / totalFileLength));
 
                     //region 利用Linux命令改变文件的权限 使其能够正常安装
-                    String[] command = {"chmod", "777", ImageFile_Final.getPath() };
+                    String[] command = {"chmod", "777", ImageFile_Final.getPath()};
                     ProcessBuilder builder = new ProcessBuilder(command);
                     builder.start();
                     //endregion
 
-                }
-                catch (IOException e)
+                } catch (IOException e)
                 {
-                    Log.e("Downloadhttp",e.getLocalizedMessage());
+                    Log.e("Downloadhttp", e.getLocalizedMessage());
                     return null;
                 }
                 return ImageFile_Final;
@@ -2250,7 +2300,7 @@ public class NetService extends Service
             }
         }
 
-        DownloadTask downloadTask=new DownloadTask(r,"DownLoadUpdateTask");
+        DownloadTask downloadTask = new DownloadTask(r, "DownLoadUpdateTask");
         downloadTask.execute();
     }
 
@@ -2259,31 +2309,32 @@ public class NetService extends Service
      */
     public void GetAnnounce(onTaskResultReturn r)
     {
-        String url=LIB_URLWITHPORT+URL_ANNOUNCE;
-        Request Leaverequest=new Request.Builder()
+        String url = LIB_URLWITHPORT + URL_ANNOUNCE;
+        Request Leaverequest = new Request.Builder()
                 .get()
                 .addHeader("token", LIB_TOKEN)
                 .url(url)
                 .build();
-        CommonTask tempTask=new CommonTask(r,"GetAnnounceTask",Leaverequest);
+        CommonTask tempTask = new CommonTask(r, "GetAnnounceTask", Leaverequest);
         tempTask.execute();
     }
 
     /**
      * 检查远端服务器winform进程是否存活(同步)
+     *
      * @return
      */
     public boolean CheckProcessAlive()
     {
-        String requestUrl=CRT_HOST+URL_CHECKPROCESS;
-        Request checkprocess=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_CHECKPROCESS;
+        Request checkprocess = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(checkprocess).execute();
-            JSONObject responseJobj=new JSONObject(response.body().string());
+            Response response = httpClient.newCall(checkprocess).execute();
+            JSONObject responseJobj = new JSONObject(response.body().string());
             return responseJobj.getBoolean("data");
 
         } catch (Exception e)
@@ -2295,19 +2346,20 @@ public class NetService extends Service
 
     /**
      * 杀死服务器上的进程(同步)
+     *
      * @return 返回服务器message
      */
     public String killProcess()
     {
-        String requestUrl=CRT_HOST+URL_KILLPROCESS;
-        Request killprocess=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_KILLPROCESS;
+        Request killprocess = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(killprocess).execute();
-            JSONObject responseJobj=new JSONObject(response.body().string());
+            Response response = httpClient.newCall(killprocess).execute();
+            JSONObject responseJobj = new JSONObject(response.body().string());
             return responseJobj.getString("message");
 
         } catch (Exception e)
@@ -2319,19 +2371,20 @@ public class NetService extends Service
 
     /**
      * 重启服务器上的进程(同步)
+     *
      * @return
      */
     public String RestartProcess()
     {
-        String requestUrl=CRT_HOST+URL_RESTARTPROCESS;
-        Request restartprocess=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_RESTARTPROCESS;
+        Request restartprocess = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(restartprocess).execute();
-            JSONObject responseJobj=new JSONObject(response.body().string());
+            Response response = httpClient.newCall(restartprocess).execute();
+            JSONObject responseJobj = new JSONObject(response.body().string());
             return responseJobj.getString("message");
 
         } catch (Exception e)
@@ -2343,19 +2396,20 @@ public class NetService extends Service
 
     /**
      * 获取服务器上的窗口文字(同步)
+     *
      * @return
      */
     public String GetLog()
     {
-        String requestUrl=CRT_HOST+URL_GETLOG;
-        Request getlog=new Request.Builder()
+        String requestUrl = CRT_HOST + URL_GETLOG;
+        Request getlog = new Request.Builder()
                 .get()
                 .url(requestUrl)
                 .build();
         try
         {
-            Response response=httpClient.newCall(getlog).execute();
-            JSONObject responseJobj=new JSONObject(response.body().string());
+            Response response = httpClient.newCall(getlog).execute();
+            JSONObject responseJobj = new JSONObject(response.body().string());
             return responseJobj.getString("data");
 
         } catch (Exception e)
@@ -2364,24 +2418,138 @@ public class NetService extends Service
             return "";
         }
     }
+
+
+    /**
+     * 获取服务器上的版本文件(异步)
+     *
+     * @return
+     */
+    public void GetVersionCode(onTaskResultReturn r)
+    {
+        Request request = new Request.Builder()
+                .get()
+                .url(CRT_HOST + URL_GETVERSION)
+                .build();
+        CommonTask GetVersionTask = new CommonTask(r, "GetVersion", request);
+        GetVersionTask.execute();
+    }
+
+    /**
+     * 刷新服务器上的版本文件(异步)
+     *
+     * @param str
+     * @param r
+     * @return
+     */
+    public void SetVersionCode(String str, onTaskResultReturn r)
+    {
+        FormBody body = new FormBody.Builder()
+                .add("value", str)
+                .build();
+        Request request = new Request.Builder()
+                .post(body)
+                .url(CRT_HOST + URL_SETVERSION)
+                .build();
+        CommonTask SetVersionTask = new CommonTask(r, "SetVersion", request);
+        SetVersionTask.execute();
+    }
+
+    /**
+     * 获得百宝盒消息文字(同步)
+     *
+     * @return
+     */
+    public String GetMoreFucMsg()
+    {
+        try
+        {
+            Request request = new Request.Builder()
+                    .get()
+                    .url(CRT_HOST + URL_GETMOREFUCMSG)
+                    .build();
+            return httpClient.newCall(request).execute().body().string();
+        } catch (IOException e)
+        {
+            Log.e(TAG, "GetMoreFucMsg:" + e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 刷新百宝盒消息文字(同步)
+     */
+    public void SetMoreFucMsg(String msg)
+    {
+        try
+        {
+            Request request = new Request.Builder()
+                    .get()
+                    .url(CRT_HOST + URL_SETMOREFUCMSG + "?msg=" + msg)
+                    .build();
+            httpClient.newCall(request).execute();
+        } catch (Exception e)
+        {
+            Log.e(TAG, "SetMoreFucMsg:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获得彩蛋消息文字(同步)
+     *
+     * @return
+     */
+    public String GetEasterEggCode()
+    {
+        try
+        {
+            Request request = new Request.Builder()
+                    .get()
+                    .url(CRT_HOST + URL_GETEGCODE)
+                    .build();
+            return httpClient.newCall(request).execute().body().string();
+        } catch (IOException e)
+        {
+            Log.e(TAG, "GetEasterEggCode:" + e.getMessage());
+            return "";
+        }
+    }
+
+    /**
+     * 刷新彩蛋消息文字(同步)
+     */
+    public void SetEasterEggCode(String msg)
+    {
+
+        try
+        {
+            Request request = new Request.Builder()
+                    .get()
+                    .url(CRT_HOST + URL_SETEGCODE + "?msg=" + msg)
+                    .build();
+            httpClient.newCall(request).execute();
+        } catch (Exception e)
+        {
+            Log.e(TAG, "SetEasterEggCode:" + e.getMessage());
+        }
+    }
+
+
     //endregion
-
-
-
-
 
 
     /**
      * 这是一个公共的不接受参数 返回原始的Json字符串的任务
      * ****************注意 本公共任务只是返回Json字符串 把字符串解析为相应信息不在这里**********
      */
-    class CommonTask extends ResultsTask<Void,Void,String>
+    class CommonTask extends ResultsTask<Void, Void, String>
     {
         Request httpRequest;
-        public CommonTask(onTaskResultReturn i,String taskname,Request r)
+
+        public CommonTask(onTaskResultReturn i, String taskname, Request r)
         {
-            super(i,taskname);
-            httpRequest=r;
+            super(i, taskname);
+            httpRequest = r;
         }
 
         @Override
@@ -2390,11 +2558,10 @@ public class NetService extends Service
             try
             {
                 //执行操作
-                Response re=httpClient.newCall(httpRequest).execute();
-                String reStr=re.body().string();
+                Response re = httpClient.newCall(httpRequest).execute();
+                String reStr = re.body().string();
                 return reStr;
-            }
-            catch (IOException e)
+            } catch (IOException e)
             {
                 Log.e("Net:CommonTask", e.getMessage());
                 return null;
@@ -2406,11 +2573,10 @@ public class NetService extends Service
         {
             //根据接口进行处理 这里因为是一个公共的任务 所以它无法处理任务是否正确完成
             super.onPostExecute(s);
-            if(s==null)
+            if (s == null)
             {
                 ResultReturn.OnTaskFailed();
-            }
-            else
+            } else
             {
                 ResultReturn.OnTaskSucceed(s);
             }

@@ -103,6 +103,7 @@ public class HomeFragment extends Fragment
         });
 
         //endregion
+
         //endregion
 
         //检查是不是新版本 然后来清除设置

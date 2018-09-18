@@ -113,6 +113,7 @@ public class SettingFragment extends Fragment
         CheckIfNewVersion();
         ImportDelaySetting();
         IsShowUpdateText();
+        RefreshMoreFucMessage();
         //保存当前版本号
         BaseActivity.AppSetting.ListenSettingEditor.putInt("AppVersion",BaseActivity.VERSIONCODE);
     }
@@ -273,6 +274,19 @@ public class SettingFragment extends Fragment
         {
             this.getView().post(()->{IsNewVersion.setVisibility(updateHelp.CheckUpdate()?View.VISIBLE:View.INVISIBLE);});
         });
+    }
+
+    /**
+     * 刷新百宝盒消息
+     */
+    public void RefreshMoreFucMessage()
+    {
+        Thread t=new Thread(()->{
+            String text=ActivityConnect.mbinder.GetMoreFucMsg();
+            final String textfinal=text.replace("\"","" );
+            tvBoxMessage.post(()->{tvBoxMessage.setText(textfinal);});
+        });
+        t.start();
     }
 
     /****************

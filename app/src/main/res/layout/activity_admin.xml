@@ -48,6 +48,43 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@color/black" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/et_MoreFucMsg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="更多功能消息"/>
+            <Button
+                android:id="@+id/btn_setmorefuc"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="更新morefuc"
+                android:textSize="10dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/et_easteregg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="彩蛋口令"/>
+            <Button
+                android:id="@+id/btn_setEasterEgg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3"
+                android:text="更新彩蛋"
+                android:textSize="13dp"/>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

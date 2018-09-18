@@ -1,10 +1,13 @@
 package com.crt.whuseats.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +18,7 @@ import com.crt.whuseats.R;
 public class AdminActivity extends BaseActivity
 {
 
+    private static final String TAG = "AdminActivity";
     //控件们
     private EditText etZhicode;
     private Button btnZhicodeGet;
@@ -30,6 +34,13 @@ public class AdminActivity extends BaseActivity
     private TextView tvProcessMessage;
     private TextView tvProcessLog;
 
+    private EditText etMoreFucMsg;
+    private Button btnSetmorefuc;
+    private EditText etEasteregg;
+    private Button btnSetEasterEgg;
+
+
+
 
 
     String Zhicode;              //吱口令内容
@@ -37,6 +48,9 @@ public class AdminActivity extends BaseActivity
 
     boolean IsProcessAlive;      //服务器进程是否存活
     boolean IsProcessActive;     //服务器进程是否活跃
+
+    String MoreFucMsg;           //更多功能消息
+    String EasterEggCode;        //彩蛋消息
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,6 +69,10 @@ public class AdminActivity extends BaseActivity
         btnGetlog = (Button) findViewById(R.id.btn_getlog);
         tvProcessMessage = (TextView) findViewById(R.id.tv_process_message);
         tvProcessLog = (TextView) findViewById(R.id.tv_process_log);
+        etMoreFucMsg = (EditText) findViewById(R.id.et_MoreFucMsg);
+        btnSetmorefuc = (Button) findViewById(R.id.btn_setmorefuc);
+        etEasteregg = (EditText) findViewById(R.id.et_easteregg);
+        btnSetEasterEgg = (Button) findViewById(R.id.btn_setEasterEgg);
 
         //绑定事件们
         btnZhicodeGet.setOnClickListener(v->{
@@ -74,6 +92,11 @@ public class AdminActivity extends BaseActivity
         });
 
         btnGetlog.setOnClickListener(v->{GetLog();});
+        btnSetmorefuc.setOnClickListener(v->SetMoreFucMsg());
+        btnSetEasterEgg.setOnClickListener(v->SetEasterEggCode());
+
+
+
 
     }
 
@@ -88,27 +111,31 @@ public class AdminActivity extends BaseActivity
         //检查winform
         checkprocessAlive();
         checkprocessActive();
+        GetMoreFucMsg();
+        GetEasterEggCode();
+        AuthCheck();
     }
 
-//    /**
-//     * 身份验证 不是管理员不能进入哦~
-//     */
-//    public void AuthCheck()
-//    {
-//        String user=AppSetting.UserAndPwd.getString("Username","" );
-//        if(!user.equals("2016301610110"))
-//        {
-//            AlertDialog tmp=new AlertDialog.Builder(this)
-//                    .setTitle("提示")
-//                    .setMessage("您没有权限进入此页面哦~但是你能进到这里很不错了哦~是看了源码还是运气好碰到了呢~\n" +
-//                            "嘛反正不管咋样 可以找我来领红包哦~")
-//                    .setCancelable(false)
-//                    .setNegativeButton("", ()->Jump2QQ())
-//                    .create();
-//
-//            tmp.show();
-//        }
-//    }
+    /**
+     * 身份验证 不是管理员不能进入哦~
+     */
+    public void AuthCheck()
+    {
+        String user=AppSetting.UserAndPwd.getString("Username","" );
+        final String text=EasterEggCode;
+        if(!user.equals("2016301610110"))
+        {
+            setScreenBgDarken();
+            AlertDialog tmp=new AlertDialog.Builder(this)
+                    .setTitle("提示")
+                    .setMessage("您没有权限进入此页面哦~但是你能进到这里很不错了哦~是看了源码还是运气好碰到了呢~\n" +
+                            "嘛反正不管咋样 可以找我来领红包哦~")
+                    .setPositiveButton(text, (dialog,which)->{Jump2QQ();this.finish();})
+                    .create();
+            tmp.setCanceledOnTouchOutside(false);
+            tmp.show();
+        }
+    }
 
 
 
@@ -234,6 +261,48 @@ public class AdminActivity extends BaseActivity
         t.start();
     }
 
+    //刷新更多功能消息 显示到EditText
+    public void GetMoreFucMsg()
+    {
+        Thread t=new Thread(()->{
+            MoreFucMsg=mbinder.GetMoreFucMsg();
+            MoreFucMsg=MoreFucMsg.replace("\"","" );
+            etMoreFucMsg.post(()->{etMoreFucMsg.setText(MoreFucMsg);});
+        });
+        t.start();
+    }
+
+    //更新更多功能消息到服务器
+    public void SetMoreFucMsg()
+    {
+        String msg=etMoreFucMsg.getText().toString();
+        Thread t=new Thread(()->{
+            mbinder.SetMoreFucMsg(msg);
+        });
+        t.start();
+    }
+
+    //刷新彩蛋消息 显示到EditText
+    public void GetEasterEggCode()
+    {
+        Thread t=new Thread(()->{
+            EasterEggCode=mbinder.GetEasterEggCode();
+            EasterEggCode=EasterEggCode.replace("\"","" );
+            etEasteregg.post(()->{etEasteregg.setText(EasterEggCode);});
+        });
+        t.start();
+    }
+
+    //更新彩蛋消息到服务器
+    public void SetEasterEggCode()
+    {
+        String msg=etMoreFucMsg.getText().toString();
+        Thread t=new Thread(()->{
+            mbinder.SetEasterEggCode(msg);
+        });
+        t.start();
+    }
+
     //endregion
 
     /**
@@ -243,6 +312,21 @@ public class AdminActivity extends BaseActivity
     {
         String url="mqqwpa://im/chat?chat_type=wpa&uin=814909233";
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    }
+
+    // 设置屏幕背景变暗
+    private void setScreenBgDarken() {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 0.1f;
+        lp.dimAmount = 0.1f;
+        getWindow().setAttributes(lp);
+    }
+    // 设置屏幕背景变亮
+    private void setScreenBgLight() {
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.alpha = 1.0f;
+        lp.dimAmount = 1.0f;
+        getWindow().setAttributes(lp);
     }
 
 }

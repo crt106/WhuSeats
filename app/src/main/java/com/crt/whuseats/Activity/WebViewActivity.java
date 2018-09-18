@@ -86,7 +86,7 @@ public class WebViewActivity extends BaseActivity
 
         wbsetting.setCacheMode(WebSettings.LOAD_DEFAULT);
         wb.clearCache(true);
-//        wb.clearHistory();
+//      wb.clearHistory();
         //提供一个JavaScript接口
 
         wb.addJavascriptInterface(new WebviewJavaScript(), "test");
@@ -99,7 +99,6 @@ public class WebViewActivity extends BaseActivity
     protected void onResume()
     {
         super.onResume();
-
     }
 
     //javaScript接口类

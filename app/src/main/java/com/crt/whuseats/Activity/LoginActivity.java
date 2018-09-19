@@ -8,7 +8,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Dialog.AlipayDialog;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.JsonHelps.JsonInfo_User;
@@ -29,7 +32,7 @@ import java.util.ArrayList;
 
 public class LoginActivity extends BaseActivity
 {
-
+    private static final String TAG = "LoginActivity";
     public static boolean IsLoginIN=true;                 //判断用户是否已登录进入
     public static final int ANDROID_M_PERMISSION=1;
     //region 控件
@@ -139,6 +142,9 @@ public class LoginActivity extends BaseActivity
     //简单的登陆效果
     public void ButtonLogin_Click(View v)
     {
+        //显示小菊花
+        LoadingDialog.LoadingShow(LoginActivity.this,true);
+
         //检查是不是处于维护状态
         if(TimeHelp.IsOverTime("23:50")||!TimeHelp.IsOverTime("0:30"))
         {
@@ -148,6 +154,7 @@ public class LoginActivity extends BaseActivity
                     .setPositiveButton("溜了溜了",null )
                     .create();
             temp.show();
+            LoadingDialog.LoadingHide();
             return;
         }
 
@@ -190,6 +197,8 @@ public class LoginActivity extends BaseActivity
                        Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
                        startActivity(StartMain);
                        IsLoginIN=true;
+                       //隐藏小菊花
+                       LoadingDialog.LoadingHide();
                     }
                     catch (Exception e)
                     {
@@ -202,12 +211,14 @@ public class LoginActivity extends BaseActivity
                 public void OnTaskFailed(Object... data)
                 {
                     Toast.makeText(getApplicationContext(), "登录失败,看看是不是输错密码啥的..", Toast.LENGTH_SHORT).show();
+                    LoadingDialog.LoadingHide();
                 }
             };
 
             //移动端登录
             USERNAME=Username.getText().toString();
             PASSWORD=Password.getText().toString();
+
             mbinder.login(USERNAME,PASSWORD,Result);
 
 
@@ -223,12 +234,10 @@ public class LoginActivity extends BaseActivity
             AppSetting.UserAndPwdEditor.apply();
         }
         else
-            Toast.makeText(LoginActivity.this, "抱歉,您没有登录权限", Toast.LENGTH_LONG).show();
-
-
-//        //调试时的跳过登陆
-//        Intent StartMain=new Intent(LoginActivity.this,MainActivity.class);
-//        startActivity(StartMain);
+        {
+            Toast.makeText(LoginActivity.this, "抱歉,网络错误或者您未被授权", Toast.LENGTH_LONG).show();
+            LoadingDialog.LoadingHide();
+        }
 
     }
     //endregion
@@ -292,18 +301,48 @@ public class LoginActivity extends BaseActivity
         }
     }
 
-    //和服务器的预热,以及获取吱口令
+    //和服务器的预热以及news获取,以及获取吱口令
     public void WebPreheat()
     {
-        mbinder.ASPNETpreheat();
+        mbinder.ASPNETpreheat(new onTaskResultReturn()
+        {
+            @Override
+            public void OnTaskSucceed(Object... data)
+            {
+                try
+                {
+                    String news=data[0].toString();
+                    news=news.replace("\"","" );
+                    String isnews=news.split("-")[0];
+                    String msg=news.split("-")[1];
+                    if(isnews.equals("true"))
+                    {
+                        AlertDialog tmp=new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle("News")
+                                .setMessage(msg)
+                                .create();
+                        tmp.show();
+                    }
+                } catch (Exception e)
+                {
+                    Log.e(TAG, "ASPNETpreheat:",e.getCause());
+                }
+            }
+
+            @Override
+            public void OnTaskFailed(Object... data)
+            {
+
+            }
+        });
+
         Thread t1=new Thread(()->{
            AlipayDialog.Zhicodestr=mbinder.GetZhicode();
         });
         t1.start();
-
     }
 
-    //region 安卓6.0动态检查权限
+    //region 安卓6.0动态检查权限 顺便检查以下通知有没有打开
     @TargetApi(23)
     private void getPersimmions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -318,6 +357,27 @@ public class LoginActivity extends BaseActivity
 
             if (permissions.size() > 0) {
                 requestPermissions(permissions.toArray(new String[permissions.size()]), ANDROID_M_PERMISSION);
+            }
+        }
+        //检查通知是否开启
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.KITKAT)
+        {
+            try
+            {
+                NotificationManagerCompat no=NotificationManagerCompat.from(LoginActivity.this);
+                //如果未开启 跳转对话框开启
+                if(!no.areNotificationsEnabled())
+                {
+                    AlertDialog tmp = new AlertDialog.Builder(LoginActivity.this)
+                            .setTitle("提示！")
+                            .setMessage("发现你没有打开本应用的通知诶,这样的话在预约第二天座位的时候陈大概率导致失败并且就算成功也没有反馈\n而且不打开的话这个对话框每次都会来烦你")
+                            .setPositiveButton("前往开启", jump2NoticeOpen)
+                            .create();
+                    tmp.show();
+                }
+            } catch (Exception e)
+            {
+                Log.e(TAG, "getPersimmions: ",e.getCause() );
             }
         }
     }
@@ -350,6 +410,14 @@ public class LoginActivity extends BaseActivity
             Log.e("LoginActivity" ,"权限获取失败");
         }
     }
+
+    AlertDialog.OnClickListener jump2NoticeOpen=(dialog,p)->{
+        Intent localIntent = new Intent();
+        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+        localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+        startActivity(localIntent);
+    };
     //endregion
 
 

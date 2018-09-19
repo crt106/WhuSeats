@@ -21,6 +21,7 @@ import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.MoreFucActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.Service.NetService;
@@ -109,7 +110,6 @@ public class SettingFragment extends Fragment
         //初始化UpdateHelp
         updateHelp=new UpdateHelp(ActivityConnect,false);
 
-
         CheckIfNewVersion();
         ImportDelaySetting();
         IsShowUpdateText();
@@ -193,6 +193,7 @@ public class SettingFragment extends Fragment
 
     //公告点击按钮
     public View.OnClickListener AnnounceClick=(v)->{
+        LoadingDialog.LoadingShow(ActivityConnect,true);
         ActivityConnect.mbinder.GetAnnounce(new onTaskResultReturn()
         {
             @Override
@@ -208,6 +209,7 @@ public class SettingFragment extends Fragment
                         .setMessage(announce)
                         .create();
                 temp.show();
+                LoadingDialog.LoadingHide();
             }
 
             @Override

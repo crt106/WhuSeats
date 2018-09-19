@@ -17,6 +17,7 @@ import com.crt.whuseats.Adapter.BuildingAdapter;
 import com.crt.whuseats.Adapter.RoomAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
 import com.crt.whuseats.Dialog.CustomProgressDialog;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
@@ -215,6 +216,7 @@ public class ListenActivity extends BaseActivity
     //通过活动发起请求总建筑布局请求
     public void GetFilters()
     {
+
         //真实返回
         mbinder.GetFilters(new onTaskResultReturn()
         {
@@ -242,6 +244,7 @@ public class ListenActivity extends BaseActivity
                     Toast.makeText(ListenActivity.this,"建筑布局获取错误",Toast.LENGTH_SHORT).show();
                     Toast.makeText(ListenActivity.this,"可能性：图书馆服务器维护、账号短时间冻结",Toast.LENGTH_SHORT).show();
                 }
+
             }
 
             @Override
@@ -256,6 +259,7 @@ public class ListenActivity extends BaseActivity
     //通过活动发起建筑内房间布局
     public void GetRoomGrid()
     {
+        LoadingDialog.LoadingShow(this,true);
         mbinder.CheckHouseStats(new onTaskResultReturn()
         {
             @Override
@@ -277,6 +281,10 @@ public class ListenActivity extends BaseActivity
                     Log.e("ListenFragment_old", "房间布局获取错误"+e.getMessage());
                     Toast.makeText(ListenActivity.this,"房间布局获取错误",Toast.LENGTH_SHORT).show();
                     Toast.makeText(ListenActivity.this,"可能性：图书馆服务器维护、账号短时间冻结",Toast.LENGTH_SHORT).show();
+                }
+                finally
+                {
+                    LoadingDialog.LoadingHide();
                 }
             }
 

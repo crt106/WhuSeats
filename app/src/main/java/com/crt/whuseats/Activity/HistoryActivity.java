@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crt.whuseats.Adapter.ReservationAdapter;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
@@ -30,7 +31,6 @@ public class HistoryActivity extends BaseActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-
         historyView=(RecyclerView)findViewById(R.id.Rv_history);
     }
 
@@ -44,6 +44,7 @@ public class HistoryActivity extends BaseActivity {
     //检查历史列表
     public void GetHistory()
     {
+        LoadingDialog.LoadingShow(this,true);
         mbinder.GetHistory(new onTaskResultReturn()
         {
             @Override
@@ -62,12 +63,13 @@ public class HistoryActivity extends BaseActivity {
                 historyView.setLayoutManager(layoutManager);
                 //Adapter赋值
                 historyView.setAdapter(Re_adapter);
+                LoadingDialog.LoadingHide();
             }
 
             @Override
             public void OnTaskFailed(Object... data)
             {
-
+                LoadingDialog.LoadingHide();
             }
         });
     }

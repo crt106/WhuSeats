@@ -1,6 +1,5 @@
 package com.crt.whuseats.Activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -11,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crt.whuseats.R;
 
@@ -38,9 +38,6 @@ public class AdminActivity extends BaseActivity
     private Button btnSetmorefuc;
     private EditText etEasteregg;
     private Button btnSetEasterEgg;
-
-
-
 
 
     String Zhicode;              //吱口令内容
@@ -75,31 +72,35 @@ public class AdminActivity extends BaseActivity
         btnSetEasterEgg = (Button) findViewById(R.id.btn_setEasterEgg);
 
         //绑定事件们
-        btnZhicodeGet.setOnClickListener(v->{
+        btnZhicodeGet.setOnClickListener(v ->
+        {
             GetZhicodeFromServer();
         });
 
-        buttonZhicodePut.setOnClickListener(v->{
+        buttonZhicodePut.setOnClickListener(v ->
+        {
             PutZhicodeToServer();
         });
 
-        btnKillprocess.setOnClickListener(v->{
+        btnKillprocess.setOnClickListener(v ->
+        {
             Killprocess();
         });
 
-        btnRestartprocess.setOnClickListener(v->{
+        btnRestartprocess.setOnClickListener(v ->
+        {
             RestartProcess();
         });
 
-        btnGetlog.setOnClickListener(v->{GetLog();});
-        btnSetmorefuc.setOnClickListener(v->SetMoreFucMsg());
-        btnSetEasterEgg.setOnClickListener(v->SetEasterEggCode());
-
-
+        btnGetlog.setOnClickListener(v ->
+        {
+            GetLog();
+        });
+        btnSetmorefuc.setOnClickListener(v -> SetMoreFucMsg());
+        btnSetEasterEgg.setOnClickListener(v -> SetEasterEggCode());
 
 
     }
-
 
 
     @Override
@@ -121,16 +122,21 @@ public class AdminActivity extends BaseActivity
      */
     public void AuthCheck()
     {
-        String user=AppSetting.UserAndPwd.getString("Username","" );
-        final String text=EasterEggCode;
-        if(!user.equals("2016301610110"))
+        String user = AppSetting.UserAndPwd.getString("Username", "");
+        String text = EasterEggCode;
+        if (!user.equals("2016301610110"))
         {
             setScreenBgDarken();
-            AlertDialog tmp=new AlertDialog.Builder(this)
-                    .setTitle("提示")
+            AlertDialog tmp = new AlertDialog.Builder(this)
+                    .setTitle(text)
                     .setMessage("您没有权限进入此页面哦~但是你能进到这里很不错了哦~是看了源码还是运气好碰到了呢~\n" +
                             "嘛反正不管咋样 可以找我来领红包哦~")
-                    .setPositiveButton(text, (dialog,which)->{Jump2QQ();this.finish();})
+                    .setCancelable(false)
+                    .setPositiveButton("口令在哪里呢", (dialog, which) ->
+                    {
+                        Jump2QQ();
+                        this.finish();
+                    })
                     .create();
             tmp.setCanceledOnTouchOutside(false);
             tmp.show();
@@ -138,15 +144,15 @@ public class AdminActivity extends BaseActivity
     }
 
 
-
     //region 管理方法
 
     //从服务端刷新吱口令到EditText
     public void GetZhicodeFromServer()
     {
-        Thread t=new Thread(()->{
-            Zhicode=mbinder.GetZhicode();
-            Zhicode=Zhicode.replaceAll("\"","" );
+        Thread t = new Thread(() ->
+        {
+            Zhicode = mbinder.GetZhicode();
+            Zhicode = Zhicode.replaceAll("\"", "");
         });
         try
         {
@@ -163,12 +169,13 @@ public class AdminActivity extends BaseActivity
     public void PutZhicodeToServer()
     {
 
-        Zhicode=etZhicode.getText().toString();
+        Zhicode = etZhicode.getText().toString();
 
         try
         {
-            Thread t=new Thread(()->{
-                ZhicodeStatus=mbinder.PutZhicode(Zhicode);
+            Thread t = new Thread(() ->
+            {
+                ZhicodeStatus = mbinder.PutZhicode(Zhicode);
             });
             t.start();
             t.join();
@@ -183,13 +190,15 @@ public class AdminActivity extends BaseActivity
     public void checkprocessAlive()
     {
         tvProcessalive.setText("检查进程存活状态...");
-        Thread t=new Thread(()->{
-            IsProcessAlive=mbinder.CheckProcessAlive();
+        Thread t = new Thread(() ->
+        {
+            IsProcessAlive = mbinder.CheckProcessAlive();
 
             //这里在子线程中更新Ui了
-            tvProcessalive.post(()->{
-                tvProcessalive.setText(IsProcessAlive?"进程存活":"进程GG");
-                tvProcessalive.setTextColor(IsProcessAlive? Color.GREEN:Color.RED);
+            tvProcessalive.post(() ->
+            {
+                tvProcessalive.setText(IsProcessAlive ? "进程存活" : "进程GG");
+                tvProcessalive.setTextColor(IsProcessAlive ? Color.GREEN : Color.RED);
             });
         });
         t.start();
@@ -197,15 +206,17 @@ public class AdminActivity extends BaseActivity
 
     //检查服务器winform活跃状况
     public void checkprocessActive()
-    { 
+    {
         tvProcessactive.setText("检查进程活跃状态...");
-        Thread t=new Thread(()->{
-            IsProcessActive=mbinder.IsWinFormActive();
+        Thread t = new Thread(() ->
+        {
+            IsProcessActive = mbinder.IsWinFormActive();
 
             //这里在子线程中更新Ui了
-            tvProcessactive.post(()->{
-                tvProcessactive.setText(IsProcessActive?"进程活跃":"进程连接失败");
-                tvProcessactive.setTextColor(IsProcessActive? Color.GREEN:Color.RED);
+            tvProcessactive.post(() ->
+            {
+                tvProcessactive.setText(IsProcessActive ? "进程活跃" : "进程连接失败");
+                tvProcessactive.setTextColor(IsProcessActive ? Color.GREEN : Color.RED);
             });
         });
         t.start();
@@ -215,7 +226,8 @@ public class AdminActivity extends BaseActivity
     //杀死winform进程
     public void Killprocess()
     {
-        Thread t=new Thread(()->{
+        Thread t = new Thread(() ->
+        {
             mbinder.killProcess();
         });
         t.start();
@@ -233,7 +245,8 @@ public class AdminActivity extends BaseActivity
     //重启进程
     public void RestartProcess()
     {
-        Thread t=new Thread(()->{
+        Thread t = new Thread(() ->
+        {
             mbinder.RestartProcess();
 
         });
@@ -252,9 +265,11 @@ public class AdminActivity extends BaseActivity
     //获取日志
     public void GetLog()
     {
-        Thread t=new Thread(()->{
-            String value=mbinder.GetLog();
-            tvProcessLog.post(()->{
+        Thread t = new Thread(() ->
+        {
+            String value = mbinder.GetLog();
+            tvProcessLog.post(() ->
+            {
                 tvProcessLog.setText(value);
             });
         });
@@ -264,10 +279,14 @@ public class AdminActivity extends BaseActivity
     //刷新更多功能消息 显示到EditText
     public void GetMoreFucMsg()
     {
-        Thread t=new Thread(()->{
-            MoreFucMsg=mbinder.GetMoreFucMsg();
-            MoreFucMsg=MoreFucMsg.replace("\"","" );
-            etMoreFucMsg.post(()->{etMoreFucMsg.setText(MoreFucMsg);});
+        Thread t = new Thread(() ->
+        {
+            MoreFucMsg = mbinder.GetMoreFucMsg();
+            MoreFucMsg = MoreFucMsg.replace("\"", "");
+            etMoreFucMsg.post(() ->
+            {
+                etMoreFucMsg.setText(MoreFucMsg);
+            });
         });
         t.start();
     }
@@ -275,8 +294,9 @@ public class AdminActivity extends BaseActivity
     //更新更多功能消息到服务器
     public void SetMoreFucMsg()
     {
-        String msg=etMoreFucMsg.getText().toString();
-        Thread t=new Thread(()->{
+        String msg = etMoreFucMsg.getText().toString();
+        Thread t = new Thread(() ->
+        {
             mbinder.SetMoreFucMsg(msg);
         });
         t.start();
@@ -285,19 +305,31 @@ public class AdminActivity extends BaseActivity
     //刷新彩蛋消息 显示到EditText
     public void GetEasterEggCode()
     {
-        Thread t=new Thread(()->{
-            EasterEggCode=mbinder.GetEasterEggCode();
-            EasterEggCode=EasterEggCode.replace("\"","" );
-            etEasteregg.post(()->{etEasteregg.setText(EasterEggCode);});
+        Thread t = new Thread(() ->
+        {
+            EasterEggCode = mbinder.GetEasterEggCode();
+            EasterEggCode = EasterEggCode.replace("\"", "");
+            etEasteregg.post(() ->
+            {
+                etEasteregg.setText(EasterEggCode);
+            });
         });
         t.start();
+        try
+        {
+            t.join();
+        } catch (InterruptedException e)
+        {
+            Log.e(TAG, "GetEasterEggCode:" + e.getMessage());
+        }
     }
 
     //更新彩蛋消息到服务器
     public void SetEasterEggCode()
     {
-        String msg=etMoreFucMsg.getText().toString();
-        Thread t=new Thread(()->{
+        String msg = etMoreFucMsg.getText().toString();
+        Thread t = new Thread(() ->
+        {
             mbinder.SetEasterEggCode(msg);
         });
         t.start();
@@ -310,19 +342,29 @@ public class AdminActivity extends BaseActivity
      */
     public void Jump2QQ()
     {
-        String url="mqqwpa://im/chat?chat_type=wpa&uin=814909233";
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        try
+        {
+            String url = "mqqwpa://im/chat?chat_type=wpa&uin=814909233";
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception e)
+        {
+            Log.e(TAG, "Jump2QQ:" + e.getMessage());
+            Toast.makeText(this, "什么鬼玩意儿QQ都不装", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // 设置屏幕背景变暗
-    private void setScreenBgDarken() {
+    private void setScreenBgDarken()
+    {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.alpha = 0.1f;
-        lp.dimAmount = 0.1f;
+        lp.alpha = 0.05f;
+        lp.dimAmount = 0.05f;
         getWindow().setAttributes(lp);
     }
+
     // 设置屏幕背景变亮
-    private void setScreenBgLight() {
+    private void setScreenBgLight()
+    {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.alpha = 1.0f;
         lp.dimAmount = 1.0f;

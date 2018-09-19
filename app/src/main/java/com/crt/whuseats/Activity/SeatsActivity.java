@@ -14,6 +14,7 @@ import com.crt.whuseats.Adapter.BuildingAdapter;
 import com.crt.whuseats.Adapter.RoomAdapter;
 import com.crt.whuseats.Adapter.SeatsAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonHelps.JsonHelp;
 import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
@@ -141,6 +142,7 @@ public class SeatsActivity extends BaseActivity
     //通过活动发起请求总建筑布局请求
     public void GetFilters()
     {
+
         //真实返回
         mbinder.GetFilters(new onTaskResultReturn()
         {
@@ -162,6 +164,7 @@ public class SeatsActivity extends BaseActivity
                     Toast.makeText(SeatsActivity.this, "建筑布局获取错误", Toast.LENGTH_SHORT).show();
                     Toast.makeText(SeatsActivity.this, "可能性：图书馆服务器维护、账号短时间冻结", Toast.LENGTH_SHORT).show();
                 }
+
             }
 
             @Override
@@ -176,6 +179,7 @@ public class SeatsActivity extends BaseActivity
     //通过活动发起建筑内房间布局
     public void GetRoomGrid()
     {
+        LoadingDialog.LoadingShow(this,true);
         mbinder.CheckHouseStats(new onTaskResultReturn()
         {
             @Override
@@ -195,6 +199,10 @@ public class SeatsActivity extends BaseActivity
                 {
                     Log.e("SeatsActivity", "房间布局获取错误"+e.getMessage());
                 }
+                finally
+                {
+                    LoadingDialog.LoadingHide();
+                }
             }
 
             @Override
@@ -212,6 +220,7 @@ public class SeatsActivity extends BaseActivity
      */
     public void GetSeatsLayout()
     {
+        LoadingDialog.LoadingShow(this,true);
         mbinder.CheckRoomStats(new onTaskResultReturn()
         {
             @Override
@@ -228,6 +237,10 @@ public class SeatsActivity extends BaseActivity
                 } catch (Exception e)
                 {
                     Log.e("SeatsActivity", "接收房间布局错误" + e.getMessage());
+                }
+                finally
+                {
+                    LoadingDialog.LoadingHide();
                 }
             }
 

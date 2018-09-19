@@ -22,6 +22,7 @@ import com.crt.whuseats.Utils.Flavors;
 import com.crt.whuseats.Utils.Settings;
 import com.crt.whuseats.Task.TaskManager;
 import com.crt.whuseats.Utils.TimeHelp;
+import com.wang.avi.AVLoadingIndicatorView;
 
 public class BaseActivity extends AppCompatActivity
 {

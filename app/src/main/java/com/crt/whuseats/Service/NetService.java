@@ -399,9 +399,9 @@ public class NetService extends Service
         }
 
         //预热ASP.NET
-        public void ASPNETpreheat()
+        public void ASPNETpreheat(onTaskResultReturn r)
         {
-            NetService.this.ASPNETpreheat();
+            NetService.this.ASPNETpreheat(r);
         }
 
         //获取第二天座位信息
@@ -552,13 +552,14 @@ public class NetService extends Service
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(NetService.this);
                 builder.setContentTitle("当当当当~");
                 builder.setContentText("看到这条消息说明APP服务还活着 正在执行座位预约~");
-                builder.setSmallIcon(R.drawable.ic_launcher);
+                builder.setSmallIcon(R.drawable.ic_launcher_new);
                 builder.setLargeIcon(largeIcon);
                 builder.setDefaults(NotificationCompat.DEFAULT_ALL);
                 builder.setWhen(System.currentTimeMillis());
                 Notification n = builder.build();
                 manager.notify(1, n);
                 //endregion
+
                 DoBook();
             }
             return super.onStartCommand(intent, flags, startId);
@@ -1797,9 +1798,9 @@ public class NetService extends Service
     }
 
     /**
-     * 给服务器端的ASP.NET程序敲个闹钟
+     * 给服务器端的ASP.NET程序敲个闹钟 顺便获取一下news
      */
-    public void ASPNETpreheat()
+    public void ASPNETpreheat(onTaskResultReturn r)
     {
         String requestUrl = CRT_HOST + URL_PREHEAT;
         Request request = new Request.Builder()
@@ -1807,21 +1808,7 @@ public class NetService extends Service
                 .url(requestUrl)
                 .build();
 
-        CommonTask tmpTask = new CommonTask(new onTaskResultReturn()
-        {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                Log.e("Preheat", "预热成功");
-            }
-
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
-
-            }
-        }, "PreheatTask", request);
-
+        CommonTask tmpTask = new CommonTask(r, "PreheatTask", request);
         tmpTask.execute();
     }
 

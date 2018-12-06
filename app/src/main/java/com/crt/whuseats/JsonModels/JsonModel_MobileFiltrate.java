@@ -50,7 +50,7 @@ public class JsonModel_MobileFiltrate
      */
     public List<seat> seatList=new LinkedList<>();
 
-    public JsonModel_MobileFiltrate(String JsonStr)
+    public JsonModel_MobileFiltrate(String JsonStr) throws Exception
     {
         try
         {

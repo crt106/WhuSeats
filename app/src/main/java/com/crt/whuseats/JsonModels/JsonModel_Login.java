@@ -18,17 +18,9 @@ public class JsonModel_Login extends JsonModel_Base
     //token包含在data层
     public String token;
 
-    public JsonModel_Login(String JsonStr)
+    public JsonModel_Login(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
-            token=((JSONObject)data).getString("token");
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
-
+        token=((JSONObject)data).getString("token");
     }
 }

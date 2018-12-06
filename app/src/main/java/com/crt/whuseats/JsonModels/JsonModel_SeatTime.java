@@ -75,11 +75,10 @@ public class JsonModel_SeatTime extends JsonModel_Base
 {
     private static final String TAG = "JsonModel_SeatTime";
     public List<TimeItems.TimeStruct> TimeList =new LinkedList<>();
-    public JsonModel_SeatTime(String JsonStr)
+    public JsonModel_SeatTime(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             //这里不要偷懒啦~
             JSONArray StartTimeArray=((JSONObject)data).getJSONArray("startTimes");
 
@@ -94,18 +93,12 @@ public class JsonModel_SeatTime extends JsonModel_Base
                     TimeList.add(TimeHelp.GetTimeStructByID(timeID));
                 } catch (JSONException e)
                 {
-                    Log.e(TAG, "JsonModel_SeatTime: 添加可用事件到列表出错"+e.toString());
+                    Log.e(TAG, "JsonModel_SeatTime: 添加可用时间到列表出错"+e.toString());
                     continue;
                 }
 
             }
 
-        }
-        catch (Exception e)
-        {
-            Log.e("JsonInfo_TimeStart", e.getMessage() );
-            return;
-        }
     }
 
 }

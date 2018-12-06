@@ -15,12 +15,11 @@ public class JsonModel_Tomorrow extends JsonModel_Base
     private static final String TAG = "JsonModel_Tomorrow";
     public HashMap<Integer, Integer> tomoInfo;
 
-    public JsonModel_Tomorrow(String JsonStr)
+    public JsonModel_Tomorrow(String JsonStr) throws Exception
     {
 
         super(JsonStr);
-        try
-        {
+
             tomoInfo = new HashMap<>();
             JSONArray reArray = (JSONArray) data;
             //构建hashmap
@@ -30,13 +29,5 @@ public class JsonModel_Tomorrow extends JsonModel_Base
                 int count = reArray.getJSONObject(i).getInt("count");
                 tomoInfo.put(seatID, count);
             }
-            
-        } 
-        catch (Exception e)
-        {
-            Log.e(TAG,e.getMessage());
-        }
-
-
     }
 }

@@ -140,11 +140,10 @@ public class JsonModel_Fliters extends JsonModel_Base
      */
     public String dates;
 
-    public JsonModel_Fliters(String JsonStr)
+    public JsonModel_Fliters(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             JSONArray buildingsArray=((JSONObject)data).getJSONArray("buildings");
             JSONArray roomsArray=((JSONObject)data).getJSONArray("rooms");
             //循环建立两个List
@@ -169,11 +168,8 @@ public class JsonModel_Fliters extends JsonModel_Base
             hours=((JSONObject)data).getInt("hours");
             dates=((JSONObject)data).getJSONArray("dates").getString(0);
         }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
+
     }
 
 
-}
+

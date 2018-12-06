@@ -74,11 +74,10 @@ public class JsonModel_RoomLayout extends JsonModel_Base
      * 房间布局子Json对象
      */
     private JSONObject layoutOBJ;
-    public JsonModel_RoomLayout(String JsonStr)
+    public JsonModel_RoomLayout(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             roomId=((JSONObject)data).getInt("id");
             roomName=((JSONObject)data).getString("name");
             cols=((JSONObject)data).getInt("cols");
@@ -108,11 +107,7 @@ public class JsonModel_RoomLayout extends JsonModel_Base
                     seatList.add(new seat(seatid,name,seattype,seatstatus,window,power,computer,local));
                 }
             }
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-            return;
-        }
+
+
     }
 }

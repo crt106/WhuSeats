@@ -94,11 +94,10 @@ public class JsonModel_HouseStats extends JsonModel_Base
 
     public List<room> roomList=new LinkedList<>();   //房间列表
 
-    public JsonModel_HouseStats(String JsonStr)
+    public JsonModel_HouseStats(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             JSONArray roomArray=((JSONArray)data);
             for (int i=0;i<roomArray.length();i++)
             {
@@ -113,11 +112,7 @@ public class JsonModel_HouseStats extends JsonModel_Base
                 int free=j.getInt("free");
                 roomList.add(new room(roomId,roomname,whichfloor,reserved,inUse,away,totalSeats,free));
             }
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
+
     }
 
 }

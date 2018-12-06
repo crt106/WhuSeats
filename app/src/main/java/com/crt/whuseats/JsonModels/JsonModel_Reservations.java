@@ -80,11 +80,10 @@ public class JsonModel_Reservations extends JsonModel_Base
      */
     public String datamessage;
 
-    public JsonModel_Reservations(String JsonStr)
+    public JsonModel_Reservations(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             JSONObject data=((JSONArray)super.data).getJSONObject(0);//转换成本类的实例 真是麻烦
             id=data.getInt("id");
             receipt=data.getString("receipt");
@@ -102,12 +101,8 @@ public class JsonModel_Reservations extends JsonModel_Base
             userEnded=data.getBoolean("userEnded");
             userEnded=data.getBoolean("userEnded");
             datamessage=data.getString("message");
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-            return;
-        }
+
+
     }
 
     public JsonModel_Reservations()

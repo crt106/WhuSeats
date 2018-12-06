@@ -85,11 +85,10 @@ public class JsonModel_User extends JsonModel_Base
      */
     public int violationCount;
 
-    public JsonModel_User(String JsonStr)
+    public JsonModel_User(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
+
             JSONObject dataObj=(JSONObject)data;
             id=dataObj.getInt("id");
             enabled=dataObj.getBoolean("enabled");
@@ -104,11 +103,5 @@ public class JsonModel_User extends JsonModel_Base
             lastInBuildingId=dataObj.getInt("lastInBuildingId");
             lastInBuildingName=dataObj.getString("lastInBuildingName");
             violationCount=dataObj.getInt("violationCount");
-        }
-        catch (Exception e)
-        {
-            Log.e("jsonInfo_User", e.toString() );
-        }
-
     }
 }

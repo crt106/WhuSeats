@@ -1,19 +1,16 @@
 package com.crt.whuseats.Net;
 
-import android.annotation.SuppressLint;
-
 import java.io.IOException;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.internal.schedulers.IoScheduler;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -40,6 +37,7 @@ class RequestBase
 
     public String LIB_TOKEN = "";  //返回的登录字段
 
+
     //region 通用地址
     final String LIB_WHU_URL = "http://seat.lib.whu.edu.cn";
     final String LIB_GXU_URL = "http://seat.gxu.edu.cn";
@@ -59,30 +57,49 @@ class RequestBase
     //endregion
 
 
-
-
-
-
     /**
-     * 基础的发送http请求
-     *
+     * 直接同步获取Response
      * @param request
      * @return
      */
-
-    protected static void SendRequest(Request request, Observer<Response> observer)
+    protected Response GetResponseSync(Request request) throws IOException
     {
-        Observable<Response> responseObservable = Observable.create(new ObservableOnSubscribe<Response>()
-        {
-            @Override
-            public void subscribe(ObservableEmitter<Response> emitter) throws Exception
-            {
-                Response response = okHttpClient.newCall(request).execute();
-                emitter.onNext(response);
-            }
-
-        })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.newThread());
+        return okHttpClient.newCall(request).execute();
     }
+
+
+    /**
+     * 创建默认Get请求
+     * @param url
+     * @return
+     */
+    protected Request CreatDefaultGet(String url)
+    {
+        Request request = new Request.Builder()
+                .get()
+                .url(url)
+                .addHeader("Host", LIB_HOST)
+                .addHeader("Connection", "Keep-Alive")
+                .build();
+        return request;
+    }
+
+    /**
+     * 创建默认Post请求
+     * @param url
+     * @param body
+     * @return
+     */
+    protected Request CreatDefaultPost(String url, RequestBody body)
+    {
+        Request request=new Request.Builder()
+                .post(body)
+                .url(url)
+                .addHeader("Host", LIB_HOST)
+                .addHeader("Connection", "Keep-Alive")
+                .build();
+        return  request;
+    }
+
+
 }

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -30,10 +31,8 @@ public class JsonModel_Base implements Serializable
     public String status;
 
     //构造方法 直接在构造方法里面解析？不然子类无法获得上述基本的四个字段
-    public JsonModel_Base(String JsonStr)
+    public JsonModel_Base(String JsonStr) throws Exception
     {
-        try
-        {
             if(JsonStr==null||JsonStr.equals(""))
             {
                 throw new Exception("给定的Json字符串有问题吧大哥");
@@ -43,12 +42,6 @@ public class JsonModel_Base implements Serializable
             data=job.get("data");
             message=job.getString("message");
             status=job.getString("status");
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
-
     }
 
     public JsonModel_Base()

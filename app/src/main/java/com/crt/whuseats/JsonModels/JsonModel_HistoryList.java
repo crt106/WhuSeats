@@ -53,11 +53,9 @@ public class JsonModel_HistoryList extends JsonModel_Base
     //存放历史预约状况的链表
     public List<JsonModel_Reservations> reservationsList=new LinkedList<>();
 
-    public JsonModel_HistoryList(String JsonStr)
+    public JsonModel_HistoryList(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
             JSONArray reservationarray=((JSONObject)data).getJSONArray("reservations");
             for (int i=0;i<reservationarray.length();i++)
             {
@@ -81,11 +79,5 @@ public class JsonModel_HistoryList extends JsonModel_Base
                     continue;
                 }
             }
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG,e.getMessage()+"nu");
-
-        }
     }
 }

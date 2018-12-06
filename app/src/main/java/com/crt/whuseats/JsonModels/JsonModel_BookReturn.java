@@ -5,6 +5,7 @@ import android.util.Log;
 import com.crt.whuseats.Model.TimeItems;
 import com.crt.whuseats.Utils.TimeHelp;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -34,11 +35,9 @@ public class JsonModel_BookReturn extends JsonModel_Base
      */
     public TimeItems.TimeStruct end;
 
-    public JsonModel_BookReturn(String JsonStr)
+    public JsonModel_BookReturn(String JsonStr) throws Exception
     {
         super(JsonStr);
-        try
-        {
             JSONObject data=((JSONObject)super.data);//转换成本类的实例 真是麻烦
             id=data.getInt("id");
             receipt=data.getString("receipt");
@@ -48,12 +47,6 @@ public class JsonModel_BookReturn extends JsonModel_Base
             begin=TimeHelp.GetTimeStructByValue(beginValue);
             String endValue=data.getString("end");
             end=TimeHelp.GetTimeStructByValue(endValue);
-        }
-        catch (Exception e)
-        {
-            Log.e(TAG, e.toString()+"/n"+JsonStr);
-            return;
-        }
     }
 
     public JsonModel_BookReturn()

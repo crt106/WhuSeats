@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.JsonHelps.JsonInfo_BookReturn;
+import com.crt.whuseats.JsonModels.JsonModel_BookReturn;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TimeHelp;
 
@@ -24,11 +24,11 @@ public class SuccessDialog extends Dialog
     Button buttonOK;
     //endregion
     //注意 这个Dialog只接受BookReturn类的info
-    JsonInfo_BookReturn bookReturn;
+    JsonModel_BookReturn bookReturn;
 
     private Context Dialogcontext;
     //构造函数
-    public SuccessDialog(@NonNull Context context,JsonInfo_BookReturn returnInfo)
+    public SuccessDialog(@NonNull Context context,JsonModel_BookReturn returnInfo)
     {
         super(context, R.style.Theme_AppCompat_Dialog);
         bookReturn=returnInfo;

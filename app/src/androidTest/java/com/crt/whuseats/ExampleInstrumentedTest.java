@@ -1,8 +1,11 @@
 package com.crt.whuseats;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.crt.whuseats.Model.TimeItems;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,4 +28,8 @@ public class ExampleInstrumentedTest
 
         assertEquals("com.crt.whuseats", appContext.getPackageName());
     }
+
+
+
+
 }

@@ -25,10 +25,10 @@ import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
-import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Fliters;
+import com.crt.whuseats.JsonModels.JsonModel_HouseStats;
+import com.crt.whuseats.JsonModels.JsonModel_MobileFiltrate;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.Utils.TimeHelp;
@@ -62,8 +62,8 @@ public class ListenFragment_old extends Fragment
 
     //region 相应字段
 
-    public List<JsonInfo_Fliters.buildings> buildingsList=new LinkedList<>();//当前建筑列表
-    public List<JsonInfo_HouseStats.room> roomList=new LinkedList<>();       //当前房间情况列表
+    public List<JsonModel_Fliters.buildings> buildingsList=new LinkedList<>();//当前建筑列表
+    public List<JsonModel_HouseStats.room> roomList=new LinkedList<>();       //当前房间情况列表
     public List<String> DateList=new LinkedList<>();                         //当前日期列表
 
     public static int MAXLOOPCOUNT=100;   //筛选模式下最大的筛选轮次
@@ -125,7 +125,7 @@ public class ListenFragment_old extends Fragment
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                JsonInfo_Fliters.buildings choosebuilding=buildingsList.get(position);
+                JsonModel_Fliters.buildings choosebuilding=buildingsList.get(position);
                 ChooseHouseID=choosebuilding.id;
                 //记录用户习惯
                 ActivityConnect.AppSetting.ListenSettingEditor.putInt("DefaultBuilding", ChooseHouseID);
@@ -162,7 +162,7 @@ public class ListenFragment_old extends Fragment
         RoomGrid.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->
         {
             //刷新选择房间的ID
-            JsonInfo_HouseStats.room chooseroom=roomList.get(position);
+            JsonModel_HouseStats.room chooseroom=roomList.get(position);
             ChooseRoomID=chooseroom.roomId;
 
             //展开设置对话框
@@ -235,7 +235,7 @@ public class ListenFragment_old extends Fragment
                     String datastr=(String)data[0];
                     if(datastr==null||datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_Fliters info= JsonHelp.GetFliters(datastr);
+                    JsonModel_Fliters info= JsonHelp.GetFliters(datastr);
                     //把接收到的数据复制给本类变量
                     buildingsList=info.buildingsList;
                     bdSpinnerAdapter=new BuildingAdapter(info.buildingsList);
@@ -262,11 +262,11 @@ public class ListenFragment_old extends Fragment
         //region 模拟返回
 
 
-//        JsonInfo_Fliters jf=new JsonInfo_Fliters();
-//        JsonInfo_Fliters.buildings t1= jf.new buildings(1,"信息科学分馆");
-//        JsonInfo_Fliters.buildings t2= jf.new buildings(2,"总馆");
-//        JsonInfo_Fliters.buildings t3= jf.new buildings(3,"医学分馆");
-//        JsonInfo_Fliters.buildings t4= jf.new buildings(4,"工学分馆");
+//        JsonModel_Fliters jf=new JsonModel_Fliters();
+//        JsonModel_Fliters.buildings t1= jf.new buildings(1,"信息科学分馆");
+//        JsonModel_Fliters.buildings t2= jf.new buildings(2,"总馆");
+//        JsonModel_Fliters.buildings t3= jf.new buildings(3,"医学分馆");
+//        JsonModel_Fliters.buildings t4= jf.new buildings(4,"工学分馆");
 //        testlist.add(t1);
 //        testlist.add(t2);
 //        testlist.add(t3);
@@ -289,7 +289,7 @@ public class ListenFragment_old extends Fragment
                     String datastr=(String)data[0];
                     if(datastr==null||datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_HouseStats info= JsonHelp.GetHouseStats(datastr);
+                    JsonModel_HouseStats info= JsonHelp.GetHouseStats(datastr);
                     //把接收到的数据复制给本类变量
                     roomList=info.roomList;
                     roomAdapter=new RoomAdapter(ActivityConnect,roomList);
@@ -311,21 +311,21 @@ public class ListenFragment_old extends Fragment
         }, ChooseHouseID);
           //region 模拟返回
 //        roomList=new LinkedList<>();
-//        JsonInfo_HouseStats jh=new JsonInfo_HouseStats();
-//        JsonInfo_HouseStats.room r1=jh.new room(3,"测试房间1",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r2=jh.new room(5,"测试房间2",1,2,3,4,5,4);
-//        JsonInfo_HouseStats.room r4=jh.new room(7,"测试房间3",4,2,3,4,5,6);
-//        JsonInfo_HouseStats.room r5=jh.new room(9,"测试房间4",1,2,3,4,5,21);
-//        JsonInfo_HouseStats.room r6=jh.new room(11,"测试房间5",1,4,3,4,5,233);
-//        JsonInfo_HouseStats.room r7=jh.new room(17,"测试房间6",2,2,4,4,5,6);
-//        JsonInfo_HouseStats.room r8=jh.new room(12,"测试房间7",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r9=jh.new room(14,"测试房间8",5,4,3,4,5,5);
-//        JsonInfo_HouseStats.room r10=jh.new room(16,"测试房间9",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r11=jh.new room(16,"测试房间10",1,2,3,4,5,0);
-//        JsonInfo_HouseStats.room r12=jh.new room(16,"测试房间11",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r13=jh.new room(16,"测试房间12",1,3,4,4,5,43);
-//        JsonInfo_HouseStats.room r14=jh.new room(16,"测试房间13",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r15=jh.new room(16,"测试房间14",3,2,3,4,5,1);
+//        JsonModel_HouseStats jh=new JsonModel_HouseStats();
+//        JsonModel_HouseStats.room r1=jh.new room(3,"测试房间1",1,2,3,4,5,2);
+//        JsonModel_HouseStats.room r2=jh.new room(5,"测试房间2",1,2,3,4,5,4);
+//        JsonModel_HouseStats.room r4=jh.new room(7,"测试房间3",4,2,3,4,5,6);
+//        JsonModel_HouseStats.room r5=jh.new room(9,"测试房间4",1,2,3,4,5,21);
+//        JsonModel_HouseStats.room r6=jh.new room(11,"测试房间5",1,4,3,4,5,233);
+//        JsonModel_HouseStats.room r7=jh.new room(17,"测试房间6",2,2,4,4,5,6);
+//        JsonModel_HouseStats.room r8=jh.new room(12,"测试房间7",1,2,3,4,5,2);
+//        JsonModel_HouseStats.room r9=jh.new room(14,"测试房间8",5,4,3,4,5,5);
+//        JsonModel_HouseStats.room r10=jh.new room(16,"测试房间9",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r11=jh.new room(16,"测试房间10",1,2,3,4,5,0);
+//        JsonModel_HouseStats.room r12=jh.new room(16,"测试房间11",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r13=jh.new room(16,"测试房间12",1,3,4,4,5,43);
+//        JsonModel_HouseStats.room r14=jh.new room(16,"测试房间13",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r15=jh.new room(16,"测试房间14",3,2,3,4,5,1);
 //        roomList.add(r1);
 //        roomList.add(r2);
 //        roomList.add(r4);
@@ -443,7 +443,7 @@ public class ListenFragment_old extends Fragment
 //                    {
 //                        try
 //                        {
-//                            JsonInfo_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
+//                            JsonModel_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
 //                            //注意这里又要嵌套一层回调 没有办法 谁叫这是异步操作呢 这里是使用mbinder的开始监听房间
 //                            ActivityConnect.mbinder_b.StartListenRoomOnce(roomLayout, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
 //                        } catch (Exception e)
@@ -471,7 +471,7 @@ public class ListenFragment_old extends Fragment
                 {
                     try
                     {
-                        JsonInfo_MobileFiltrate filtrateresult=JsonHelp.GetMFiltrateSeats((String)data[0]);
+                        JsonModel_MobileFiltrate filtrateresult=JsonHelp.GetMFiltrateSeats((String)data[0]);
                         ActivityConnect.mbinder.StartListenRoomOnce(filtrateresult, sT, eT, ChooseDate, CheckOnceReturn, progressReturn);
                     }
                     catch (Exception e)

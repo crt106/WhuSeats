@@ -20,15 +20,14 @@ import android.util.Log;
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.LoginActivity;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_BookReturn;
-import com.crt.whuseats.JsonHelps.JsonInfo_Login;
-import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
-import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
-import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_End;
-import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_Start;
-import com.crt.whuseats.JsonHelps.JsonInfo_WebFiltrate;
-import com.crt.whuseats.JsonHelps.seat;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_BookReturn;
+import com.crt.whuseats.JsonModels.JsonModel_Login;
+import com.crt.whuseats.JsonModels.JsonModel_MobileFiltrate;
+import com.crt.whuseats.JsonModels.JsonModel_RoomLayout;
+import com.crt.whuseats.JsonModels.JsonModel_SeatTime;
+import com.crt.whuseats.JsonModels.JsonModel_WebFiltrate;
+import com.crt.whuseats.JsonModels.seat;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Task.ResultsTask;
 import com.crt.whuseats.Interface.onProgressReturn;
@@ -111,12 +110,12 @@ public class NetService extends Service
     //套接字输出流和输入流
     public OutputStream Clientop;
     public InputStream Clientin;
-    String ServerIP1 = "120.79.7.230";//阿里云服务器ip
-    String ServerIP2 = "10.133.1.126";//寝室crt的ip
-    String ServerIP3 = "10.135.97.4";//图书馆crt的ip
-    String ServerIP4 = "192.168.43.94";//热点的crt的ip
-    String ServerIP5 = "192.168.137.1";//热点代理
-    String LocalServerIP = "127.0.0.1";
+    final String ServerIP1 = "120.79.7.230";//阿里云服务器ip
+    final String ServerIP2 = "10.133.1.126";//寝室crt的ip
+    final String ServerIP3 = "10.135.97.4";//图书馆crt的ip
+    final String ServerIP4 = "192.168.43.94";//热点的crt的ip
+    final String ServerIP5 = "192.168.137.1";//热点代理
+    final String LocalServerIP = "127.0.0.1";
     //endregion
     //某些静态字段
     private static HashMap<String, List<Cookie>> cookiestore = new HashMap<>();   //储存网页登录产生的Cookies的东东
@@ -125,40 +124,13 @@ public class NetService extends Service
 
     public static String LIB_SEATSSTATUS = ""; //指示全局的座位预约状况
     public static String LIB_MESSAGE; //指示一个返回的Message;
-    public static JsonInfo_BookReturn LIB_BOOKRETURNINFO; //指示全局预约返回内容
+    public static JsonModel_BookReturn LIB_BOOKRETURNINFO; //指示全局预约返回内容
     public static int REMOTEVERSION;  //指示远程版本号
     public static boolean ISFORCEUPDATE = false;//指示当前远程版本是不是强制更新
 
-    //region 弃用的字段
-    //开始查询一个新的座位之前的延迟
-    @Deprecated
-    public static int DELAY_NEWSEATS_DEFAULT = 400;
-    @Deprecated
-    public static int DELAY_NEWSEATS = 400;
 
-    //请求开始时间之前的延迟
-    @Deprecated
-    public static int DELAY_BEFORESTARTTIME = 850;
-    @Deprecated
-    public static int DELAY_BEFORESTARTTIME_DEFAULT = 850;
 
-    //请求结束时间之前的延迟
-    @Deprecated
-    public static int DELAY_BEFOREENDTIME = 550;
-    @Deprecated
-    public static int DELAY_BEFOREENDTIME_DEFAULT = 550;
-    //endregion
 
-    // 发送预约请求前后的延迟
-    public static int DELAY_SENDBOOK = 300;
-    public static int DELAY_SENDBOOK_DEFAULT = 300;
-
-    //发起筛选请求之前的延迟
-    public static int DELAY_BEFOREFILTRATE = 1500;
-    public static int DELAY_BEFOREFILTRATE_DEFAULT = 1500;
-
-    //判断PC登录是否已经获取到了Cookies
-    public static boolean ISLOGINPCCOOKIESGET = false;
 
     //endregion
 
@@ -188,7 +160,7 @@ public class NetService extends Service
     static final String URL_CHECKIN = "/rest/v2/checkIn";
     static final String URL_LEAVE = "/rest/v2/leave";
     static final String URL_STOP = "/rest/v2/stop";
-    //TODO 处理请求多页历史
+
     static final String URL_HISTORY = "/rest/v2/history/1/10";
     static final String URL_CANCEL = "/rest/v2/cancel";
     static final String URL_HISTORYONEVIEW = "/rest/view/";
@@ -199,7 +171,7 @@ public class NetService extends Service
     static final String URL_AJAXSEARCH = "/freeBook/ajaxSearch";
     static final String URL_MOBILESEARCH = "/rest/v2/searchSeats";
     static final String URL_ANNOUNCE = "/rest/v2/announce";
-    //API地址
+    //CRT API地址
     static final String URL_UPDATE = "/whuseatsapi/download.html";
     static final String URL_TOMORROWINFO_GET = "/whuseatsapi/api/getinfo";
     static final String URL_TOMORROWINFO_ADD = "/whuseatsapi/api/add";
@@ -332,14 +304,14 @@ public class NetService extends Service
 
         //开始监听一次房间(遍历)
         @Deprecated
-        public void StartListenRoomOnce(JsonInfo_RoomLayout roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
+        public void StartListenRoomOnce(JsonModel_RoomLayout roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
         {
             NetService.this.StartListenRoomOnce(roomInfo, startTime, endTime, Date, r, p);
         }
 
         //开始监听一次房间(筛选)
         @Deprecated
-        public void StartListenRoomOnce(JsonInfo_WebFiltrate roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
+        public void StartListenRoomOnce(JsonModel_WebFiltrate roomInfo, String startTime, String endTime, String Date, @NonNull onTaskResultReturn r, @Nullable onProgressReturn p)
         {
             NetService.this.StartListenRoomOnce(roomInfo, startTime, endTime, Date, r, p);
         }
@@ -351,13 +323,13 @@ public class NetService extends Service
         }
 
         //开始监听一次房间(移动端筛选)
-        public void StartListenRoomOnce(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
+        public void StartListenRoomOnce(JsonModel_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
         {
             NetService.this.StartListenRoomOnce(FiltrateInfo, startTime, endTime, Date, r, p);
         }
 
         //同步监听一次房间(移动端筛选)
-        public boolean StartListenRoomOnce_Sync(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
+        public boolean StartListenRoomOnce_Sync(JsonModel_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
         {
             return NetService.this.StartListenRoomOnce_Sync(FiltrateInfo, startTime, endTime, Date);
         }
@@ -608,7 +580,7 @@ public class NetService extends Service
                 {
                     Response re = httpClient.newCall(loginRequest).execute();
                     String ResponseStr = re.body().string();
-                    JsonInfo_Login info = JsonHelp.GetLogin(ResponseStr);
+                    JsonModel_Login info = JsonHelp.GetLogin(ResponseStr);
                     //判断是否登陆成功咯~
                     if (info.status.equals("success"))
                     {
@@ -672,7 +644,7 @@ public class NetService extends Service
                     .build();
             Response re = httpClient.newCall(loginRequest).execute();
             String ResponseStr = re.body().string();
-            JsonInfo_Login info = JsonHelp.GetLogin(ResponseStr);
+            JsonModel_Login info = JsonHelp.GetLogin(ResponseStr);
             LIB_TOKEN = info.token;
             return true;
         } catch (Exception e)
@@ -1077,7 +1049,7 @@ public class NetService extends Service
         @Override
         public void OnTaskSucceed(Object... data) //注意 任务成功不代表预约成功
         {
-            JsonInfo_BookReturn bookReturn;
+            JsonModel_BookReturn bookReturn;
             try
             {
                 String rece = (String) data[0];
@@ -1119,7 +1091,7 @@ public class NetService extends Service
             {
                 Response re = httpClient.newCall(bookRequest).execute();
                 String reStr = re.body().string();
-                JsonInfo_BookReturn bookReturn = JsonHelp.GetBookReturn(reStr);
+                JsonModel_BookReturn bookReturn = JsonHelp.GetBookReturn(reStr);
 
                 if (bookReturn.status.equals("success"))
                 {
@@ -1176,7 +1148,7 @@ public class NetService extends Service
      * 检查某个座位的开始时间(同步 请在子线程执行)
      */
 
-    public JsonInfo_SeatTime_Start GetSeatStartTimeSync(int SeatID, String Date)
+    public JsonModel_SeatTime GetSeatStartTimeSync(int SeatID, String Date)
     {
         String requestUrl = LIB_URL + URL_GETSEATSTARTTIME + "/" + SeatID + "/" + Date + "?" + "token=" + LIB_TOKEN;
         Request GetStartTimeRequest = new Request.Builder()
@@ -1189,7 +1161,7 @@ public class NetService extends Service
         {
             Response re = httpClient.newCall(GetStartTimeRequest).execute();
             String reStr = re.body().string();
-            return new JsonInfo_SeatTime_Start(reStr);
+            return new JsonModel_SeatTime(reStr);
 
         } catch (Exception e)
         {
@@ -1220,7 +1192,7 @@ public class NetService extends Service
     /**
      * 检查某个座位结束时间(同步 请在子线程执行)
      */
-    public JsonInfo_SeatTime_End GetSeatEndTimeSync(int SeatID, String startTime, String Date)
+    public JsonModel_SeatTime GetSeatEndTimeSync(int SeatID, String startTime, String Date)
     {
         String requestUrl = LIB_URL + URL_GETSEATENDTIME + "/" + SeatID + "/" + Date + "/" + startTime + "?" + "token=" + LIB_TOKEN;
         Request GetEndTimeRequest = new Request.Builder()
@@ -1233,7 +1205,7 @@ public class NetService extends Service
         {
             Response re = httpClient.newCall(GetEndTimeRequest).execute();
             String reStr = re.body().string();
-            return new JsonInfo_SeatTime_End(reStr);
+            return new JsonModel_SeatTime(reStr);
 
         } catch (Exception e)
         {
@@ -1243,289 +1215,14 @@ public class NetService extends Service
     }
 
 
-    int nowseatID = 0; //给下个方法用的全局变量
 
-    /**
-     * ********************************************************************核心方法
-     * 开始监测一次某个房间的空位情况 有空就预约 没有就返回
-     * 现在感觉这个方法问题比较多 频率太快导致的临时冻结账号的现象比较严重2333
-     * 看样子要一定要设置间隔
-     * *********************************************************************
-     */
-    @Deprecated
-    public void StartListenRoomOnce(JsonInfo_RoomLayout roomInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
-    {
-
-        //region 用于异步的回调 不过这里子线程内打算用同步了
-        /*
-
-
-        //请求结束时间回调
-        onTaskResultReturn EndReturn=new onTaskResultReturn()
-        {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                String jsonstr=(String)data[0];
-                JsonInfo_SeatTime_End temp=JsonHelp.GetSeatEndTime(jsonstr);
-                int min=Integer.parseInt(temp.minTimeID);
-                int max=Integer.parseInt(temp.maxTimeID);
-                //如果满足条件 则开始发起预订请求
-                if(endTime>min&&endTime<max)
-                    FreeBook(nowseatID, startTime, endTime, Date, BookTaskReturn);
-            }
-
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
-
-            }
-        };
-
-        //请求开始时间回调 因为请求开始时间成功之后要请求结束时间 所以这个回调放在后面
-        onTaskResultReturn StartReturn=new onTaskResultReturn()
-        {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                String jsonstr=(String)data[0];
-                JsonInfo_SeatTime_Start temp=JsonHelp.GetSeatStartTime(jsonstr);
-                int min=Integer.parseInt(temp.minTimeID);
-                int max=Integer.parseInt(temp.maxTimeID);
-                //如果请求的开始时间合乎要求 则请求结束时间
-                if(startTime>min&&startTime<max)
-                    GetSeatEndTime(nowseatID, Integer.toString(startTime), Date, EndReturn);
-            }
-
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
-
-            }
-        };
-        */
-        //endregion
-
-        class ListenRoomTask extends ResultsTask<Void, Integer, Void>
-        {
-            public ListenRoomTask(onTaskResultReturn i)
-            {
-                super(i, "ListenRoomTask");
-            }
-
-            int TotalSeatsNumber;
-            int NowSeatNumber = 0;
-
-            @Override
-            protected Void doInBackground(Void... voids)
-            {
-                TotalSeatsNumber = roomInfo.seatList.size();
-                for (seat thisseat : roomInfo.seatList) //foreach
-                {
-                    NowSeatNumber++;//座位计数器自增
-                    publishProgress();
-                    //region 头等待
-                    try
-                    {
-                        Log.e("NetService——Listen", "开启新座位的开头等待");
-                        Thread.sleep(DELAY_NEWSEATS);
-                        Log.e("NetService——Listen", "结束新座位的开头等待");
-                    } catch (InterruptedException e)
-                    {
-                        Log.e("NetService——Listen", "任务可能被中断?");
-                        return null;
-                    }
-                    //endregion
-
-                    //如果已经预定成功了直接跳出
-                    if (LIB_SEATSSTATUS.equals("success"))
-                        break;
-
-                    /*
-                     本地检查座位状态
-                     这个座位状态应该有 FREE IN_USE FULL AWAY
-                    */
-                    if (!thisseat.seatstatus.equals("FULL"))
-                    {
-                        try
-                        {
-                            nowseatID = thisseat.seatid;
-
-                            //region 请求开始时间等待
-                            Log.e("NetService——Listen", "开启座位的请求结束时间等待");
-                            Thread.sleep(DELAY_BEFORESTARTTIME);
-                            Log.e("NetService——Listen", "结束等待");
-                            //endregion
-                            JsonInfo_SeatTime_Start startinfo = GetSeatStartTimeSync(nowseatID, Date);
-
-                            //如果请求的开始时间合乎要求 则请求结束时间
-                            if (JsonHelp.IsTimeAvaliable(startTime, startinfo.StartTimeList))
-                            {
-
-                                //region 请求结束时间等待
-                                Log.e("NetService——Listen", "开启请求结束时间等待");
-                                Thread.sleep(DELAY_BEFOREENDTIME);
-                                Log.e("NetService——Listen", "结束等待");
-                                //endregion
-                                JsonInfo_SeatTime_End endinfo = GetSeatEndTimeSync(nowseatID, startTime, Date);
-
-                                //如果请求的结束时间合乎要求 则开始预订
-                                if (JsonHelp.IsTimeAvaliable(endTime, endinfo.EndTimeList))
-                                {
-                                    //region 预约等待
-                                    Thread.sleep(DELAY_SENDBOOK);
-                                    //endregion
-                                    //Log.e("NetService——Listen", "找到一个合适的座位 调试中跳过预约");
-                                    FreeBookSync(nowseatID, startTime, endTime, Date);
-                                    //region 预约等待2
-                                    Thread.sleep(DELAY_SENDBOOK);
-                                    //endregion
-                                }
-                            }
-                        } catch (InterruptedException e)
-                        {
-                            Log.e("ListenRoomOnce", "任务可能被中断?" + e.getMessage());
-                            return null;
-                        } catch (Exception e)
-                        {
-                            Log.e("ListenRoomOnce", e.getMessage());
-                            continue;
-                        }
-
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Integer... values)
-            {
-                //通过回调方法报告进度
-                p.OnSendProgress(TotalSeatsNumber, NowSeatNumber);
-            }
-
-            //结束任务
-            @Override
-            protected void onPostExecute(Void aVoid)
-            {
-                super.onPostExecute(aVoid);
-
-                if (LIB_SEATSSTATUS.equals("success"))
-                    ResultReturn.OnTaskSucceed();
-                else
-                    ResultReturn.OnTaskFailed();
-            }
-        }
-
-
-        new ListenRoomTask(r).execute();
-
-    }
-
-
-    /*******************************************************************核心方法
-     *上一个方法的使用[筛选数据]的重载形式
-     * *****************************************************************
-     */
-    @Deprecated
-    public void StartListenRoomOnce(JsonInfo_WebFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
-    {
-
-
-        class ListenRoomTask extends ResultsTask<Void, Integer, Void>
-        {
-            public ListenRoomTask(onTaskResultReturn i)
-            {
-                super(i, "ListenRoomTask");
-            }
-
-            int TotalSeatsNumber;
-            int NowSeatNumber = 0;
-
-            @Override
-            protected Void doInBackground(Void... voids)
-            {
-                //region 头等待1
-                try
-                {
-                    Log.e("NetService——Listen", "开启新筛选的等待");
-                    Thread.sleep(DELAY_BEFOREFILTRATE);
-                    Log.e("NetService——Listen", "结束新筛选的等待");
-                } catch (InterruptedException e)
-                {
-                    Log.e("ListenRoomOnce_PC", "任务中断");
-                    return null;
-                }
-                //endregion
-                TotalSeatsNumber = FiltrateInfo.SuitableSeatsList.size();
-                //如果筛选结果为空直接返回
-                if (TotalSeatsNumber <= 0)
-                    return null;
-
-                for (String thisseat : FiltrateInfo.SuitableSeatsList) //foreach
-                {
-                    //把字符串形式转换为整数
-                    int thisseatId = Integer.parseInt(thisseat);
-                    NowSeatNumber++;//座位计数器自增
-                    publishProgress();
-
-
-                    //如果已经预定成功了直接跳出
-                    if (LIB_SEATSSTATUS.equals("success"))
-                        break;
-
-                    try
-                    {
-                        FreeBookSync(thisseatId, startTime, endTime, Date);
-                        //region 预约等待
-                        Thread.sleep(DELAY_SENDBOOK * 3);
-                        //endregion
-                    } catch (InterruptedException e)
-                    {
-                        Log.e("ListenRoomOnce_PC", "任务中断");
-                        return null;
-                    } catch (Exception e)
-                    {
-                        Log.e("ListenRoomOnce_PC", e.getMessage());
-                        continue;
-                    }
-
-
-                }
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(Integer... values)
-            {
-                //通过回调方法报告进度
-                p.OnSendProgress(TotalSeatsNumber, NowSeatNumber);
-            }
-
-            //结束任务
-            @Override
-            protected void onPostExecute(Void aVoid)
-            {
-                super.onPostExecute(aVoid);
-
-                if (LIB_SEATSSTATUS.equals("success"))
-                    ResultReturn.OnTaskSucceed();
-                else
-                    ResultReturn.OnTaskFailed();
-            }
-        }
-
-
-        new ListenRoomTask(r).execute();
-
-    }
 
     /***
      * ******************************************************************最新操作
      * 原来移动端也是可以筛选座位的我CNM
      * ******************************************************************
      */
-    public void StartListenRoomOnce(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
+    public void StartListenRoomOnce(JsonModel_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date, onTaskResultReturn r, onProgressReturn p)
     {
         class ListenRoomTask extends ResultsTask<Void, Integer, Void>
         {
@@ -1621,7 +1318,7 @@ public class NetService extends Service
      *  ************************************************
      *  @return 返回本次监听是否成功
      */
-    public boolean StartListenRoomOnce_Sync(JsonInfo_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
+    public boolean StartListenRoomOnce_Sync(JsonModel_MobileFiltrate FiltrateInfo, String startTime, String endTime, String Date)
     {
 
         //region 头等待1

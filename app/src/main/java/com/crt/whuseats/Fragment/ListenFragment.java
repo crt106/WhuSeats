@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Filter;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -25,10 +24,9 @@ import com.crt.whuseats.Dialog.ChooseTimeDialog;
 import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.ListenSwitchChangeListener;
-import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_MobileFiltrate;
 import com.crt.whuseats.Model.ListenDateType;
 import com.crt.whuseats.Model.ListenItem;
 import com.crt.whuseats.R;
@@ -260,7 +258,7 @@ public class ListenFragment extends Fragment
      * 核心方法 开始监听
      */
     private int LoopCount=1; //全局变量 循环次数
-    private JsonInfo_MobileFiltrate mobileFiltrate; //本次移动端过滤结果
+    private JsonModel_MobileFiltrate mobileFiltrate; //本次移动端过滤结果
 
     public void StartListen()
     {

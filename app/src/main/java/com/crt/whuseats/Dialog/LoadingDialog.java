@@ -11,13 +11,17 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.Random;
 
+/**
+ * 利用开源库显示全屏小菊花对话框
+ * Updated at v1.0 by crt 2018-12-5
+ */
 public class LoadingDialog extends AlertDialog
 {
 
     private static final String TAG = "LoadingDialog";
     private AVLoadingIndicatorView aviview;
     private static LoadingDialog instance;
-    private static String[] AVItypeArra={"BallClipRotatePulseIndicator","TriangleSkewSpinIndicator","PacmanIndicator","SemiCircleSpinIndicator"};
+    private static String[] AVItypeArray = {"BallClipRotatePulseIndicator", "TriangleSkewSpinIndicator", "PacmanIndicator", "SemiCircleSpinIndicator"};
 
     private LoadingDialog(@NonNull Context context)
     {
@@ -30,7 +34,7 @@ public class LoadingDialog extends AlertDialog
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_loadingdialog);
-        aviview=(AVLoadingIndicatorView)findViewById(R.id.avi);
+        aviview = (AVLoadingIndicatorView) findViewById(R.id.avi);
         this.setCancelable(false);
         this.setCanceledOnTouchOutside(false);
     }
@@ -40,25 +44,29 @@ public class LoadingDialog extends AlertDialog
      */
     public static void LoadingShow(Context context)
     {
-        LoadingDialog tmp=new LoadingDialog(context);
-        instance=tmp;
+        LoadingDialog tmp = new LoadingDialog(context);
+        instance = tmp;
         tmp.show();
     }
 
     /**
      * 调用这个方法就会无条件随机式的切换loading风格 与random参数无关
+     *
      * @param context
      * @param random
      */
-    public static void LoadingShow(Context context,boolean random)
+    public static void LoadingShow(Context context, boolean random)
     {
-        LoadingDialog tmp=new LoadingDialog(context);
-        int index= new Random().nextInt(4);
-        instance=tmp;
+        LoadingDialog tmp = new LoadingDialog(context);
+        int index = new Random().nextInt(4);
+        instance = tmp;
         tmp.show();
-        tmp.aviview.setIndicator(AVItypeArra[index]);
+        tmp.aviview.setIndicator(AVItypeArray[index]);
     }
 
+    /**
+     * 隐藏该对话框
+     */
     public static void LoadingHide()
     {
         try
@@ -66,7 +74,7 @@ public class LoadingDialog extends AlertDialog
             instance.dismiss();
         } catch (Exception e)
         {
-            Log.e(TAG, "LoadingHide: "+e.getMessage());
+            Log.e(TAG, "LoadingHide: " + e.getMessage());
         }
     }
 }

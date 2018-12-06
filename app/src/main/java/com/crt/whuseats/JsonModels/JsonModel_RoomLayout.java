@@ -1,4 +1,4 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
@@ -49,16 +49,32 @@ import java.util.List;
  "code": "0"
  }
  */
-public class JsonInfo_RoomLayout extends  JsonInfo_Base
+public class JsonModel_RoomLayout extends JsonModel_Base
 {
 
+    private static final String TAG = "JsonModel_RoomLayout";
     public List<seat> seatList=new LinkedList<>();
+    /**
+     * 房间唯一ID
+     */
     public int roomId;
+    /**
+     * 房间名称
+     */
     public String roomName;
+    /**
+     * 房间总行数
+     */
     public int cols;
+    /**
+     * 房间总列数
+     */
     public int rows;
+    /**
+     * 房间布局子Json对象
+     */
     private JSONObject layoutOBJ;
-    public JsonInfo_RoomLayout(String JsonStr)
+    public JsonModel_RoomLayout(String JsonStr)
     {
         super(JsonStr);
         try
@@ -68,6 +84,7 @@ public class JsonInfo_RoomLayout extends  JsonInfo_Base
             cols=((JSONObject)data).getInt("cols");
             rows=((JSONObject)data).getInt("rows");
             layoutOBJ=((JSONObject)data).getJSONObject("layout");
+
             //开始循环解析 获取座位列表
             for(int i=0;i<rows;i++)
             {
@@ -94,7 +111,7 @@ public class JsonInfo_RoomLayout extends  JsonInfo_Base
         }
         catch (Exception e)
         {
-            Log.e("JsonInfo_RoomLayout", e.getMessage() );
+            Log.e(TAG, e.getMessage());
             return;
         }
     }

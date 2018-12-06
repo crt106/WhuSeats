@@ -1,9 +1,10 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
+import com.crt.whuseats.Utils.TimeHelp;
+
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.LinkedList;
@@ -46,12 +47,13 @@ import java.util.List;
  "code": "0"
  }
  */
-public class JsonInfo_HistoryList extends JsonInfo_Base
+public class JsonModel_HistoryList extends JsonModel_Base
 {
+    private static final String TAG = "JsonModel_HistoryList";
     //存放历史预约状况的链表
-    public List<JsonInfo_Reservations> reservationsList=new LinkedList<>();
+    public List<JsonModel_Reservations> reservationsList=new LinkedList<>();
 
-    public JsonInfo_HistoryList(String JsonStr)
+    public JsonModel_HistoryList(String JsonStr)
     {
         super(JsonStr);
         try
@@ -62,11 +64,12 @@ public class JsonInfo_HistoryList extends JsonInfo_Base
                 try
                 {
                     JSONObject jobj=reservationarray.getJSONObject(i);
-                    JsonInfo_Reservations temp=new JsonInfo_Reservations();
+
+                    JsonModel_Reservations temp=new JsonModel_Reservations();
                     temp.id=jobj.getInt("id");
                     temp.onDate=jobj.getString("date");
-                    temp.begin=jobj.getString("begin");
-                    temp.end=jobj.getString("end");
+                    temp.begin=TimeHelp.GetTimeStructByValue(jobj.getString("begin"));
+                    temp.end=TimeHelp.GetTimeStructByValue(jobj.getString("end"));
                     temp.awayBegin=jobj.getString("awayBegin");
                     temp.awayEnd=jobj.getString("awayEnd");
                     temp.location=jobj.getString("loc");
@@ -81,7 +84,7 @@ public class JsonInfo_HistoryList extends JsonInfo_Base
         }
         catch (Exception e)
         {
-            Log.e("JsonInfo_HistoryList",e.getMessage()+"nu");
+            Log.e(TAG,e.getMessage()+"nu");
 
         }
     }

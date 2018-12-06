@@ -29,26 +29,7 @@ public class BaseActivity extends AppCompatActivity
 
     protected ReservationChangeReciver localreceiver;
     public LocalBroadcastManager localBroadcastManager;  //广播发送者
-    //region 服务
 
-    public NetService.NetBinder mbinder;
-    public ServiceConnection serviceConnection=new ServiceConnection()
-    {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service)
-        {
-            mbinder=(NetService.NetBinder)service;
-            //触发绑定服务完成生命周期
-            onServiceBinded();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
-
-        }
-    };
-    //endregion
 
     //region 生命周期
     @Override
@@ -63,10 +44,7 @@ public class BaseActivity extends AppCompatActivity
         localreceiver=new ReservationChangeReciver();
         localBroadcastManager.registerReceiver(localreceiver,intentFilter );
         //endregion
-        Intent serviceintent=new Intent(BaseActivity.this,NetService.class);
 
-        //在基类中绑定服务
-        bindService(serviceintent,serviceConnection,BIND_AUTO_CREATE);
     }
 
 
@@ -88,17 +66,9 @@ public class BaseActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        unbindService(serviceConnection);
         //解除广播注册
         localBroadcastManager.unregisterReceiver(localreceiver);
     }
 
-    /**
-     * 生命周期-当服务绑定完成的时候
-     */
-    protected void onServiceBinded()
-    {
-
-    }
     //endregion
 }

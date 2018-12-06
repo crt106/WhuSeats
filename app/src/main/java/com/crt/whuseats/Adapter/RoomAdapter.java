@@ -9,17 +9,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
+import com.crt.whuseats.JsonModels.JsonModel_HouseStats;
 import com.crt.whuseats.R;
 
 import java.util.List;
 
-public class RoomAdapter extends ArrayAdapter<JsonInfo_HouseStats.room>
+public class RoomAdapter extends ArrayAdapter<JsonModel_HouseStats.room>
 {
 
-    List<JsonInfo_HouseStats.room> roomList;
+    List<JsonModel_HouseStats.room> roomList;
 
-    public RoomAdapter(@NonNull Context context, @NonNull List<JsonInfo_HouseStats.room> objects)
+    public RoomAdapter(@NonNull Context context, @NonNull List<JsonModel_HouseStats.room> objects)
     {
         super(context, R.layout.layout_rooms, objects);
         roomList=objects;
@@ -29,7 +29,7 @@ public class RoomAdapter extends ArrayAdapter<JsonInfo_HouseStats.room>
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
     {
-        JsonInfo_HouseStats.room thisroom=getItem(position);
+        JsonModel_HouseStats.room thisroom=getItem(position);
         //这里是创建view的过程 如果已经创建了就读取现有的 不然就创建咯
         View view;
         if(convertView!=null)
@@ -53,7 +53,7 @@ public class RoomAdapter extends ArrayAdapter<JsonInfo_HouseStats.room>
      */
     public String GetRoomname(int roomID)
     {
-        for(JsonInfo_HouseStats.room ro:roomList)
+        for(JsonModel_HouseStats.room ro:roomList)
         {
             if(ro.roomId==roomID)
                 return ro.roomname;

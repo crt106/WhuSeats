@@ -1,4 +1,4 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
@@ -70,14 +70,25 @@ import java.util.List;
  "code": "0"
  }
  */
-public class JsonInfo_Fliters extends JsonInfo_Base
+public class JsonModel_Fliters extends JsonModel_Base
 {
+    private static final String TAG = "JsonModel_Fliters";
     //两个相应数据结构
     public class buildings
     {
+        /**
+         * 建筑唯一ID
+         */
        public int id;
+        /**
+         * 建筑名称
+         */
        public String name;
-       public int floors;        //总层数
+        /**
+         * 建筑总层数
+         */
+       public int floors;
+
         public buildings(int id,String name,int... moreValue)
         {
             this.id=id;
@@ -90,10 +101,22 @@ public class JsonInfo_Fliters extends JsonInfo_Base
     }
     public class rooms
     {
+        /**
+         * 房间唯一ID
+         */
         public int id;
+        /**
+         * 房间名称
+         */
         public String name;
-        public int belongBuilding;   //属于哪个建筑
-        public int whichfloor;       //在几层
+        /**
+         * 房间属于哪个建筑
+         */
+        public int belongBuilding;
+        /**
+         * 房间所在层数
+         */
+        public int whichfloor;
         public rooms(int id,String name,int... moreValue)
         {
             this.id=id;
@@ -108,9 +131,16 @@ public class JsonInfo_Fliters extends JsonInfo_Base
     public List<buildings> buildingsList=new LinkedList<>();
     public List<rooms> roomsList=new LinkedList<>();
 
+    /**
+     * 当前最长可用时间
+     */
     public int hours;
+    /**
+     * 当前信息的日期
+     */
     public String dates;
-    public JsonInfo_Fliters(String JsonStr)
+
+    public JsonModel_Fliters(String JsonStr)
     {
         super(JsonStr);
         try
@@ -141,7 +171,7 @@ public class JsonInfo_Fliters extends JsonInfo_Base
         }
         catch (Exception e)
         {
-            Log.e("JsonInfo_Fliters", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
     }
 

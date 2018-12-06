@@ -1,4 +1,4 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
@@ -36,20 +36,46 @@ import java.util.List;
  "code": "0"
  }
  */
-public class JsonInfo_HouseStats extends JsonInfo_Base
+public class JsonModel_HouseStats extends JsonModel_Base
 {
+    private static final String TAG = "JsonModel_HouseStats";
     /**
      * 这个room类指代特定的房间
      */
     public class room
     {
+        /**
+         * 房间唯一ID
+         */
         public int roomId;
+        /**
+         * 房间名称
+         */
         public String roomname;
+        /**
+         * 所处楼层位置
+         */
         public int whichfloor;
+
+        /**
+         * 已经被预约的座位数量
+         */
         public int reserved;
+        /**
+         * 正在使用中的座位数量
+         */
         public int inUse;
+        /**
+         * 暂离的座位数量
+         */
         public int away;
+        /**
+         * 总座位数量
+         */
         public int totalSeats;
+        /**
+         * 空闲座位数量
+         */
         public int free;
 
         public room(int roomId, String roomname, int whichfloor, int reserved, int inUse, int away, int totalSeats, int free)
@@ -67,7 +93,8 @@ public class JsonInfo_HouseStats extends JsonInfo_Base
     }
 
     public List<room> roomList=new LinkedList<>();   //房间列表
-    public JsonInfo_HouseStats(String JsonStr)
+
+    public JsonModel_HouseStats(String JsonStr)
     {
         super(JsonStr);
         try
@@ -89,7 +116,7 @@ public class JsonInfo_HouseStats extends JsonInfo_Base
         }
         catch (Exception e)
         {
-            Log.e("JsonInfo_HouseStatus", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
     }
 

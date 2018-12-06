@@ -1,5 +1,7 @@
 package com.crt.whuseats;
 
+import com.crt.whuseats.Model.TimeItems;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -15,5 +17,24 @@ public class ExampleUnitTest
     public void addition_isCorrect()
     {
         assertEquals(4, 2 + 2);
+    }
+
+    /**
+     * 从时间ID获取时间结构
+     * @param ID
+     * @return
+     */
+
+    @Test
+    public TimeItems.TimeStruct GetTimeStructByID(int ID)
+    {
+        try
+        {
+            return TimeItems.IDMap.get(ID);
+
+        } catch (Exception e)
+        {
+            return null;
+        }
     }
 }

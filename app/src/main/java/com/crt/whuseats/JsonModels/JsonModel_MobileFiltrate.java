@@ -1,4 +1,4 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
@@ -42,12 +42,15 @@ import java.util.List;
  "local": false
  },
  */
-public class JsonInfo_MobileFiltrate
+public class JsonModel_MobileFiltrate
 {
-
+    private static final String TAG = "JsonModel_MobileFiltrat";
+    /**
+     * @see seat seat数据结构见链接
+     */
     public List<seat> seatList=new LinkedList<>();
 
-    public JsonInfo_MobileFiltrate(String JsonStr)
+    public JsonModel_MobileFiltrate(String JsonStr)
     {
         try
         {
@@ -78,7 +81,7 @@ public class JsonInfo_MobileFiltrate
         }
         catch (Exception e)
         {
-            Log.e("JI_MFiltrate", e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 }

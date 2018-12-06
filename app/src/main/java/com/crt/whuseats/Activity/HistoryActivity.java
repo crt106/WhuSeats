@@ -6,17 +6,16 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.crt.whuseats.Adapter.ReservationAdapter;
 import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Base;
-import com.crt.whuseats.JsonHelps.JsonInfo_BookReturn;
-import com.crt.whuseats.JsonHelps.JsonInfo_HistoryList;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Base;
+import com.crt.whuseats.JsonModels.JsonModel_BookReturn;
+import com.crt.whuseats.JsonModels.JsonModel_HistoryList;
 import com.crt.whuseats.R;
 
 public class HistoryActivity extends BaseActivity {
@@ -51,7 +50,7 @@ public class HistoryActivity extends BaseActivity {
             public void OnTaskSucceed(Object... data)
             {
                 String datastr=(String)data[0];
-                JsonInfo_HistoryList his=JsonHelp.GetHistoryList(datastr);
+                JsonModel_HistoryList his=JsonHelp.GetHistoryList(datastr);
 
                 //初始化Adapter
                 Re_adapter=new ReservationAdapter(his.reservationsList);
@@ -85,7 +84,7 @@ public class HistoryActivity extends BaseActivity {
             try
             {
                 String datastr=(String)data[0];
-                JsonInfo_Base info=new JsonInfo_Base(datastr);
+                JsonModel_Base info=new JsonModel_Base(datastr);
                 if(info.status.equals("fail"))
                 {
                     Toast.makeText(HistoryActivity.this, info.message, Toast.LENGTH_SHORT).show();
@@ -119,7 +118,7 @@ public class HistoryActivity extends BaseActivity {
             {
                 String datastr=(String)data[0];
                 //这里调用了辣个比较特殊的JsonHelp处理方法
-                JsonInfo_BookReturn info=JsonHelp.GetHistoryView(datastr);
+                JsonModel_BookReturn info=JsonHelp.GetHistoryView(datastr);
                 SuccessDialog temp=new SuccessDialog(HistoryActivity.this,info);
                 temp.show();
                 temp.SetTitle("历史预约");

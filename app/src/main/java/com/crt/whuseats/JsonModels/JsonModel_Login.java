@@ -1,4 +1,4 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
@@ -12,12 +12,13 @@ import org.json.JSONObject;
  * "code":"0",
  * "message":""}
  */
-public class JsonInfo_Login extends JsonInfo_Base
+public class JsonModel_Login extends JsonModel_Base
 {
+    private static final String TAG = "JsonModel_Login";
     //token包含在data层
     public String token;
 
-    public JsonInfo_Login(String JsonStr)
+    public JsonModel_Login(String JsonStr)
     {
         super(JsonStr);
         try
@@ -26,7 +27,7 @@ public class JsonInfo_Login extends JsonInfo_Base
         }
         catch (Exception e)
         {
-            Log.e("Jsoninfo_login", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
 
     }

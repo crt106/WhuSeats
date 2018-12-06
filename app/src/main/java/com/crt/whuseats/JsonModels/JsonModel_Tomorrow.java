@@ -1,19 +1,21 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.sql.Struct;
 import java.util.HashMap;
-import java.util.List;
 
-public class JsonInfo_Tomorrow extends JsonInfo_Base
+/**
+ * 从服务器（crt）上获取第二天用户已经提交的座位信息
+ * Update at v0.6.9 by crt 2018-12-4
+ */
+public class JsonModel_Tomorrow extends JsonModel_Base
 {
+    private static final String TAG = "JsonModel_Tomorrow";
     public HashMap<Integer, Integer> tomoInfo;
 
-    public JsonInfo_Tomorrow(String JsonStr)
+    public JsonModel_Tomorrow(String JsonStr)
     {
 
         super(JsonStr);
@@ -32,7 +34,7 @@ public class JsonInfo_Tomorrow extends JsonInfo_Base
         } 
         catch (Exception e)
         {
-            Log.e("JsonInfo_Tomorrow",e.getMessage());
+            Log.e(TAG,e.getMessage());
         }
 
 

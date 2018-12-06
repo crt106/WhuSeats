@@ -1,9 +1,7 @@
 package com.crt.whuseats.Activity;
 
 
-import android.app.AlertDialog;
 import android.os.Bundle;
-import android.service.chooser.ChooserTargetService;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,22 +14,16 @@ import android.widget.Toast;
 import com.crt.whuseats.Adapter.BuildingAdapter;
 import com.crt.whuseats.Adapter.RoomAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
-import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.LoadingDialog;
-import com.crt.whuseats.Dialog.SuccessDialog;
-import com.crt.whuseats.Interface.onProgressReturn;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
-import com.crt.whuseats.JsonHelps.JsonInfo_MobileFiltrate;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Fliters;
+import com.crt.whuseats.JsonModels.JsonModel_HouseStats;
 import com.crt.whuseats.Model.ListenDateType;
 import com.crt.whuseats.Model.ListenItem;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.Utils.TimeHelp;
 
-import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,16 +47,11 @@ public class ListenActivity extends BaseActivity
 
     //region 相应字段
 
-    public List<JsonInfo_Fliters.buildings> buildingsList=new LinkedList<>();//当前建筑列表
-    public List<JsonInfo_HouseStats.room> roomList=new LinkedList<>();       //当前房间情况列表
+    public List<JsonModel_Fliters.buildings> buildingsList=new LinkedList<>();//当前建筑列表
+    public List<JsonModel_HouseStats.room> roomList=new LinkedList<>();       //当前房间情况列表
     public List<String> DateList=new LinkedList<>();                         //当前日期列表
 
-    public static int MAXLOOPCOUNT=100;   //筛选模式下最大的筛选轮次
-    public static int MAXLOOPCOUT_DEFAULT=100;
 
-    public static int ChooseHouseID=1;   //选择的建筑ID
-    public static int ChooseRoomID;    //选择的房间ID
-    public static String ChooseDate;   //选择的日期
 
     //endregion
     public ListenActivity()
@@ -79,6 +66,7 @@ public class ListenActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.frag_rooms);
+
         //region 控件初始化
         RoomGrid=(GridView)findViewById(R.id.gv_endtimes);
         buildingSpinner=(Spinner)findViewById(R.id.sp_building);
@@ -106,7 +94,7 @@ public class ListenActivity extends BaseActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                JsonInfo_Fliters.buildings choosebuilding=buildingsList.get(position);
+                JsonModel_Fliters.buildings choosebuilding=buildingsList.get(position);
                 ChooseHouseID=choosebuilding.id;
                 //记录用户习惯
                 AppSetting.ListenSettingEditor.putInt("DefaultBuilding", ChooseHouseID);
@@ -143,7 +131,7 @@ public class ListenActivity extends BaseActivity
         RoomGrid.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->
         {
             //刷新选择房间的ID
-            JsonInfo_HouseStats.room chooseroom=roomList.get(position);
+            JsonModel_HouseStats.room chooseroom=roomList.get(position);
             ChooseRoomID=chooseroom.roomId;
 
             //展开设置对话框
@@ -228,7 +216,7 @@ public class ListenActivity extends BaseActivity
                     String datastr=(String)data[0];
                     if(datastr==null||datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_Fliters info= JsonHelp.GetFliters(datastr);
+                    JsonModel_Fliters info= JsonHelp.GetFliters(datastr);
                     //把接收到的数据复制给本类变量
                     buildingsList=info.buildingsList;
                     bdSpinnerAdapter=new BuildingAdapter(info.buildingsList);
@@ -270,7 +258,7 @@ public class ListenActivity extends BaseActivity
                     String datastr=(String)data[0];
                     if(datastr==null||datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_HouseStats info= JsonHelp.GetHouseStats(datastr);
+                    JsonModel_HouseStats info= JsonHelp.GetHouseStats(datastr);
                     //把接收到的数据复制给本类变量
                     roomList=info.roomList;
                     roomAdapter=new RoomAdapter(ListenActivity.this,roomList);
@@ -297,21 +285,21 @@ public class ListenActivity extends BaseActivity
 
         //region 模拟返回
 //        roomList=new LinkedList<>();
-//        JsonInfo_HouseStats jh=new JsonInfo_HouseStats();
-//        JsonInfo_HouseStats.room r1=jh.new room(3,"测试房间1",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r2=jh.new room(5,"测试房间2",1,2,3,4,5,4);
-//        JsonInfo_HouseStats.room r4=jh.new room(7,"测试房间3",4,2,3,4,5,6);
-//        JsonInfo_HouseStats.room r5=jh.new room(9,"测试房间4",1,2,3,4,5,21);
-//        JsonInfo_HouseStats.room r6=jh.new room(11,"测试房间5",1,4,3,4,5,233);
-//        JsonInfo_HouseStats.room r7=jh.new room(17,"测试房间6",2,2,4,4,5,6);
-//        JsonInfo_HouseStats.room r8=jh.new room(12,"测试房间7",1,2,3,4,5,2);
-//        JsonInfo_HouseStats.room r9=jh.new room(14,"测试房间8",5,4,3,4,5,5);
-//        JsonInfo_HouseStats.room r10=jh.new room(16,"测试房间9",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r11=jh.new room(16,"测试房间10",1,2,3,4,5,0);
-//        JsonInfo_HouseStats.room r12=jh.new room(16,"测试房间11",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r13=jh.new room(16,"测试房间12",1,3,4,4,5,43);
-//        JsonInfo_HouseStats.room r14=jh.new room(16,"测试房间13",1,2,3,4,5,53);
-//        JsonInfo_HouseStats.room r15=jh.new room(16,"测试房间14",3,2,3,4,5,1);
+//        JsonModel_HouseStats jh=new JsonModel_HouseStats();
+//        JsonModel_HouseStats.room r1=jh.new room(3,"测试房间1",1,2,3,4,5,2);
+//        JsonModel_HouseStats.room r2=jh.new room(5,"测试房间2",1,2,3,4,5,4);
+//        JsonModel_HouseStats.room r4=jh.new room(7,"测试房间3",4,2,3,4,5,6);
+//        JsonModel_HouseStats.room r5=jh.new room(9,"测试房间4",1,2,3,4,5,21);
+//        JsonModel_HouseStats.room r6=jh.new room(11,"测试房间5",1,4,3,4,5,233);
+//        JsonModel_HouseStats.room r7=jh.new room(17,"测试房间6",2,2,4,4,5,6);
+//        JsonModel_HouseStats.room r8=jh.new room(12,"测试房间7",1,2,3,4,5,2);
+//        JsonModel_HouseStats.room r9=jh.new room(14,"测试房间8",5,4,3,4,5,5);
+//        JsonModel_HouseStats.room r10=jh.new room(16,"测试房间9",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r11=jh.new room(16,"测试房间10",1,2,3,4,5,0);
+//        JsonModel_HouseStats.room r12=jh.new room(16,"测试房间11",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r13=jh.new room(16,"测试房间12",1,3,4,4,5,43);
+//        JsonModel_HouseStats.room r14=jh.new room(16,"测试房间13",1,2,3,4,5,53);
+//        JsonModel_HouseStats.room r15=jh.new room(16,"测试房间14",3,2,3,4,5,1);
 //        roomList.add(r1);
 //        roomList.add(r2);
 //        roomList.add(r4);

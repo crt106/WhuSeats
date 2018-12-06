@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.crt.whuseats.JsonHelps.JsonInfo_Reservations;
+import com.crt.whuseats.JsonModels.JsonModel_Reservations;
 import com.crt.whuseats.R;
 
 import java.util.List;
@@ -18,11 +18,11 @@ import java.util.List;
 public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ViewHolder>
 {
 
-    List<JsonInfo_Reservations> HistroyList;
+    List<JsonModel_Reservations> HistroyList;
 
 
     //构造函数
-    public ReservationAdapter(List<JsonInfo_Reservations> list)
+    public ReservationAdapter(List<JsonModel_Reservations> list)
     {
         super();
         HistroyList=list;
@@ -70,7 +70,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
-        JsonInfo_Reservations reinfo=HistroyList.get(position);
+        JsonModel_Reservations reinfo=HistroyList.get(position);
         holder.dateview.setText(reinfo.onDate);
         holder.locview.setText(reinfo.location);
         //根据不同状况给按钮赋不同的值

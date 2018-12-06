@@ -1,8 +1,7 @@
-package com.crt.whuseats.JsonHelps;
+package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,9 +13,10 @@ import java.util.List;
 
 /**
  * 解析由Web端服务器返回的座位筛选结果
- *
+ * Deprecated at v0.5.6 改为移动端过滤替代
  */
-public class JsonInfo_WebFiltrate
+@Deprecated
+public class JsonModel_WebFiltrate
 {
     public List<String> SuitableSeatsList=new LinkedList<>();
 
@@ -25,7 +25,7 @@ public class JsonInfo_WebFiltrate
     public int offset;
     public int SeatNum;
 
-    public JsonInfo_WebFiltrate(String JsonStr)
+    public JsonModel_WebFiltrate(String JsonStr)
     {
         try
         {

@@ -1,0 +1,21 @@
+#### Settings在SharedPreferences的结构
+- UserInfo(Editor)　<font color=green>userdata.xml</font>
+  - `Username` 　　　　　　　　-用户名
+  - `Password `　　　　　　　　-密码
+  ---
+- ListenSetting(Editor) 　<font color=green>listendata.xml</font>
+  - `DefaultBuilding`        -默认所在建筑ID
+  - `DELAY_SENDBOOK`         -预约前延迟
+  - `MAXLOOPCOUNT`           -最大循环次数
+  - `DELAY_BEFOREFILTRATE`   -过滤前延迟
+  - `startTime`              -开始时间 值为ID(480等)
+  - `endTime`                -结束时间 值为ID
+  ---
+- BookSetting(Editor) 　<font color=green>bookdata.xml</font>
+  - `ChooseSeatID` -选择的座位唯一ID
+  - `ChooseRoomID` -选择的房间ID
+  - `ChooseHouseID` -选择的房屋ID
+  - `ChooseRoomName` -选择的房间名称
+  - `ChooseHouseName` -选择的房屋名称
+  - `ChooseSeatName` -选择的座位名称(001 002 003)
+  - `IsClockon` -是否启用了定时器

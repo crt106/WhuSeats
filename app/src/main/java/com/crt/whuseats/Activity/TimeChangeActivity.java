@@ -1,6 +1,5 @@
 package com.crt.whuseats.Activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,12 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crt.whuseats.Adapter.TimeManageAdapter;
+import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Dialog.SuccessDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Base;
-import com.crt.whuseats.JsonHelps.JsonInfo_Reservations;
-import com.crt.whuseats.JsonHelps.JsonInfo_SeatTime_Start;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Base;
+import com.crt.whuseats.JsonModels.JsonModel_Reservations;
+import com.crt.whuseats.JsonModels.JsonModel_SeatTime;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.NetService;
 
@@ -95,7 +95,7 @@ public class TimeChangeActivity extends BaseActivity
                 try
                 {
                     String datastr=(String)data[0];
-                    JsonInfo_Base info=new JsonInfo_Base(datastr);
+                    JsonModel_Base info=new JsonModel_Base(datastr);
                     if(info.status.equals("fail"))
                     {
                         Toast.makeText(TimeChangeActivity.this, info.message, Toast.LENGTH_SHORT).show();
@@ -179,7 +179,7 @@ public class TimeChangeActivity extends BaseActivity
                 try
                 {
                     String datastr = (String) data[0];
-                    JsonInfo_Reservations reinfo = JsonHelp.GetReservation(datastr);
+                    JsonModel_Reservations reinfo = JsonHelp.GetReservation(datastr);
                     //如果当前预约为空的话 刷新状态
                     if (reinfo.data.toString().equals("null"))
                     {
@@ -222,6 +222,7 @@ public class TimeChangeActivity extends BaseActivity
     //刷新时间列表,将RecyclerView实例化
     public void RefreshTimeList()
     {
+        LoadingDialog.LoadingShow(this,true);
         try
         {
             mbinder.GetSeatStartTime(NowSeatsId, timeHelp.GetTodayStr(), new onTaskResultReturn()
@@ -229,7 +230,7 @@ public class TimeChangeActivity extends BaseActivity
                 @Override
                 public void OnTaskSucceed(Object... data)
                 {
-                    JsonInfo_SeatTime_Start seatTime_start=JsonHelp.GetSeatStartTime((String)data[0]);
+                    JsonModel_SeatTime seatTime_start=JsonHelp.GetSeatStartTime((String)data[0]);
                     List<String> timelist=new LinkedList<>();
 
                     /**建立合乎要求的时间链表
@@ -246,7 +247,7 @@ public class TimeChangeActivity extends BaseActivity
                             timelist.add(i2Value+"_user");
                             continue;
                         }
-                        else if(seatTime_start.StartTimeList.contains(istr))
+                        else if(seatTime_start.TimeList.contains(istr))
                         {
                             timelist.add(i2Value+"_free");
                             continue;
@@ -265,6 +266,7 @@ public class TimeChangeActivity extends BaseActivity
                     rvTimeList.setAdapter(timeManageAdapter);
                     //刷新一下
                     rvTimeList.refreshDrawableState();
+                    LoadingDialog.LoadingHide();
                 }
 
                 @Override

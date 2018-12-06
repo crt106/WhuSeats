@@ -2,7 +2,6 @@ package com.crt.whuseats.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -13,9 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.crt.whuseats.Activity.SeatsActivity;
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
-import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
-import com.crt.whuseats.JsonHelps.seat;
+import com.crt.whuseats.JsonModels.seat;
 import com.crt.whuseats.R;
 
 import java.util.List;

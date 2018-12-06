@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
@@ -27,9 +25,9 @@ import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.SeatsActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Base;
-import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Base;
+import com.crt.whuseats.JsonModels.JsonModel_Tomorrow;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.BookService;
 import com.crt.whuseats.Utils.TimeHelp;
@@ -265,7 +263,7 @@ public class BookFragment extends Fragment
                         @Override
                         public void OnTaskSucceed(Object... data)
                         {
-                            JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
+                            JsonModel_Base info=new JsonModel_Base(data[0].toString());
                             String message= info.message;
                             Log.e("book_addtomoinfo", message);
                         }
@@ -311,7 +309,7 @@ public class BookFragment extends Fragment
                             @Override
                             public void OnTaskSucceed(Object... data)
                             {
-                                JsonInfo_Base info=new JsonInfo_Base(data[0].toString());
+                                JsonModel_Base info=new JsonModel_Base(data[0].toString());
                                 String message= info.message;
                                 Log.e("book_deletetomoinfo", message);
                             }
@@ -450,7 +448,7 @@ public class BookFragment extends Fragment
                 try
                 {
                     String str=(String)data[0];
-                    JsonInfo_Tomorrow JsonClass= JsonHelp.GetTomorrowInfo(str);
+                    JsonModel_Tomorrow JsonClass= JsonHelp.GetTomorrowInfo(str);
                     //构建信息链表
                     SeatsActivity.tomoinfolist.clear();
                     for ( Map.Entry<Integer, Integer> ob : JsonClass.tomoInfo.entrySet() )

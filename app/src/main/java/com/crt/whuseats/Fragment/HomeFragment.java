@@ -2,7 +2,6 @@ package com.crt.whuseats.Fragment;
 
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,9 +21,9 @@ import com.crt.whuseats.Activity.MainActivity;
 import com.crt.whuseats.Activity.TimeChangeActivity;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Base;
-import com.crt.whuseats.JsonHelps.JsonInfo_Reservations;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Base;
+import com.crt.whuseats.JsonModels.JsonModel_Reservations;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Service.NetService;
 
@@ -133,7 +132,7 @@ public class HomeFragment extends Fragment
             try
             {
                 String datastr=(String)data[0];
-                JsonInfo_Base info=new JsonInfo_Base(datastr);
+                JsonModel_Base info=new JsonModel_Base(datastr);
                 if(info.status.equals("fail"))
                 {
                     Toast.makeText(ActivityConnect, info.message, Toast.LENGTH_SHORT).show();
@@ -175,7 +174,7 @@ public class HomeFragment extends Fragment
                 try
                 {
                     String datastr=(String)data[0];
-                    JsonInfo_Reservations reinfo= JsonHelp.GetReservation(datastr);
+                    JsonModel_Reservations reinfo= JsonHelp.GetReservation(datastr);
 
                     //如果当前预约为空的话 刷新状态
                     if(reinfo.data.toString().equals("null"))

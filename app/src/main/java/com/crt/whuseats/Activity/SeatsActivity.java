@@ -16,12 +16,12 @@ import com.crt.whuseats.Adapter.SeatsAdapter;
 import com.crt.whuseats.Dialog.ChooseTimeDialog;
 import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
-import com.crt.whuseats.JsonHelps.JsonInfo_Fliters;
-import com.crt.whuseats.JsonHelps.JsonInfo_HouseStats;
-import com.crt.whuseats.JsonHelps.JsonInfo_RoomLayout;
-import com.crt.whuseats.JsonHelps.JsonInfo_Tomorrow;
-import com.crt.whuseats.JsonHelps.seat;
+import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Fliters;
+import com.crt.whuseats.JsonModels.JsonModel_HouseStats;
+import com.crt.whuseats.JsonModels.JsonModel_RoomLayout;
+import com.crt.whuseats.JsonModels.JsonModel_Tomorrow;
+import com.crt.whuseats.JsonModels.seat;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TimeHelp;
 
@@ -70,16 +70,16 @@ public class SeatsActivity extends BaseActivity
         //设置相应点击事件
         rvHouse.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->{
             //刷新当前选择
-            ChooseHouseID=((JsonInfo_Fliters.buildings)rvHouse.getAdapter().getItem(position)).id;
-            ChooseHouseName=((JsonInfo_Fliters.buildings)rvHouse.getAdapter().getItem(position)).name;
+            ChooseHouseID=((JsonModel_Fliters.buildings)rvHouse.getAdapter().getItem(position)).id;
+            ChooseHouseName=((JsonModel_Fliters.buildings)rvHouse.getAdapter().getItem(position)).name;
             tvBooktitle.setText(ChooseHouseName);
             GetRoomGrid();
         });
         //房间列表点击事件
         rvRoom.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id)->{
             //刷新当前选择
-            ChooseRoomID=((JsonInfo_HouseStats.room)rvRoom.getAdapter().getItem(position)).roomId;
-            ChooseRoomName=((JsonInfo_HouseStats.room)rvRoom.getAdapter().getItem(position)).roomname;
+            ChooseRoomID=((JsonModel_HouseStats.room)rvRoom.getAdapter().getItem(position)).roomId;
+            ChooseRoomName=((JsonModel_HouseStats.room)rvRoom.getAdapter().getItem(position)).roomname;
             tvBooktitle.setText(ChooseHouseName+" "+ChooseRoomName);
             GetSeatsLayout();
         });
@@ -154,7 +154,7 @@ public class SeatsActivity extends BaseActivity
                     String datastr = (String) data[0];
                     if (datastr == null || datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_Fliters info = JsonHelp.GetFliters(datastr);
+                    JsonModel_Fliters info = JsonHelp.GetFliters(datastr);
                     //把接收到的数据复制给本类变量
                     buildingAdapter = new BuildingAdapter(info.buildingsList);
                     rvHouse.setAdapter(buildingAdapter);
@@ -190,7 +190,7 @@ public class SeatsActivity extends BaseActivity
                     String datastr=(String)data[0];
                     if(datastr==null||datastr.equals(""))
                         throw new Exception("返回Json为空");
-                    JsonInfo_HouseStats info= JsonHelp.GetHouseStats(datastr);
+                    JsonModel_HouseStats info= JsonHelp.GetHouseStats(datastr);
                     //把接收到的数据复制给本类变量
                     roomAdapter=new RoomAdapter(SeatsActivity.this,info.roomList);
                     rvRoom.setAdapter(roomAdapter);
@@ -228,7 +228,7 @@ public class SeatsActivity extends BaseActivity
             {
                 try
                 {
-                    JsonInfo_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
+                    JsonModel_RoomLayout roomLayout = JsonHelp.GetRoomLayout((String) data[0]);
                     //把接收到的数据传给Adapter
                     Collections.sort(roomLayout.seatList);//重新排序
                     seatsAdapter=new SeatsAdapter(SeatsActivity.this,roomLayout.seatList);
@@ -270,7 +270,7 @@ public class SeatsActivity extends BaseActivity
                 try
                 {
                     String str=(String)data[0];
-                    JsonInfo_Tomorrow JsonClass=JsonHelp.GetTomorrowInfo(str);
+                    JsonModel_Tomorrow JsonClass=JsonHelp.GetTomorrowInfo(str);
                     //构建信息链表
                     tomoinfolist.clear();
                     for ( Map.Entry<Integer, Integer> ob : JsonClass.tomoInfo.entrySet() )

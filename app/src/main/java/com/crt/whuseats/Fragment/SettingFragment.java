@@ -19,11 +19,10 @@ import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Activity.MoreFucActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
 import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonHelps.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonHelp;
 import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.UpdateHelp;

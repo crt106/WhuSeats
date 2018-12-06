@@ -8,3 +8,7 @@
 /build
 /captures
 .externalNativeBuild
+*.apk
+*.apk
+app/release/com.crt.whuseats_1(修复5.0更新问题).apk
+*.apk

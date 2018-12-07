@@ -33,15 +33,42 @@ public class JsonModel_Base implements Serializable
     //构造方法 直接在构造方法里面解析？不然子类无法获得上述基本的四个字段
     public JsonModel_Base(String JsonStr) throws Exception
     {
-            if(JsonStr==null||JsonStr.equals(""))
-            {
-                throw new Exception("给定的Json字符串有问题吧大哥");
-            }
-            JSONObject job=new JSONObject(JsonStr);
-            code=job.getInt("code");
-            data=job.get("data");
-            message=job.getString("message");
-            status=job.getString("status");
+        if (JsonStr == null || JsonStr.equals(""))
+        {
+            throw new Exception("给定的Json字符串有问题吧大哥");
+        }
+
+        JSONObject job = new JSONObject(JsonStr);
+
+        //这里分段try catch 保证能获取到部分正确数据
+        try
+        {
+            code = job.getInt("code");
+        } catch (JSONException e)
+        {
+            Log.e(TAG, "JsonModel_Base: code数据获取失败");
+        }
+        try
+        {
+            data = job.get("data");
+        } catch (JSONException e)
+        {
+            Log.e(TAG, "JsonModel_Base: data获取失败");
+        }
+        try
+        {
+            message = job.getString("message");
+        } catch (JSONException e)
+        {
+            Log.e(TAG, "JsonModel_Base: message获取失败");
+        }
+        try
+        {
+            status = job.getString("status");
+        } catch (JSONException e)
+        {
+            Log.e(TAG, "JsonModel_Base: stsatus获取失败");
+        }
     }
 
     public JsonModel_Base()
@@ -51,11 +78,12 @@ public class JsonModel_Base implements Serializable
 
     /**
      * 利用Gson进行转换为字符串
+     *
      * @return
      */
     public String toString()
     {
-        Gson gson=new Gson();
+        Gson gson = new Gson();
         return gson.toJson(this);
     }
 

@@ -160,7 +160,8 @@ public class LoginActivity extends BaseActivity
         //检查是不是处于维护状态
         if (TimeHelp.IsOverTime("23:50") || !TimeHelp.IsOverTime("0:30"))
         {
-            AlertDialog temp = new AlertDialog.Builder(this)
+            AlertDialog temp = new AlertDialog.Builder(
+                    this)
                     .setTitle("提示")
                     .setMessage("此时处于图书馆服务器维护阶段")
                     .setPositiveButton("溜了溜了", null)
@@ -202,7 +203,20 @@ public class LoginActivity extends BaseActivity
                 @Override
                 public void onError(Throwable e)
                 {
-
+                    if(e instanceof LoginCRTPermissionException)
+                    {
+                        ToastUtils.ShowShortToast("权限错误");
+                        return;
+                    }
+                    else if(e instanceof LoginException)
+                    {
+                        ToastUtils.ShowShortToast(e.getMessage());
+                    }
+                    else
+                    {
+                        ToastUtils.ShowShortToast("未处理的异常："+e.getMessage());
+                    }
+                    LoadingDialog.LoadingHide();
                 }
 
                 @Override
@@ -211,16 +225,6 @@ public class LoginActivity extends BaseActivity
 
                 }
             });
-        }
-        catch (LoginCRTPermissionException e1)
-        {
-            ToastUtils.ShowShortToast("权限错误");
-            LoadingDialog.LoadingHide();
-        }
-        catch (LoginException e2)
-        {
-            ToastUtils.ShowShortToast("登录失败");
-            LoadingDialog.LoadingHide();
         }
         catch (Exception e3)
         {

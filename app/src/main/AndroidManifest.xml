@@ -25,8 +25,12 @@
         android:theme="@style/AppTheme">
 
         <!--百度自动更新元数据-->
-        <meta-data android:name="BDAPPID" android:value="11759848"/>
-        <meta-data android:name="BDAPPKEY" android:value="I8DPkwND7obIy7e8ur48XiOykpuRz4Xy"/>
+        <meta-data
+            android:name="BDAPPID"
+            android:value="11759848" />
+        <meta-data
+            android:name="BDAPPKEY"
+            android:value="I8DPkwND7obIy7e8ur48XiOykpuRz4Xy" />
         <!--百度移动统计-->
         <meta-data
             android:name="BaiduMobAd_STAT_ID"
@@ -82,13 +86,13 @@
 
         <!-- android:authorities="包名.fileprovider"将“包名”替换为实际包名 -->
         <!--<provider-->
-            <!--android:authorities="com.crt.whuseats.fileprovider"-->
-            <!--android:name="android.support.v4.content.FileProvider"-->
-            <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-                <!--android:resource="@xml/bdp_update_filepaths"/>-->
+        <!--android:authorities="com.crt.whuseats.fileprovider"-->
+        <!--android:name="android.support.v4.content.FileProvider"-->
+        <!--android:exported="false"-->
+        <!--android:grantUriPermissions="true">-->
+        <!--<meta-data-->
+        <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
+        <!--android:resource="@xml/bdp_update_filepaths"/>-->
         <!--</provider>-->
 
         <activity
@@ -102,8 +106,8 @@
             android:theme="@style/FullscreenTheme">
 
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
 
@@ -171,8 +175,12 @@
         <activity android:name="com.crt.whuseats.Activity.AdminActivity"></activity>
 
         <!--广点通联盟要求的两个内容-->
-        <service android:name="com.qq.e.comm.DownloadService" android:exported="false" />
-        <activity android:name="com.qq.e.ads.ADActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
+        <service
+            android:name="com.qq.e.comm.DownloadService"
+            android:exported="false" />
+        <activity
+            android:name="com.qq.e.ads.ADActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
     </application>
 

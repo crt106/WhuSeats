@@ -2,6 +2,7 @@ package com.crt.whuseats.JsonModels;
 
 import android.util.Log;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -21,6 +22,14 @@ public class JsonModel_Login extends JsonModel_Base
     public JsonModel_Login(String JsonStr) throws Exception
     {
         super(JsonStr);
-        token=((JSONObject)data).getString("token");
+        try
+        {
+            token = ((JSONObject) data).getString("token");
+        } catch (Exception e)
+        {
+            Log.e(TAG, "JsonModel_Login: token获取失败");
+            return;
+        }
+
     }
 }

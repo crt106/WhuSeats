@@ -78,7 +78,14 @@ public class RequestLogin extends RequestBase
                     public JsonModel_Login apply(ResponseBody body) throws Exception
                     {
                         String jsonstr = body.string();
-                        JsonModel_Login info = JsonHelp.GetLogin(jsonstr);
+                        JsonModel_Login info = null;
+                        try
+                        {
+                            info = JsonHelp.GetLogin(jsonstr);
+                        } catch (Exception e)
+                        {
+                            throw new LoginException("登录异常"+info.message);
+                        }
                         //判断是否登陆成功咯~
                         if (info.status.equals("success"))
                         {
@@ -86,10 +93,10 @@ public class RequestLogin extends RequestBase
                             Log.e("Net:Login", "移动端返回Token:" + LIB_TOKEN);
                             return info;
 
-                        } else
+                        } else //这里可以认为是用户密码错误
                         {
                             Log.e("Net:Login", "移动端登陆失败");
-                            throw new LoginException("移动端登录错误" + info.message);
+                            throw new LoginException(info.message);
                         }
                     }
                 })

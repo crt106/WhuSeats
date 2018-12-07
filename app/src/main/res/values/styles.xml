@@ -7,7 +7,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="MaterialNoActionBar" parent="Theme.Design.Light.NoActionBar">
 
+    </style>
     <style name="AppTheme" parent="@style/AppBaseTheme" />
 
     <style name="CommonTitleBackground">
@@ -71,6 +73,7 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <!--小菊花对话框主题-->
     <style name="LoadingDialog" parent="@android:style/Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <!--浮现在activity-->

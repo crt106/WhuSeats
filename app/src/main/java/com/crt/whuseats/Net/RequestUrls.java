@@ -38,7 +38,43 @@ public class RequestUrls
     static final String URL_CHECKIN = "/rest/v2/checkIn";                         //签到API地址
     static final String URL_LEAVE = "/rest/v2/leave";                             //暂离API地址
     static final String URL_STOP = "/rest/v2/stop";                              //结束使用API地址
+    @Deprecated
+    static final String URL_CAPTCHA = "/simpleCaptcha/captcha";                  //查询Web登录验证码
+    static final String URL_USER = "/rest/v2/user";                              //查询用户信息
+    static final String URL_CHECKNOWRE = "/rest/v2/user/reservations";           //检查当前预约
+    static final String URL_FREEFILTERS = "/rest/v2/free/filters";               //获取建筑布局
 
+    static final String URL_HISTORY = "/rest/v2/history/1/10";                   //获取1-10条历史纪录
+    static final String URL_CANCEL = "/rest/v2/cancel";                          //取消预约
+    static final String URL_HISTORYONEVIEW = "/rest/view/";
+    static final String URL_CHECKHOUSESTATS = "/rest/v2/room/stats2";
+    static final String URL_CHECKROOMSTATS = "/rest/v2/room/layoutByDate";
+    static final String URL_GETSEATSTARTTIME = "/rest/v2/startTimesForSeat";
+    static final String URL_GETSEATENDTIME = "/rest/v2/endTimesForSeat";
+    @Deprecated
+    static final String URL_AJAXSEARCH = "/freeBook/ajaxSearch";
+    static final String URL_MOBILESEARCH = "/rest/v2/searchSeats";
+    static final String URL_ANNOUNCE = "/rest/v2/announce";
 
+    //endregion
+
+    //region crt功能地址
+    static final String URL_UPDATE = "/whuseatsapi/download.html";
+    static final String URL_TOMORROWINFO_GET = "/whuseatsapi/api/getinfo";
+    static final String URL_TOMORROWINFO_ADD = "/whuseatsapi/api/add";
+    static final String URL_TOMORROWINFO_DELETE = "/whuseatsapi/api/delete";
+    static final String URL_PREHEAT = "/whuseatsapi/api/preheat";
+    static final String URL_ZHICODE = "/whuseatsapi/api/alipay/zhicode";
+    static final String URL_PUTZHICODE = "/whuseatsapi/api/alipay/putzhicode";
+    static final String URL_CHECKPROCESS = "/whuseatsapi/api/winform/checkprocess";
+    static final String URL_KILLPROCESS = "/whuseatsapi/api/winform/killprocess";
+    static final String URL_RESTARTPROCESS = "/whuseatsapi/api/winform/restart";
+    static final String URL_GETLOG = "/whuseatsapi/api/winform/getlog";
+    static final String URL_GETVERSION = "/whuseatsapi/api/versionget";
+    static final String URL_SETVERSION = "/whuseatsapi/api/versionset";
+    static final String URL_GETMOREFUCMSG = "/whuseatsapi/api/morefucmessage";
+    static final String URL_SETMOREFUCMSG = "/whuseatsapi/api/setmorefucmessage";
+    static final String URL_GETEGCODE = "/whuseatsapi/api/getEgCode";
+    static final String URL_SETEGCODE = "/whuseatsapi/api/setEgCode";
     //endregion
 }

@@ -56,6 +56,15 @@ public class Settings
         UserInfoEditor.putString("Password", Password);
         UserInfoEditor.apply();
     }
+
+    /**
+     * 清除用户信息
+     */
+    public void ClearUserInfo()
+    {
+        UserInfoEditor.clear();
+        UserInfoEditor.apply();
+    }
     //endregion
 
     //region 控制监听信息的读写

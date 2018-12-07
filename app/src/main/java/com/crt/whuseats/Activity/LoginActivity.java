@@ -23,20 +23,26 @@ import com.crt.whuseats.Dialog.AlipayDialog;
 import com.crt.whuseats.Dialog.LoadingDialog;
 import com.crt.whuseats.Interface.onTaskResultReturn;
 import com.crt.whuseats.JsonModels.JsonHelp;
+import com.crt.whuseats.JsonModels.JsonModel_Login;
 import com.crt.whuseats.JsonModels.JsonModel_User;
+import com.crt.whuseats.Net.Login.LoginCRTPermissionException;
+import com.crt.whuseats.Net.Login.LoginException;
+import com.crt.whuseats.Net.Login.RequestLogin;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TimeHelp;
+import com.crt.whuseats.Utils.ToastUtils;
 import com.crt.whuseats.Utils.UpdateHelp;
-
 import java.util.ArrayList;
+import static com.crt.whuseats.ApplicationV.*;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
-import static com.crt.whuseats.ApplicationV.AppSetting;
 
 public class LoginActivity extends BaseActivity
 {
     private static final String TAG = "LoginActivity";
-    public static boolean IsLoginIN = true;                 //判断用户是否已登录进入
-    public static final int ANDROID_M_PERMISSION = 1;
+
+    public static final int ANDROID_M_PERMISSION = 1356564;
     //region 控件
     public EditText Username;
     public EditText Password;
@@ -57,14 +63,43 @@ public class LoginActivity extends BaseActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //region 绑定控件和设定控件事件
+
         Username = (EditText) findViewById(R.id.et_userName);
         Password = (EditText) findViewById(R.id.et_password);
         IsSavePassword = (CheckBox) findViewById(R.id.if_remember_password);
-//        IsLoginpc=(CheckBox)findViewById(R.id.if_loginpc);
         JoinQQGroup = (TextView) findViewById(R.id.tv_JoinQQGroup);
         tvLoginPass = (TextView) findViewById(R.id.tv_login_pass);
 
-        //读取已经保存的用户名和密码
+        //跳过登陆按钮点击之后 跳过登陆
+        tvLoginPass.setOnClickListener(v ->
+        {
+            //直接进入主界面
+            IsLoginIN = false;
+            Toast.makeText(getApplicationContext(), "跳过登录 功能受限~", Toast.LENGTH_SHORT).show();
+            Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(StartMain);
+        });
+
+        //长按跳过登录按钮进入管理
+        tvLoginPass.setOnLongClickListener(v ->
+        {
+            IsLoginIN = false;
+            Intent StartMain = new Intent(LoginActivity.this, AdminActivity.class);
+            startActivity(StartMain);
+            return true;
+        });
+
+        //绑定加入QQ群文字点击事件
+        JoinQQGroup.setOnClickListener((v) ->
+        {
+            joinQQGroup();
+        });
+
+        //endregion
+
+        //region 读取已经保存的用户名和密码
         try
         {
             USERNAME = AppSetting.GetUserName();
@@ -75,37 +110,13 @@ public class LoginActivity extends BaseActivity
         {
             Log.e(TAG, e.getMessage());
         }
-        //绑定加入QQ群文字点击事件
-        JoinQQGroup.setOnClickListener((v) ->
-        {
-            joinQQGroup();
-        });
-
-        //跳过登陆按钮点击之后 跳过登陆
-
-        tvLoginPass.setOnClickListener(v ->
-        {
-            //直接进入主界面
-            IsLoginIN = false;
-            Toast.makeText(getApplicationContext(), "跳过登录 功能受限~", Toast.LENGTH_SHORT).show();
-            Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(StartMain);
-        });
-
-        //长按进入管理
-        tvLoginPass.setOnLongClickListener(v ->
-        {
-            IsLoginIN = false;
-            Intent StartMain = new Intent(LoginActivity.this, AdminActivity.class);
-            startActivity(StartMain);
-            return true;
-        });
+        //endregion
 
         //获取权限
         getPersimmions();
 
 
-        //向百度统计发送数据
+        //region 向百度统计发送数据
         try
         {
             StatService.setOn(this, 0);
@@ -114,9 +125,10 @@ public class LoginActivity extends BaseActivity
         {
             e.printStackTrace();
         }
+        //endregion
 
 
-        //实现通知点击的自动登录
+        // region 实现通知点击的自动登录(解析Intent)
         try
         {
             boolean isautologin = getIntent().getBooleanExtra("IsAutoLogin", false);
@@ -132,16 +144,12 @@ public class LoginActivity extends BaseActivity
             Log.e(TAG, "AutoStart:" + e.toString());
         }
 
-    }
+        //endregion
 
-    //在服务绑定之后检查更新
-    @Override
-    protected void onServiceBinded()
-    {
-        super.onServiceBinded();
         CheckUpdate();
         WebPreheat();
     }
+
 
     //简单的登陆效果
     public void ButtonLogin_Click(View v)
@@ -161,82 +169,62 @@ public class LoginActivity extends BaseActivity
             LoadingDialog.LoadingHide();
             return;
         }
-
-        //如果是合法用户才予以登陆
-        if (CheckPermission(Username.getText().toString()))
+        //移动端登录
+        USERNAME = Username.getText().toString();
+        PASSWORD = Password.getText().toString();
+        try
         {
-            //获取用户信息回调接口 如果处于冻结状态的话...
-            onTaskResultReturn UserInfoResult = new onTaskResultReturn()
+            RequestLogin.SendLoginRequest(USERNAME, PASSWORD, new Observer<JsonModel_Login>()
             {
                 @Override
-                public void OnTaskSucceed(Object... data)
+                public void onSubscribe(Disposable d)
                 {
-                    try
-                    {
-                        JsonModel_User userdata = JsonHelp.GetUserInfo((String) data[0]);
-
-                    } catch (Exception e)
-                    {
-                        Log.e("LoginActivity", e.toString());
-                    }
-                }
-
-                @Override
-                public void OnTaskFailed(Object... data)
-                {
-
-                }
-            };
-            //创建[移动端登录]回调处理接口
-            onTaskResultReturn Result = new onTaskResultReturn()
-            {
-                @Override
-                public void OnTaskSucceed(Object... data)
-                {
-                    try
-                    {
-                        mbinder.GetUserInfo(UserInfoResult);
-                        Toast.makeText(getApplicationContext(), "登录成功~", Toast.LENGTH_SHORT).show();
-                        Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(StartMain);
-                        IsLoginIN = true;
-                        //隐藏小菊花
-                        LoadingDialog.LoadingHide();
-                    } catch (Exception e)
-                    {
-                        Log.e("LoginActivity", e.getMessage());
-                    }
 
                 }
 
                 @Override
-                public void OnTaskFailed(Object... data)
+                public void onNext(JsonModel_Login jsonModel_login)
                 {
-                    Toast.makeText(getApplicationContext(), "登录失败,看看是不是输错密码啥的..", Toast.LENGTH_SHORT).show();
+                    ToastUtils.ShowLongToast("登陆成功");
+
+                    //检查是否保存密码 是则保存到那啥里面
+                    if (IsSavePassword.isChecked())
+                    {
+                        AppSetting.SetUserName(USERNAME);
+                        AppSetting.SetPassWord(PASSWORD);
+                        Log.e(TAG, "onNext: 用户名密码保存成功");
+                    } else
+                        AppSetting.ClearUserInfo();
+
                     LoadingDialog.LoadingHide();
                 }
-            };
 
-            //移动端登录
-            USERNAME = Username.getText().toString();
-            PASSWORD = Password.getText().toString();
+                @Override
+                public void onError(Throwable e)
+                {
 
-            mbinder.login(USERNAME, PASSWORD, Result);
+                }
 
+                @Override
+                public void onComplete()
+                {
 
-            //检查是否保存密码 是则保存到那啥里面
-            if (IsSavePassword.isChecked())
-            {
-                AppSetting.UserAndPwdEditor.putString("Username", Username.getText().toString());
-                AppSetting.UserAndPwdEditor.putString("Password", Password.getText().toString());
-            } else
-                AppSetting.UserAndPwdEditor.clear();
-
-            AppSetting.UserAndPwdEditor.apply();
-        } else
+                }
+            });
+        }
+        catch (LoginCRTPermissionException e1)
         {
-            Toast.makeText(LoginActivity.this, "抱歉,网络错误或者您未被授权", Toast.LENGTH_LONG).show();
+            ToastUtils.ShowShortToast("权限错误");
             LoadingDialog.LoadingHide();
+        }
+        catch (LoginException e2)
+        {
+            ToastUtils.ShowShortToast("登录失败");
+            LoadingDialog.LoadingHide();
+        }
+        catch (Exception e3)
+        {
+            Log.e(TAG, "ButtonLogin_Click: "+e3.toString());
         }
 
     }
@@ -245,26 +233,6 @@ public class LoginActivity extends BaseActivity
 
     boolean Ispermit;
 
-    //检查登陆权限
-    public boolean CheckPermission(String Username)
-    {
-
-        Thread checkThread = new Thread(
-                () ->
-                {
-                    Ispermit = mbinder.CheckPermissionTxT(Username);
-                });
-        try
-        {
-            checkThread.start();
-            checkThread.join();
-            return Ispermit;
-        } catch (Exception e)
-        {
-            Log.e("LoginActivity_check", e.getMessage());
-            return false;
-        }
-    }
 
     //region 检查更新
     public void CheckUpdate()
@@ -305,46 +273,41 @@ public class LoginActivity extends BaseActivity
     //和服务器的预热以及news获取,以及获取吱口令
     public void WebPreheat()
     {
-        mbinder.ASPNETpreheat(new onTaskResultReturn()
-        {
-            @Override
-            public void OnTaskSucceed(Object... data)
-            {
-                try
-                {
-                    String news = data[0].toString();
-                    news = news.replace("\"", "");
-                    String isnews = news.split("-")[0];
-                    String msg = news.split("-")[1];
-                    if (isnews.equals("true"))
-                    {
-                        AlertDialog tmp = new AlertDialog.Builder(LoginActivity.this)
-                                .setTitle("News")
-                                .setMessage(msg)
-                                .create();
-                        tmp.show();
-                    }
-                } catch (Exception e)
-                {
-                    Log.e(TAG, "ASPNETpreheat:", e.getCause());
-                }
-            }
+//        mbinder.ASPNETpreheat(new onTaskResultReturn()
+//        {
+//            @Override
+//            public void OnTaskSucceed(Object... data)
+//            {
+//                try
+//                {
+//                    String news = data[0].toString();
+//                    news = news.replace("\"", "");
+//                    String isnews = news.split("-")[0];
+//                    String msg = news.split("-")[1];
+//                    if (isnews.equals("true"))
+//                    {
+//                        AlertDialog tmp = new AlertDialog.Builder(LoginActivity.this)
+//                                .setTitle("News")
+//                                .setMessage(msg)
+//                                .create();
+//                        tmp.show();
+//                    }
+//                } catch (Exception e)
+//                {
+//                    Log.e(TAG, "ASPNETpreheat:", e.getCause());
+//                }
+//            }
+//
+//            @Override
+//            public void OnTaskFailed(Object... data)
+//            {
+//
+//            }
+//        });
 
-            @Override
-            public void OnTaskFailed(Object... data)
-            {
-
-            }
-        });
-
-        Thread t1 = new Thread(() ->
-        {
-            AlipayDialog.Zhicodestr = mbinder.GetZhicode();
-        });
-        t1.start();
     }
 
-    //region 安卓6.0动态检查权限 顺便检查以下通知有没有打开
+    //region 安卓6.0动态检查权限 顺便检查一下通知有没有打开
     @TargetApi(23)
     private void getPersimmions()
     {
@@ -375,7 +338,7 @@ public class LoginActivity extends BaseActivity
                 {
                     AlertDialog tmp = new AlertDialog.Builder(LoginActivity.this)
                             .setTitle("提示！")
-                            .setMessage("发现你没有打开本应用的通知诶,这样的话在预约第二天座位的时候陈大概率导致失败并且就算成功也没有反馈\n而且不打开的话这个对话框每次都会来烦你")
+                            .setMessage("发现你没有打开本应用的通知诶,这样的话在预约第二天座位的时候会大概率导致失败 并且就算成功也没有反馈\n而且不打开的话这个对话框每次都会来烦你~")
                             .setPositiveButton("前往开启", jump2NoticeOpen)
                             .create();
                     tmp.show();
@@ -416,6 +379,9 @@ public class LoginActivity extends BaseActivity
         }
     }
 
+    /**
+     * 跳转到开启通知的界面
+     */
     AlertDialog.OnClickListener jump2NoticeOpen = (dialog, p) ->
     {
         Intent localIntent = new Intent();

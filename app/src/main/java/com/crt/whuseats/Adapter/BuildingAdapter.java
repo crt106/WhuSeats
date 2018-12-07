@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.ApplicationV;
 import com.crt.whuseats.JsonModels.JsonModel_Fliters;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class BuildingAdapter extends ArrayAdapter<JsonModel_Fliters.buildings>
     public BuildingAdapter(List<JsonModel_Fliters.buildings> objects)
     {
         //这个布局是安卓自带的一个布局 里面只有一个textview;
-        super(BaseActivity.ApplicationContext,android.R.layout.simple_list_item_1,objects);
+        super(ApplicationV.ApplicationContext,android.R.layout.simple_list_item_1,objects);
         buildingsList=objects;
     }
 

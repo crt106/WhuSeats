@@ -21,14 +21,14 @@ public class ReservationChangeReciver extends BroadcastReceiver
         //如果当前没有预约
         if(intentinfo.equals("None"))
         {
-            NetService.LIB_SEATSSTATUS="None";
+//            NetService.LIB_SEATSSTATUS="None";
             //Toast.makeText(BaseActivity.ApplicationContext, "当前预约为空", Toast.LENGTH_SHORT).show();
         }
 
         //如果当前已有成功的预约
         if(intentinfo.equals("success"))
         {
-            NetService.LIB_SEATSSTATUS="success";
+//            NetService.LIB_SEATSSTATUS="success";
         }
 
     }

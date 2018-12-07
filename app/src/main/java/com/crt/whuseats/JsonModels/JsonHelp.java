@@ -18,7 +18,7 @@ public class JsonHelp
      * 获取如下GET请求返回的JSon对象
      * GET http://seat.lib.whu.edu.cn/rest/auth?username={0}&password={1} HTTP/1.1
      */
-    public static JsonModel_Login GetLogin(String JsonStr)
+    public static JsonModel_Login GetLogin(String JsonStr) throws Exception
     {
         return new JsonModel_Login(JsonStr);
     }
@@ -27,7 +27,7 @@ public class JsonHelp
      * 获取如下GET请求返回的JSon对象
      * GET http://seat.lib.whu.edu.cn/rest/v2/user/reservations?token=8ZXSSXN3CC05154011 HTTP/1.1
      */
-    public static JsonModel_Reservations GetReservation(String JsonStr)
+    public static JsonModel_Reservations GetReservation(String JsonStr) throws Exception
     {
         return new JsonModel_Reservations(JsonStr);
     }
@@ -35,7 +35,7 @@ public class JsonHelp
     /**
      * 获取预约操作完成后返回的结果
      */
-    public static JsonModel_BookReturn GetBookReturn(String JsonStr)
+    public static JsonModel_BookReturn GetBookReturn(String JsonStr) throws Exception
     {
         return new JsonModel_BookReturn(JsonStr);
     }
@@ -66,7 +66,7 @@ public class JsonHelp
     /**
      * 获取预约历史的列表
      */
-    public static JsonModel_HistoryList GetHistoryList(String JsonStr)
+    public static JsonModel_HistoryList GetHistoryList(String JsonStr) throws Exception
     {
         return new JsonModel_HistoryList(JsonStr);
     }
@@ -107,7 +107,7 @@ public class JsonHelp
      * 获取如下GET请求返回的JSon对象
      * GET http://seat.lib.whu.edu.cn/rest/v2/free/filters?token=8ZXSSXN3CC05154011 HTTP/1.1
      */
-    public static JsonModel_Fliters GetFliters(String JsonStr)
+    public static JsonModel_Fliters GetFliters(String JsonStr) throws Exception
     {
         return new JsonModel_Fliters(JsonStr);
     }
@@ -116,7 +116,7 @@ public class JsonHelp
      * 检查图书馆某个特定的馆的布局
      * http://seat.lib.whu.edu.cn/rest/v2/room/stats2/1?token=
      */
-    public static JsonModel_HouseStats GetHouseStats(String JsonStr)
+    public static JsonModel_HouseStats GetHouseStats(String JsonStr) throws Exception
     {
         return new JsonModel_HouseStats(JsonStr);
     }
@@ -125,7 +125,7 @@ public class JsonHelp
      * 检查具体房间情况
      * http://seat.lib.whu.edu.cn/rest/v2/room/layoutByDate/14/2018-05-15?token=
      */
-    public static JsonModel_RoomLayout GetRoomLayout(String JsonStr)
+    public static JsonModel_RoomLayout GetRoomLayout(String JsonStr) throws Exception
     {
         return new JsonModel_RoomLayout(JsonStr);
     }
@@ -134,7 +134,7 @@ public class JsonHelp
     /**
      * 获取座位的开始或结束时间
      */
-    public static JsonModel_SeatTime GetSeatStartTime(String JsonStr)
+    public static JsonModel_SeatTime GetSeatStartTime(String JsonStr) throws Exception
     {
         return new JsonModel_SeatTime(JsonStr);
     }
@@ -153,7 +153,7 @@ public class JsonHelp
     /**
      * 解析移动端座位筛选结果
      */
-    public static JsonModel_MobileFiltrate GetMFiltrateSeats(String JsonStr)
+    public static JsonModel_MobileFiltrate GetMFiltrateSeats(String JsonStr) throws Exception
     {
         return new JsonModel_MobileFiltrate(JsonStr);
     }
@@ -163,7 +163,7 @@ public class JsonHelp
      * @param JsonStr
      * @return
      */
-    public static JsonModel_User GetUserInfo(String JsonStr)
+    public static JsonModel_User GetUserInfo(String JsonStr) throws Exception
     {
         return new JsonModel_User(JsonStr);
     }
@@ -186,7 +186,7 @@ public class JsonHelp
      * 获取公告
      * @return 直接返回公告内容组成的字符串
      */
-    public static String Getannounce(String JsonInfo)
+    public static String Getannounce(String JsonInfo) throws Exception
     {
         JsonModel_Base temp = new JsonModel_Base(JsonInfo);
         JSONObject dataobj = (JSONObject) temp.data;
@@ -206,7 +206,7 @@ public class JsonHelp
      * @param Jsonstr
      * @return
      */
-    public static JsonModel_Tomorrow GetTomorrowInfo(String Jsonstr)
+    public static JsonModel_Tomorrow GetTomorrowInfo(String Jsonstr) throws Exception
     {
         return new JsonModel_Tomorrow(Jsonstr);
     }

@@ -14,8 +14,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
+import com.crt.whuseats.ApplicationV;
 import com.crt.whuseats.Broadcast.ReservationChangeReciver;
 import com.crt.whuseats.Service.NetService;
 import com.crt.whuseats.Utils.Flavors;
@@ -69,6 +71,7 @@ public class BaseActivity extends AppCompatActivity
         //解除广播注册
         localBroadcastManager.unregisterReceiver(localreceiver);
     }
+
 
     //endregion
 }

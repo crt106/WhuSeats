@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.ApplicationV;
 import com.crt.whuseats.R;
 
 import org.jsoup.Connection;
@@ -51,7 +52,7 @@ public class UpdateDialog extends Dialog
     {
 
         //获取控件
-        nowVersion.setText(String.format("当前版本:V%s(%d)",BaseActivity.VERSIONNAME, BaseActivity.VERSIONCODE));
+        nowVersion.setText(String.format("当前版本:V%s(%d)",ApplicationV.VERSIONNAME, ApplicationV.VERSIONCODE));
         //region 初始化Webview
         UpdateInfo.setWebViewClient(new WebViewClient()
         {

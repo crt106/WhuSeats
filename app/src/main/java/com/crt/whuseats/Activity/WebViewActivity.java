@@ -38,11 +38,11 @@ public class WebViewActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         //region 控件获取
-        wb=(WebView) findViewById(R.id.webview);
-        pb=(ProgressBar)findViewById(R.id.wb_progressBar);
+        wb = (WebView) findViewById(R.id.webview);
+        pb = (ProgressBar) findViewById(R.id.wb_progressBar);
         //endregion
         //获取Intent提供的Uri
-        String uri=getIntent().getStringExtra("Uri");
+        String uri = getIntent().getStringExtra("Uri");
 
         //region 初始化Webview
         wb.setWebViewClient(new WebViewClient()
@@ -67,7 +67,7 @@ public class WebViewActivity extends BaseActivity
             @Override
             public void onProgressChanged(WebView view, int newProgress)
             {
-                if(newProgress==100)
+                if (newProgress == 100)
                     pb.setVisibility(View.GONE);
                 else
                 {
@@ -76,13 +76,13 @@ public class WebViewActivity extends BaseActivity
                 }
             }
         });
-        WebSettings wbsetting=wb.getSettings();
+        WebSettings wbsetting = wb.getSettings();
         wbsetting.setJavaScriptEnabled(true);
         wbsetting.setDomStorageEnabled(true);
 
         //这里在api21以下跳过
-        if(Build.VERSION.SDK_INT>21)
-        wbsetting.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        if (Build.VERSION.SDK_INT > 21)
+            wbsetting.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
         wbsetting.setCacheMode(WebSettings.LOAD_DEFAULT);
         wb.clearCache(true);
@@ -111,12 +111,12 @@ public class WebViewActivity extends BaseActivity
         {
             try
             {
-                Class<?> ac=Class.forName("com.crt.whuseats.Activity."+name);
-                Intent i=new Intent(WebViewActivity.this,ac);
+                Class<?> ac = Class.forName("com.crt.whuseats.Activity." + name);
+                Intent i = new Intent(WebViewActivity.this, ac);
                 startActivity(i);
             } catch (ClassNotFoundException e)
             {
-                Log.e(TAG, "jump2Activity:"+e.getMessage() );
+                Log.e(TAG, "jump2Activity:" + e.getMessage());
             }
         }
 
@@ -135,14 +135,14 @@ public class WebViewActivity extends BaseActivity
         {
             try
             {
-                Intent webIntent=new Intent("android.intent.action.VIEW");
-                Uri euri=Uri.parse(uri);
+                Intent webIntent = new Intent("android.intent.action.VIEW");
+                Uri euri = Uri.parse(uri);
                 webIntent.setData(euri);
                 startActivity(webIntent);
             } catch (Exception e)
             {
-                Log.e(TAG, "CallBrowser:"+e.getMessage());
-                Toast.makeText(WebViewActivity.this, "啊嘞 遇到什么错误了呢",Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "CallBrowser:" + e.getMessage());
+                Toast.makeText(WebViewActivity.this, "啊嘞 遇到什么错误了呢", Toast.LENGTH_SHORT).show();
             }
         }
     }

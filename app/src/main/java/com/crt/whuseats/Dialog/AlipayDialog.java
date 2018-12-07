@@ -16,9 +16,11 @@ import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.ApplicationV;
 import com.crt.whuseats.R;
 import com.crt.whuseats.Utils.TimeHelp;
 
+@Deprecated
 public class AlipayDialog extends AlertDialog
 {
     //控件们
@@ -69,7 +71,7 @@ public class AlipayDialog extends AlertDialog
                 Dialogcontext.startActivity(intent);
 
                 //保存本地信息 指示今天已经点击过红包
-                BaseActivity.AppSetting.UserAndPwdEditor.putBoolean("Alipay_"+ TimeHelp.GetTodayStr(), true).apply();
+//                ApplicationV.AppSetting.UserAndPwdEditor.putBoolean("Alipay_"+ TimeHelp.GetTodayStr(), true).apply();
                 this.dismiss();
             } catch (Exception e)
             {

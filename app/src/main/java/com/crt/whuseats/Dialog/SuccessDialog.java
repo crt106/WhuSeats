@@ -50,17 +50,6 @@ public class SuccessDialog extends Dialog
         buttonOK.setOnClickListener((v)->
         {
 
-            //如果是预约成功状态 则判断要不要弹出吱口令窗口
-            if(tv_successTitle.getText().equals(Dialogcontext.getString(R.string.dialog_title)))
-            {
-               boolean isshown=BaseActivity.AppSetting.UserAndPwd.getBoolean("Alipay_"+ TimeHelp.GetTodayStr(), false);
-               //展示支付宝对话框
-               if(!isshown)
-               {
-                   AlipayDialog alipayDialog=new AlipayDialog(Dialogcontext);
-                   alipayDialog.show();
-               }
-            }
             this.dismiss();
         });
     }

@@ -13,6 +13,7 @@ import com.baidu.autoupdatesdk.BDAutoUpdateSDK;
 import com.baidu.autoupdatesdk.UICheckUpdateCallback;
 import com.crt.whuseats.Activity.BaseActivity;
 import com.crt.whuseats.Activity.WebViewActivity;
+import com.crt.whuseats.ApplicationV;
 import com.crt.whuseats.Dialog.CustomProgressDialog;
 import com.crt.whuseats.Dialog.UpdateDialog;
 import com.crt.whuseats.Interface.onProgressReturn;
@@ -21,7 +22,13 @@ import com.crt.whuseats.Service.NetService;
 
 import java.io.File;
 
-//下载更新的帮助类 和
+import static com.crt.whuseats.Utils.Flavors.BaiduMarket;
+import static com.crt.whuseats.Utils.Flavors.crt;
+
+/**
+ * 下载更新辅助类
+ * Updated at v1.0 by crt
+ */
 public class UpdateHelp
 {
     BaseActivity ActivityConnect;                //与主活动的连接
@@ -92,7 +99,8 @@ public class UpdateHelp
         downloadDialog.setMessage("不要催了不要催了..服务器小水管");
 
         //开始执行下载
-        ActivityConnect.mbinder.DownLoadUpdateByHttp(downloadTaskReturn,downloadProgress);
+//        ActivityConnect.mbinder.DownLoadUpdateByHttp(downloadTaskReturn,downloadProgress);
+        Toast.makeText(ApplicationV.ApplicationContext,"模拟下载" ,Toast.LENGTH_SHORT).show();
     };
 
     //百度UI更新接口
@@ -117,57 +125,58 @@ public class UpdateHelp
     //endregion
 
     /**
-     *
+     * 检查更新方法
      * 是否忽略非强制更新 即非强制更新没有必要弹出更新对话框
      */
     public boolean CheckUpdate()
     {
-        try
-        {
-            switch (BaseActivity.appFlavors)
-            {
-                case crt:
-                    //本地渠道更新
-                    Thread t=new Thread(()->{IsneedUpdate=ActivityConnect.mbinder.CheckUpdate_IsShowDialog(false);});
-                    t.start();
-                    t.join();
-
-                    //如果忽略掉非强制更新
-                    if(IgnoreUnforce)
-                    {
-                        if(IsneedUpdate&&NetService.ISFORCEUPDATE)
-                        {
-                            //显示确定对话框
-                            ConfimDialog=new UpdateDialog(ActivityConnect, NetService.ISFORCEUPDATE);
-                            ConfimDialog.show();
-                            ConfimDialog.setButtonOKListenner(ConfimDialog_OK);
-                            return true;
-                        }
-                        return false;
-                    }
-                    else if(IsneedUpdate)
-                    {
-                        //显示确定对话框
-                        ConfimDialog=new UpdateDialog(ActivityConnect, NetService.ISFORCEUPDATE);
-                        ConfimDialog.show();
-                        ConfimDialog.setButtonOKListenner(ConfimDialog_OK);
-                        return true;
-                    }
-                    return false;
-
-
-                case BaiduMarket:
-                    //百度渠道更新
-                    BDAutoUpdateSDK.uiUpdateAction(ActivityConnect, uiCheckUpdateCallback, false);
-                    break;
-            }
-        }
-        catch (Exception e)
-        {
-            Log.e("Checkupdate", e.toString());
-            return false;
-        }
-        return true;
+//        try
+//        {
+//            switch (ApplicationV.appFlavors)
+//            {
+//                case crt:
+//                    //本地渠道更新
+//                    Thread t=new Thread(()->{IsneedUpdate=ActivityConnect.mbinder.CheckUpdate_IsShowDialog(false);});
+//                    t.start();
+//                    t.join();
+//
+//                    //如果忽略掉非强制更新
+//                    if(IgnoreUnforce)
+//                    {
+//                        if(IsneedUpdate&&NetService.ISFORCEUPDATE)
+//                        {
+//                            //显示确定对话框
+//                            ConfimDialog=new UpdateDialog(ActivityConnect, NetService.ISFORCEUPDATE);
+//                            ConfimDialog.show();
+//                            ConfimDialog.setButtonOKListenner(ConfimDialog_OK);
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                    else if(IsneedUpdate)
+//                    {
+//                        //显示确定对话框
+//                        ConfimDialog=new UpdateDialog(ActivityConnect, NetService.ISFORCEUPDATE);
+//                        ConfimDialog.show();
+//                        ConfimDialog.setButtonOKListenner(ConfimDialog_OK);
+//                        return true;
+//                    }
+//                    return false;
+//
+//
+//                case BaiduMarket:
+//                    //百度渠道更新
+//                    BDAutoUpdateSDK.uiUpdateAction(ActivityConnect, uiCheckUpdateCallback, false);
+//                    break;
+//            }
+//        }
+//        catch (Exception e)
+//        {
+//            Log.e("Checkupdate", e.toString());
+//            return false;
+//        }
+//        return true;
+        return false;
     }
 
     //调用系统程序安装apk
@@ -183,7 +192,7 @@ public class UpdateHelp
         else
         {
             //兼容android7.0 使用共享文件的形式
-            fileUri= FileProvider.getUriForFile(BaseActivity.ApplicationContext,BaseActivity.PACKAGENAME,f);
+            fileUri= FileProvider.getUriForFile(ApplicationV.ApplicationContext,ApplicationV.PACKAGENAME,f);
             installapk.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             installapk.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }

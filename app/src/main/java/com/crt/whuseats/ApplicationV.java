@@ -54,6 +54,7 @@ public class ApplicationV extends Application
     //region 用户信息
 
     public static JsonModel_User UserInfo;                 //用户信息
+    public static boolean IsLoginIN = true;                 //判断用户是否已登录进入
 
     //endregion
 

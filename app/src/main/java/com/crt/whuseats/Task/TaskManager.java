@@ -4,6 +4,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crt.whuseats.Activity.BaseActivity;
+import com.crt.whuseats.Utils.ToastUtils;
 
 import java.util.HashMap;
 
@@ -40,7 +41,7 @@ public class TaskManager
             task.cancel(true);
             taskHashMap.remove(Taskname);
             Log.e("TaskManager", "成功取消Task:"+Taskname+"\n");
-            Toast.makeText(BaseActivity.ApplicationContext, "成功取消Task:"+Taskname, Toast.LENGTH_SHORT).show();
+            ToastUtils.ShowShortToast("成功取消Task:"+Taskname);
         }
         catch (Exception e)
         {

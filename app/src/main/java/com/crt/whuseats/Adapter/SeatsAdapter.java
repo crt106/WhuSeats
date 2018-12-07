@@ -42,7 +42,7 @@ public class SeatsAdapter extends ArrayAdapter<seat>
             try
             {
                 //如果是
-                if(SeatsActivity.tomoinfolist.contains(thisseat.seatid))
+//                if(SeatsActivity.tomoinfolist.contains(thisseat.seatid))
                 {
                     view.findViewById(R.id.ll_seat_bg).setBackgroundResource(R.drawable.seat_02);
                 }

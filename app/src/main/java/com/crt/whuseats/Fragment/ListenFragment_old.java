@@ -1,40 +1,7 @@
 package com.crt.whuseats.Fragment;
 
 
-import android.app.AlertDialog;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.Spinner;
-import android.widget.Toast;
-
-import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Adapter.BuildingAdapter;
-import com.crt.whuseats.Adapter.RoomAdapter;
-import com.crt.whuseats.Dialog.ChooseTimeDialog;
-import com.crt.whuseats.Dialog.CustomProgressDialog;
-import com.crt.whuseats.Dialog.SuccessDialog;
-import com.crt.whuseats.Interface.onProgressReturn;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
-import com.crt.whuseats.JsonModels.JsonModel_Fliters;
-import com.crt.whuseats.JsonModels.JsonModel_HouseStats;
-import com.crt.whuseats.JsonModels.JsonModel_MobileFiltrate;
-import com.crt.whuseats.R;
-import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.Utils.TimeHelp;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * 旧的监听界面碎片
@@ -46,7 +13,7 @@ public class ListenFragment_old extends Fragment
 
 //    //与Activity的连接
 //
-//    public MainActivity ActivityConnect;
+//    public HomeActivity ActivityConnect;
 //    //region 控件
 //    Spinner buildingSpinner;
 //    Spinner DateSpinner;
@@ -84,7 +51,7 @@ public class ListenFragment_old extends Fragment
 //    @Override
 //    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 //    {
-//        ActivityConnect=(MainActivity)getActivity();
+//        ActivityConnect=(HomeActivity)getActivity();
 //        return inflater.inflate(R.layout.frag_rooms, container,false);
 //    }
 //

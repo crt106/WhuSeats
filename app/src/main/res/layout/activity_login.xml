@@ -4,47 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     android:theme="@style/MaterialNoActionBar">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/center"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="55dp"
         android:layout_marginLeft="20.0dip"
         android:layout_marginRight="20.0dip"
-        android:layout_marginBottom="40.0dip"
         android:orientation="horizontal">
 
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                app:srcCompat="@mipmap/ic_launcher_new" />
-
-        </LinearLayout>
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:srcCompat="@mipmap/ic_launcher_new" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/center"
+        android:id="@+id/ll_logincenter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="40.0dip"
-        android:layout_marginRight="40.0dip"
+        android:layout_marginTop="175dp"
+        android:layout_marginLeft="30.0dp"
+        android:layout_marginRight="30.0dp"
         android:orientation="vertical">
 
         <android.support.design.widget.TextInputLayout
-
+            android:id="@+id/til_userName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:errorEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:hintEnabled="true">
 
 
             <EditText
@@ -59,8 +54,13 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/til_password"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:errorEnabled="true"
+            app:hintAnimationEnabled="true"
+            app:hintEnabled="true"
+            app:passwordToggleEnabled="true">
 
             <EditText
                 android:id="@+id/et_password"
@@ -88,22 +88,38 @@
                 android:layout_weight="1.0"
                 android:orientation="horizontal">
 
-                <CheckBox
-                    android:id="@+id/if_remember_password"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="4"
-                    android:checked="true"
-                    android:text="@string/remember_password"
-                    android:textColor="@android:color/background_light" />
+                    android:orientation="vertical"
+                    android:layout_weight="4">
+
+                    <CheckBox
+                        android:id="@+id/if_remember_password"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/remember_password"
+                        android:textColor="@color/md_indigo_900" />
+
+                    <CheckBox
+                        android:id="@+id/if_auto_login"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:text="@string/is_auto_login"
+                        android:textColor="@color/md_indigo_900" />
+                </LinearLayout>
+
 
                 <TextView
                     android:id="@+id/tv_JoinQQGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:layout_gravity="center"
                     android:text="@string/JoinQQGroup"
-                    android:textColor="@android:color/holo_orange_light"
+                    android:textColor="@color/md_yellow_900"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -120,12 +136,13 @@
             <Button
                 android:id="@+id/Buttonlogin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1.0"
-                android:shadowColor="@color/black"
+                android:background="@color/md_blue_500"
                 android:onClick="ButtonLogin_Click"
+                android:shadowColor="@color/md_black_1000"
                 android:text="@string/btn_login"
-                android:textColor="@color/white"
+                android:textColor="@color/md_white_1000"
                 android:textSize="16.0sp"
                 android:textStyle="bold" />
 
@@ -133,34 +150,12 @@
                 android:id="@+id/tv_login_pass"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/loginpass"
-                android:textAlignment="viewEnd" />
+                android:textAlignment="viewEnd"
+                android:textColor="@color/md_blue_900" />
         </LinearLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15.0dip"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/copyRight"-->
-        <!--android:textColor="@color/gray_font"-->
-        <!--android:textSize="12.0sp" />-->
-
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/en_copyRight"-->
-        <!--android:textColor="@color/gray_font"-->
-        <!--android:textSize="10.0sp" />-->
     </LinearLayout>
 
 </RelativeLayout>

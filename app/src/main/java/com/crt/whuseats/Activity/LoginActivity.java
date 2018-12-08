@@ -1,6 +1,8 @@
 package com.crt.whuseats.Activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -9,22 +11,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.ApplicationV;
-import com.crt.whuseats.Dialog.AlipayDialog;
 import com.crt.whuseats.Dialog.LoadingDialog;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
 import com.crt.whuseats.JsonModels.JsonModel_Login;
-import com.crt.whuseats.JsonModels.JsonModel_User;
 import com.crt.whuseats.Net.Login.LoginCRTPermissionException;
 import com.crt.whuseats.Net.Login.LoginException;
 import com.crt.whuseats.Net.Login.RequestLogin;
@@ -37,7 +38,10 @@ import static com.crt.whuseats.ApplicationV.*;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
-
+/**
+ * 登录界面
+ * Update at v1.0 crt 2018-12-8
+ */
 public class LoginActivity extends BaseActivity
 {
     private static final String TAG = "LoginActivity";
@@ -47,6 +51,13 @@ public class LoginActivity extends BaseActivity
     public EditText Username;
     public EditText Password;
     public CheckBox IsSavePassword;
+    private CheckBox ifAutoLogin;
+    private TextInputLayout tilUserName;
+    private TextInputLayout tilPassword;
+    private LinearLayout llLogincenter;
+
+
+
 
     public TextView JoinQQGroup;
     private TextView tvLoginPass;
@@ -69,35 +80,40 @@ public class LoginActivity extends BaseActivity
         Username = (EditText) findViewById(R.id.et_userName);
         Password = (EditText) findViewById(R.id.et_password);
         IsSavePassword = (CheckBox) findViewById(R.id.if_remember_password);
+        ifAutoLogin = (CheckBox) findViewById(R.id.if_auto_login);
         JoinQQGroup = (TextView) findViewById(R.id.tv_JoinQQGroup);
         tvLoginPass = (TextView) findViewById(R.id.tv_login_pass);
+        tilUserName = (TextInputLayout) findViewById(R.id.til_userName);
+        tilPassword = (TextInputLayout) findViewById(R.id.til_password);
+        llLogincenter = (LinearLayout) findViewById(R.id.ll_logincenter);
 
         //跳过登陆按钮点击之后 跳过登陆
-        tvLoginPass.setOnClickListener(v ->
-        {
-            //直接进入主界面
-            IsLoginIN = false;
-            Toast.makeText(getApplicationContext(), "跳过登录 功能受限~", Toast.LENGTH_SHORT).show();
-            Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(StartMain);
-        });
+        tvLoginPass.setOnClickListener(LoginPassClick);
 
         //长按跳过登录按钮进入管理
-        tvLoginPass.setOnLongClickListener(v ->
-        {
-            IsLoginIN = false;
-            Intent StartMain = new Intent(LoginActivity.this, AdminActivity.class);
-            startActivity(StartMain);
-            return true;
-        });
+        tvLoginPass.setOnLongClickListener(LoginPassLongClick);
 
         //绑定加入QQ群文字点击事件
-        JoinQQGroup.setOnClickListener((v) ->
-        {
-            joinQQGroup();
-        });
+        JoinQQGroup.setOnClickListener((v) ->joinQQGroup());
+
+        //自动登录开关事件
+        ifAutoLogin.setOnCheckedChangeListener(AutoLoginSwitch);
 
         //endregion
+
+        //region 向百度统计发送数据
+        try
+        {
+            StatService.setOn(this, 0);
+            StatService.start(this);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        //endregion
+
+        //获取权限
+        getPersimmions();
 
         //region 读取已经保存的用户名和密码
         try
@@ -112,46 +128,83 @@ public class LoginActivity extends BaseActivity
         }
         //endregion
 
-        //获取权限
-        getPersimmions();
-
-
-        //region 向百度统计发送数据
-        try
-        {
-            StatService.setOn(this, 0);
-            StatService.start(this);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        //endregion
-
-
-        // region 实现通知点击的自动登录(解析Intent)
-        try
-        {
-            boolean isautologin = getIntent().getBooleanExtra("IsAutoLogin", false);
-            if (isautologin)
-            {
-                //直接进入主界面
-                Intent StartMain = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(StartMain);
-                IsLoginIN = true;
-            }
-        } catch (Exception e)
-        {
-            Log.e(TAG, "AutoStart:" + e.toString());
-        }
-
-        //endregion
-
         CheckUpdate();
         WebPreheat();
+
+        //最后一步 是否自动登录
+        AutoLogin();
     }
 
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        PlayAnimation();
+    }
 
-    //简单的登陆效果
+    /**
+     * 登录请求的观察者
+     */
+    Observer<JsonModel_Login> LoginObserver=new Observer<JsonModel_Login>()
+    {
+        @Override
+        public void onSubscribe(Disposable d)
+        {
+
+        }
+
+        @Override
+        public void onNext(JsonModel_Login jsonModel_login)
+        {
+            ToastUtils.ShowLongToast("登陆成功");
+
+            //检查是否保存密码 是则保存到那啥里面
+            if (IsSavePassword.isChecked())
+            {
+                AppSetting.SetUserName(USERNAME);
+                AppSetting.SetPassWord(PASSWORD);
+                Log.e(TAG, "onNext: 用户名密码保存成功");
+            } else
+                AppSetting.ClearUserInfo();
+
+            LoadingDialog.LoadingHide();
+            IsLoginIN=true;
+
+            //启动主界面
+            Intent intent=new Intent(ApplicationV.ApplicationContext,HomeActivity.class);
+            startActivity(intent);
+            //将loginActivity从堆中移除
+            finish();
+        }
+
+        @Override
+        public void onError(Throwable e)
+        {
+            if(e instanceof LoginCRTPermissionException)
+            {
+                ToastUtils.ShowShortToast("权限错误");
+                return;
+            }
+            else if(e instanceof LoginException)
+            {
+                ToastUtils.ShowShortToast(e.getMessage());
+            }
+            else
+            {
+                ToastUtils.ShowShortToast("未处理的异常："+e.getMessage());
+            }
+            LoadingDialog.LoadingHide();
+        }
+
+        @Override
+        public void onComplete()
+        {
+
+        }
+    };
+
+
+    //简单的登录按钮按下效果
     public void ButtonLogin_Click(View v)
     {
         //显示小菊花
@@ -173,58 +226,18 @@ public class LoginActivity extends BaseActivity
         //移动端登录
         USERNAME = Username.getText().toString();
         PASSWORD = Password.getText().toString();
+
         try
         {
-            RequestLogin.SendLoginRequest(USERNAME, PASSWORD, new Observer<JsonModel_Login>()
-            {
-                @Override
-                public void onSubscribe(Disposable d)
-                {
+//            //发起登录请求
+//            RequestLogin.SendLoginRequest(USERNAME, PASSWORD, LoginObserver);
 
-                }
-
-                @Override
-                public void onNext(JsonModel_Login jsonModel_login)
-                {
-                    ToastUtils.ShowLongToast("登陆成功");
-
-                    //检查是否保存密码 是则保存到那啥里面
-                    if (IsSavePassword.isChecked())
-                    {
-                        AppSetting.SetUserName(USERNAME);
-                        AppSetting.SetPassWord(PASSWORD);
-                        Log.e(TAG, "onNext: 用户名密码保存成功");
-                    } else
-                        AppSetting.ClearUserInfo();
-
-                    LoadingDialog.LoadingHide();
-                }
-
-                @Override
-                public void onError(Throwable e)
-                {
-                    if(e instanceof LoginCRTPermissionException)
-                    {
-                        ToastUtils.ShowShortToast("权限错误");
-                        return;
-                    }
-                    else if(e instanceof LoginException)
-                    {
-                        ToastUtils.ShowShortToast(e.getMessage());
-                    }
-                    else
-                    {
-                        ToastUtils.ShowShortToast("未处理的异常："+e.getMessage());
-                    }
-                    LoadingDialog.LoadingHide();
-                }
-
-                @Override
-                public void onComplete()
-                {
-
-                }
-            });
+            ToastUtils.ShowLongToast("暂时不登录");
+            //启动主界面
+            Intent intent=new Intent(ApplicationV.ApplicationContext,HomeActivity.class);
+            startActivity(intent);
+            //将loginActivity从堆中移除
+            finish();
         }
         catch (Exception e3)
         {
@@ -232,11 +245,37 @@ public class LoginActivity extends BaseActivity
         }
 
     }
+
     //endregion
 
 
-    boolean Ispermit;
+    //region 按键点击事件
 
+    //[跳过登录]短按
+    View.OnClickListener LoginPassClick=(v)->{
+        //直接进入主界面
+        IsLoginIN = false;
+        Toast.makeText(getApplicationContext(), "跳过登录 功能受限~", Toast.LENGTH_SHORT).show();
+        Intent StartMain = new Intent(LoginActivity.this, HomeActivity.class);
+        startActivity(StartMain);
+    };
+
+    //[跳过登录]长按
+    View.OnLongClickListener LoginPassLongClick=(v)->
+    {
+        IsLoginIN = false;
+        Intent StartMain = new Intent(LoginActivity.this, AdminActivity.class);
+        startActivity(StartMain);
+        return true;
+    };
+
+    //[自动登录]开关切换事件
+    CompoundButton.OnCheckedChangeListener AutoLoginSwitch=(buttonView,isChecked)->{
+        AppSetting.SetIsAutoLogin(isChecked);
+    };
+
+
+    //endregion
 
     //region 检查更新
     public void CheckUpdate()
@@ -249,6 +288,28 @@ public class LoginActivity extends BaseActivity
     //endregion
 
 
+    //region 动画控制
+    private void PlayAnimation()
+    {
+        Animator animator=AnimatorInflater.loadAnimator(this,R.animator.aclogin_mainanim);
+        animator.setTarget(llLogincenter);
+        animator.start();
+    }
+    //endregion
+    /**
+     * 从两个角度判断是否需要自动登录
+     * 【用户选择自动登录】和【点击通知自动登录】
+     */
+    private void AutoLogin()
+    {
+        boolean IsuserAutoLogin=AppSetting.GetIsAutoLogin();
+        ifAutoLogin.setChecked(IsuserAutoLogin);
+        boolean IsNoticeAutoLogin=getIntent().getBooleanExtra("IsAutoLogin", false);
+        if(IsuserAutoLogin||IsNoticeAutoLogin)
+        {
+            ButtonLogin_Click(Username);
+        }
+    }
     /****************
      *
      * 发起添加群流程。群号：WhuSeats(789729207) 的 key 为： mo5gO56OIB_tQ1idGlZDAItUqbPPHHDL
@@ -257,7 +318,7 @@ public class LoginActivity extends BaseActivity
      * key 由官网生成的key
      * @return 返回true表示呼起手Q成功，返回false表示呼起失败
      ******************/
-    public boolean joinQQGroup()
+    private boolean joinQQGroup()
     {
         Intent intent = new Intent();
         intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + "mo5gO56OIB_tQ1idGlZDAItUqbPPHHDL"));
@@ -275,7 +336,7 @@ public class LoginActivity extends BaseActivity
     }
 
     //和服务器的预热以及news获取,以及获取吱口令
-    public void WebPreheat()
+    private void WebPreheat()
     {
 //        mbinder.ASPNETpreheat(new onTaskResultReturn()
 //        {
@@ -311,6 +372,7 @@ public class LoginActivity extends BaseActivity
 
     }
 
+
     //region 安卓6.0动态检查权限 顺便检查一下通知有没有打开
     @TargetApi(23)
     private void getPersimmions()
@@ -331,9 +393,7 @@ public class LoginActivity extends BaseActivity
                 requestPermissions(permissions.toArray(new String[permissions.size()]), ANDROID_M_PERMISSION);
             }
         }
-        //检查通知是否开启
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-        {
+
             try
             {
                 NotificationManagerCompat no = NotificationManagerCompat.from(LoginActivity.this);
@@ -351,7 +411,7 @@ public class LoginActivity extends BaseActivity
             {
                 Log.e(TAG, "getPersimmions: ", e.getCause());
             }
-        }
+
     }
 
     //获取权限回调函数

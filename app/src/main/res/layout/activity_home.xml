@@ -1,21 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/all_bg"
-    android:gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/home_content"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginBottom="15.0dip"
-        android:layout_marginLeft="15.0dip"
-        android:layout_marginRight="15.0dip"
-        android:layout_marginTop="5.0dip"
-        android:background="@drawable/context_bg"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="15.0dip" />
+
+    <com.ogaclejapan.smarttablayout.SmartTabLayout
+        android:id="@+id/achome_smartTL"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:fillViewport="true"
+        app:stl_defaultTabTextColor="@color/white"
+        app:stl_defaultTabTextHorizontalPadding="16dp"
+        app:stl_dividerColor="@color/transparent"
+        app:stl_dividerThickness="0dp"
+        app:stl_indicatorColor="#CC000000"
+        app:stl_indicatorCornerRadius="18dp"
+        app:stl_indicatorGravity="center"
+        app:stl_indicatorInterpolation="smart"
+        app:stl_indicatorThickness="32dp"
+        app:stl_distributeEvenly="true"
+        app:stl_underlineColor="@color/transparent"
+        app:stl_underlineThickness="0dp"
+        />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_achome"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/Nv_achome"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start" />
+
 </LinearLayout>
+
+

@@ -96,7 +96,7 @@
         <!--</provider>-->
 
         <activity
-            android:name="com.crt.whuseats.Activity.MainActivity"
+            android:name="com.crt.whuseats.Activity.HomeActivity"
             android:screenOrientation="portrait" />
 
         <!--广告SplashActivity-->
@@ -111,7 +111,9 @@
             <!--</intent-filter>-->
         </activity>
 
-        <activity android:name="com.crt.whuseats.Activity.LoginActivity">
+        <activity
+            android:name="com.crt.whuseats.Activity.LoginActivity"
+            android:theme="@style/MaterialNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

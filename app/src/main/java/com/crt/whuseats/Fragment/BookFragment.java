@@ -1,42 +1,15 @@
 package com.crt.whuseats.Fragment;
 
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import android.support.v4.app.Fragment;
-import android.widget.Toast;
 
-import com.crt.whuseats.Activity.AutoCreatSettingActivity;
-import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Activity.LoginActivity;
-import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Activity.SeatsActivity;
-import com.crt.whuseats.Activity.WebViewActivity;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
-import com.crt.whuseats.JsonModels.JsonModel_Base;
-import com.crt.whuseats.JsonModels.JsonModel_Tomorrow;
+import com.crt.whuseats.Activity.HomeActivity;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Service.BookService;
-import com.crt.whuseats.Utils.TimeHelp;
-
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,7 +19,7 @@ public class BookFragment extends Fragment
 //
 //
 //    //region 控件们
-//    public MainActivity ActivityConnect;
+    public HomeActivity ActivityConnect;
 //    private TextView tvBookinfoHouse;
 //    private TextView tvBookinfoRoom;
 //    private TextView tvBookinfoTime;
@@ -100,29 +73,27 @@ public class BookFragment extends Fragment
 //
 //
 //
-//    public BookFragment()
-//    {
-//        // Required empty public constructor
-//    }
+    public BookFragment()
+    {
+        // Required empty public constructor
+    }
 //
 //
 //
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState)
-//    {
-//        ActivityConnect=(MainActivity)getActivity();
-//        Intent bookService=new Intent(ActivityConnect, BookService.class);
-//        ActivityConnect.bindService(bookService, serviceConnection, Context.BIND_AUTO_CREATE);
-//        return inflater.inflate(R.layout.frag_book, container,false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        ActivityConnect=(HomeActivity)getActivity();
+
+        return inflater.inflate(R.layout.frag_book, container,false);
+
+    }
 //
-//    }
-//
-//    @Override
-//    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-//    {
-//        super.onViewCreated(view, savedInstanceState);
-//
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+
 //        //region 绑定控件和事件
 //        tvBookinfoHouse = (TextView) getView().findViewById(R.id.tv_bookinfo_house);
 //        tvBookinfoRoom = (TextView) getView().findViewById(R.id.tv_bookinfo_room);
@@ -159,16 +130,16 @@ public class BookFragment extends Fragment
 //            Intent intent=new Intent(ActivityConnect, AutoCreatSettingActivity.class);
 //            startActivity(intent);
 //        });
-//
-////        //云预约开关的事件
-////        swUsecloud.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked)->{
-////            Toast.makeText(ActivityConnect,"敬请期待~" , Toast.LENGTH_SHORT).show();
-////            buttonView.setChecked(false);
-////        });
-//
-//        //endregion
-//
-//        //创建的时候尝试各类初始化
+
+//        //云预约开关的事件
+//        swUsecloud.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked)->{
+//            Toast.makeText(ActivityConnect,"敬请期待~" , Toast.LENGTH_SHORT).show();
+//            buttonView.setChecked(false);
+//        });
+
+        //endregion
+
+        //创建的时候尝试各类初始化
 //        try
 //        {
 //            RefreshClockInfo();
@@ -179,8 +150,8 @@ public class BookFragment extends Fragment
 //        {
 //
 //        }
-//
-//    }
+
+    }
 //
 //    @Override
 //    public void onStart()

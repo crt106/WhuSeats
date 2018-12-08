@@ -5,11 +5,24 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <!--Android 5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色-->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        作者：扬州慢_
+        链接：https://www.jianshu.com/p/dc20e98b9a90
+        來源：简书
+        简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
     </style>
 
     <style name="MaterialNoActionBar" parent="Theme.Design.Light.NoActionBar">
-
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <!--Android 5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色-->
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
     <style name="AppTheme" parent="@style/AppBaseTheme" />
 
     <style name="CommonTitleBackground">

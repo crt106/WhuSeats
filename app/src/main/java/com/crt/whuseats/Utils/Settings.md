@@ -2,6 +2,7 @@
 - UserInfo(Editor)　<font color=green>userdata.xml</font>
   - `Username` 　　　　　　　　-用户名
   - `Password `　　　　　　　　-密码
+  - `IsAutoLogin` 　　　　　　-是否自动登录
   ---
 - ListenSetting(Editor) 　<font color=green>listendata.xml</font>
   - `DefaultBuilding`        -默认所在建筑ID

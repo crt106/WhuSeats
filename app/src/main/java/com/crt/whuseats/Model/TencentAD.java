@@ -1,4 +1,4 @@
-package com.crt.whuseats.Utils;
+package com.crt.whuseats.Model;
 
 public class TencentAD
 {

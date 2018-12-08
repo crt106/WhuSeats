@@ -1,41 +1,15 @@
 package com.crt.whuseats.Fragment;
 
-import android.app.AlertDialog;
-import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Switch;
-import android.widget.Toast;
 
-import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Activity.ListenActivity;
-import com.crt.whuseats.Activity.LoginActivity;
-import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Adapter.ListenItemAdapter;
-import com.crt.whuseats.Dialog.ChooseTimeDialog;
-import com.crt.whuseats.Dialog.CustomProgressDialog;
-import com.crt.whuseats.Dialog.SuccessDialog;
-import com.crt.whuseats.Interface.ListenSwitchChangeListener;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
-import com.crt.whuseats.JsonModels.JsonModel_MobileFiltrate;
-import com.crt.whuseats.Model.ListenDateType;
-import com.crt.whuseats.Model.ListenItem;
+import com.crt.whuseats.Activity.HomeActivity;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Service.NetService;
-import com.crt.whuseats.Task.ResultsTask;
-import com.crt.whuseats.Utils.TimeHelp;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ListenFragment extends Fragment
 {
@@ -54,8 +28,8 @@ public class ListenFragment extends Fragment
 //     */
 //    CustomProgressDialog progressDialog;
 //
-//    //与主活动的连接
-//    public MainActivity ActivityConnect;
+    //与主活动的连接
+    public HomeActivity ActivityConnect;
 //
 //    //适配器
 //    public ListenItemAdapter listenItemAdapter;
@@ -68,20 +42,20 @@ public class ListenFragment extends Fragment
 //        super();
 //    }
 //
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-//    {
-//        ActivityConnect=(MainActivity)getActivity();
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
+        ActivityConnect=(HomeActivity)getActivity();
 //        ListenItem.ReadFromFile(ActivityConnect);
+
+        return inflater.inflate(R.layout.frag_listen, container, false);
+    }
 //
-//        return inflater.inflate(R.layout.frag_listen, container, false);
-//    }
-//
-//    @Override
-//    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-//    {
-//        super.onViewCreated(view, savedInstanceState);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
 //        //region 获取控件以及绑定他们的事件们
 //        rcvListenrooms = (RecyclerView) getView().findViewById(R.id.rcv_listenrooms);
 //        btnAddroom = (Button) getView().findViewById(R.id.btn_addroom);
@@ -134,7 +108,7 @@ public class ListenFragment extends Fragment
 //
 //        //初始化完成之后的操作
 //        RefreshListenList();
-//    }
+    }
 //
 //    @Override
 //    public void onDestroyView()

@@ -57,6 +57,26 @@ public class Settings
         UserInfoEditor.apply();
     }
 
+
+    /**
+     * 获取是否自动登录
+     * @return
+     */
+    public boolean GetIsAutoLogin()
+    {
+        return UserInfo.getBoolean("IsAutoLogin", false);
+    }
+
+    /**
+     * 设置是否自动登录
+     * @param b
+     */
+    public void SetIsAutoLogin(boolean b)
+    {
+        UserInfoEditor.putBoolean("IsAutoLogin", b);
+        UserInfoEditor.apply();
+    }
+
     /**
      * 清除用户信息
      */

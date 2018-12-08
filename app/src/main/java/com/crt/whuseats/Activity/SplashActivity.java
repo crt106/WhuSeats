@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Utils.TencentAD;
+import com.crt.whuseats.Model.TencentAD;
 import com.qq.e.ads.splash.SplashAD;
 import com.qq.e.ads.splash.SplashADListener;
 import com.qq.e.comm.util.AdError;

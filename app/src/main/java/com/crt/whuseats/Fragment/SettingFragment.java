@@ -1,31 +1,17 @@
 package com.crt.whuseats.Fragment;
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Activity.WebViewActivity;
-import com.crt.whuseats.Dialog.LoadingDialog;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
-import com.crt.whuseats.Service.NetService;
+import com.crt.whuseats.Activity.HomeActivity;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Utils.UpdateHelp;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +22,7 @@ public class SettingFragment extends Fragment
 //
 //    //与Activity的连接
 //
-//    public MainActivity ActivityConnect;
+    public HomeActivity ActivityConnect;
 //
 ////    public EditText et_newSeatDelay;
 ////    public EditText et_startTimeDelay;
@@ -68,22 +54,21 @@ public class SettingFragment extends Fragment
 //    }
 //
 //
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState)
-//    {
-//        ActivityConnect=(MainActivity)getActivity();
-//        return  inflater.inflate(R.layout.frag_setting,container,false );
-//    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        ActivityConnect=(HomeActivity)getActivity();
+        return  inflater.inflate(R.layout.frag_setting,container,false );
+    }
 //
 //
 //    //在活动创建后调用控件以及注册啥的
 //
-//    @Override
-//    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-//    {
-//        super.onViewCreated(view, savedInstanceState);
-//
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+
 //        //获取控件
 //        et_bookDelay=(EditText)getView().findViewById(R.id.et_Delay_Book);
 //        et_DelayFiltrate = (EditText) getView().findViewById(R.id.et_Delay_Filtrate);
@@ -115,7 +100,7 @@ public class SettingFragment extends Fragment
 //        RefreshMoreFucMessage();
 //        //保存当前版本号
 //        BaseActivity.AppSetting.ListenSettingEditor.putInt("AppVersion",BaseActivity.VERSIONCODE);
-//    }
+    }
 //
 //    //导入已经保存的设置
 //    public void ImportDelaySetting()

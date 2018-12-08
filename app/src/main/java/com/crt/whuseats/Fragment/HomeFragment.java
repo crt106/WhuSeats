@@ -1,31 +1,15 @@
 package com.crt.whuseats.Fragment;
 
 
-import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.crt.whuseats.Activity.BaseActivity;
-import com.crt.whuseats.Activity.HistoryActivity;
-import com.crt.whuseats.Activity.LoginActivity;
-import com.crt.whuseats.Activity.MainActivity;
-import com.crt.whuseats.Activity.TimeChangeActivity;
-import com.crt.whuseats.Broadcast.ReservationChangeReciver;
-import com.crt.whuseats.Interface.onTaskResultReturn;
-import com.crt.whuseats.JsonModels.JsonHelp;
-import com.crt.whuseats.JsonModels.JsonModel_Base;
-import com.crt.whuseats.JsonModels.JsonModel_Reservations;
+import com.crt.whuseats.Activity.HomeActivity;
 import com.crt.whuseats.R;
-import com.crt.whuseats.Service.NetService;
 
 //主界面Fragment
 public class HomeFragment extends Fragment
@@ -40,8 +24,8 @@ public class HomeFragment extends Fragment
 //    public Button ButtonStop;
 //    public Button ButtonHistroy;
 //    public TextView tv_Reshow;
-//    //与主活动的连接
-//    public MainActivity ActivityConnect;
+    //与主活动的连接
+    public HomeActivity ActivityConnect;
 //
 //    public HomeFragment()
 //    {
@@ -49,18 +33,18 @@ public class HomeFragment extends Fragment
 //    }
 //
 //
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-//    {
-//        ActivityConnect=(MainActivity) getActivity();
-//        return inflater.inflate(R.layout.frag_home,container,false);
-//    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        ActivityConnect=(HomeActivity) getActivity();
+        return inflater.inflate(R.layout.frag_home,container,false);
+    }
 //
-//    @Override
-//    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-//    {
-//        super.onViewCreated(view, savedInstanceState);
-//
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+
 //        //region 获取可爱的控件们以及注册他们的事件
 //        ButtonCheckIn=(Button)getView().findViewById(R.id.btn_checkin);
 //        ButtonLeave=(Button)getView().findViewById(R.id.btn_leave_back);
@@ -108,7 +92,7 @@ public class HomeFragment extends Fragment
 //        //检查是不是新版本 然后来清除设置
 //        CheckIfNewVersion();
 //        RefreshRE();
-//    }
+    }
 //
 //    @Override
 //    public void onStart()
